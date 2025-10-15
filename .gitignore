@@ -45,3 +45,12 @@ packages/stripe-app/.build/*
 *.csv
 *.ndjson
 .vitest
+# Devenv
+.devenv*
+devenv.local.nix
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
