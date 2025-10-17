@@ -44,6 +44,11 @@ module.exports = withAxiom({
   webpack: (config, { webpack, isServer }) => {
     if (isServer) {
       config.plugins.push(
+        // strip Enterprise Edition routes from the server bundle
+        new webpack.IgnorePlugin({ resourceRegExp: /app\/\(ee\)\// }),
+      );
+
+      config.plugins.push(
         // mute errors for unused typeorm deps
         new webpack.IgnorePlugin({
           resourceRegExp:
