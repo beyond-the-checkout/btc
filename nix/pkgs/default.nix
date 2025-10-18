@@ -14,4 +14,8 @@
   # Droid (Factory AI CLI) - AI-powered development tool
   # Normally installed via: curl -fsSL https://app.factory.ai/cli | sh
   droid = pkgs.callPackage ./droid.nix { };
+
+  # Beads (bd) - Lightweight memory system for coding agents
+  # Normally installed via: curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/install.sh | bash
+  beads = pkgs.callPackage ./beads.nix { };
 }

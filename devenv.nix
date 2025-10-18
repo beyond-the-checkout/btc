@@ -43,6 +43,7 @@ in
   # customPkgs.tinybird  # TODO: Package not found on PyPI with version 3.0.0b50
   customPkgs.amp  # ✓ Working - npm package
   customPkgs.droid  # ✓ Working - binary download
+  customPkgs.beads  # Beads (bd) CLI - memory system for coding agents
   ];
   # graphql-scalars
   # type-graphql
@@ -92,6 +93,7 @@ in
     echo "Custom tools:"
     echo "  amp: $(amp --version 2>/dev/null || echo 'not available')"
     echo "  droid: $(droid --version 2>/dev/null || echo 'not available')"
+    echo "  bd: $(bd --version 2>/dev/null || echo 'not available')"
     # echo "  tb: $(tb --version 2>/dev/null || echo 'not available')"
 
     # Set DEVENV_PROFILE for Starship
