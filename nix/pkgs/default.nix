@@ -18,4 +18,8 @@
   # Beads (bd) - Lightweight memory system for coding agents
   # Normally installed via: curl -fsSL https://raw.githubusercontent.com/steveyegge/beads/main/install.sh | bash
   beads = pkgs.callPackage ./beads.nix { };
+
+  # Linearis - CLI tool for Linear.app with JSON output
+  # Normally installed via: npm install -g --install-links czottmann/linearis
+  linearis = pkgs.callPackage ./linearis.nix { };
 }
