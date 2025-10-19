@@ -38,7 +38,7 @@ export const FEATURES = {
    * partner management components). Disable to remove all partner program UI
    * surface area deployment-wide.
    */
-  partnerProgram: true,
+  partnerProgram: false,
   /**
    * Governs availability of the core short links product (links list, folders,
    * analytics). Disable when running Dub without the link shortener experience.
