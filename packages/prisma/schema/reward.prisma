@@ -1,3 +1,7 @@
+// DEPRECATED: Reward Schema (Partner Program)
+// This schema is deprecated and should not be used in new code.
+// Kept for safe rollback during platform refactor (Initial_platform_refactor.md section 1.2).
+
 enum EventType {
   click
   lead

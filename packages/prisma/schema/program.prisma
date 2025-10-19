@@ -1,3 +1,7 @@
+// DEPRECATED: Program Schema (Partner Program)
+// This schema is deprecated and should not be used in new code.
+// Kept for safe rollback during platform refactor (Initial_platform_refactor.md section 1.2).
+
 enum ProgramEnrollmentStatus {
   pending // pending applications that need approval
   approved // partner who has been approved/actively enrolled

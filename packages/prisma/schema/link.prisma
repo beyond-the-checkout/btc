@@ -33,7 +33,7 @@ model Link {
   android String? @db.Text // custom link for Android devices
   geo     Json?   @db.Json // custom link for specific countries
 
-  // A/B Testing
+  // A/B Testing - DEPRECATED (do not use in new code, kept for safe rollback)
   testVariants    Json?     @db.Json
   testStartedAt   DateTime? // When tests were started
   testCompletedAt DateTime? // When tests were or will be completed
@@ -80,6 +80,7 @@ model Link {
 
   dashboard Dashboard?
 
+  // Partner Program Relations - DEPRECATED (do not use in new code, kept for safe rollback)
   programId                 String?
   program                   Program?                 @relation(fields: [programId], references: [id])
   partnerId                 String?
