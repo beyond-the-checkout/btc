@@ -1,6 +1,5 @@
 import { cn, createHref } from "@dub/utils";
 import { Link as NavigationMenuLink } from "@radix-ui/react-navigation-menu";
-import Image from "next/image";
 import Link from "next/link";
 import { CSSProperties } from "react";
 import { Grid } from "../..";
@@ -17,9 +16,9 @@ const products = [
         <DubLinksIcon className="size-2.5 text-orange-900" />
       </div>
     ),
-    title: "Dynamic QR Campaigns",
-    description: "Create and manage QR codes at scale for your products.",
-    href: "/campaigns",
+    title: "Static QR codes",
+    description: "Simple, permanent QR codes for packaging.",
+    href: "/qr-codes/static",
     color: "#f4950c",
     graphicsContainerClassName: "px-2",
     graphic: <LinksGraphic className="absolute left-0 top-0 h-auto w-full" />,
@@ -30,9 +29,9 @@ const products = [
         <DubAnalyticsIcon className="size-2.5 text-green-900" />
       </div>
     ),
-    title: "Analytics Dashboard",
-    description: "Real-time engagement and conversion metrics.",
-    href: "/analytics",
+    title: "Dynamic QR codes",
+    description: "Updateable QR codes with tracking and analytics.",
+    href: "/qr-codes/dynamic",
     color: "#36D78F",
     graphicsContainerClassName: "h-[170%] bottom-0 top-[unset]",
     graphic: (
@@ -45,39 +44,12 @@ const products = [
         <DubPartnersIcon className="size-2.5 text-violet-900" />
       </div>
     ),
-    title: "Bitcoin Rewards",
-    description: "Instant incentives via Lightning Network.",
-    href: "/rewards",
+    title: "Incentive QR codes",
+    description: "Reward customers with Bitcoin via Lightning Network.",
+    href: "/qr-codes/incentive",
     color: "#818cf8",
     graphicsContainerClassName: "pl-2",
     graphic: <PartnersGraphic />,
-  },
-];
-
-const largeLinks = [
-  {
-    title: "Integrations",
-    description: "Connect with packaging partners",
-    href: "/integrations",
-    graphic: (
-      <div className="absolute -right-4 top-1/2 h-[180px] w-[240px] -translate-y-1/2 [mask-image:linear-gradient(90deg,black_50%,transparent_95%)] dark:opacity-80">
-        <Image
-          src="https://assets.dub.co/misc/integrations-grid.png"
-          alt=""
-          fill
-        />
-      </div>
-    ),
-  },
-  {
-    title: "Developer API",
-    description: "Integrate with your workflow",
-    href: "/docs/api-reference/introduction",
-    graphic: (
-      <div className="absolute -right-4 top-2.5 h-[180px] w-[240px] [mask-image:linear-gradient(90deg,black_50%,transparent_95%)] dark:opacity-60">
-        <Image src="https://assets.dub.co/misc/api-thumbnail.png" alt="" fill />
-      </div>
-    ),
   },
 ];
 
@@ -140,42 +112,6 @@ export function ProductContent({ domain }: { domain: string }) {
             </NavigationMenuLink>
           ),
         )}
-      </div>
-      <div className="grid grow grid-cols-2 gap-4">
-        {largeLinks.map(({ title, description, href, graphic }) => (
-          <NavigationMenuLink asChild key={title}>
-            <Link
-              href={createHref(
-                href,
-                domain,
-                getUtmParams({ domain, utm_content: title }),
-              )}
-              className="group relative flex flex-col justify-center rounded-xl border border-neutral-100 bg-neutral-50 transition-colors duration-150 hover:bg-neutral-100 active:bg-neutral-200 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/15 dark:active:bg-white/20"
-            >
-              <Grid
-                className="[mask-image:linear-gradient(90deg,transparent,black)] dark:text-white/5"
-                cellSize={60}
-                patternOffset={[-39, -49]}
-              />
-              <div
-                className="pointer-events-none absolute inset-0 overflow-hidden"
-                aria-hidden
-              >
-                {graphic}
-              </div>
-              <div className="relative flex items-center justify-between px-5 py-4">
-                <div>
-                  <span className="text-sm font-medium leading-none text-neutral-900 dark:text-white">
-                    {title}
-                  </span>
-                  <p className="mt-1 text-sm text-neutral-500 dark:text-white/60">
-                    {description}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </NavigationMenuLink>
-        ))}
       </div>
     </div>
   );

@@ -8,13 +8,12 @@ import { useParams, usePathname } from "next/navigation";
 import { PropsWithChildren, SVGProps, createContext, useId } from "react";
 import useSWR from "swr";
 import { buttonVariants } from "../button";
-import { FEATURES_LIST, RESOURCES, SOLUTIONS } from "../content";
+import { FEATURES_LIST, RESOURCES } from "../content";
 import { useScroll } from "../hooks";
 import { MaxWidthWrapper } from "../max-width-wrapper";
 import { NavWordmark } from "../nav-wordmark";
 import { ProductContent } from "./content/product-content";
 import { ResourcesContent } from "./content/resources-content";
-import { SolutionsContent } from "./content/solutions-content";
 
 export type NavTheme = "light" | "dark";
 
@@ -37,12 +36,6 @@ export const navItems = [
     ],
   },
   {
-    name: "Solutions",
-    content: SolutionsContent,
-    childItems: SOLUTIONS,
-    segments: ["/solutions", "/sdks"],
-  },
-  {
     name: "Resources",
     content: ResourcesContent,
     childItems: RESOURCES,
@@ -56,11 +49,6 @@ export const navItems = [
       "/changelog",
       "/contact",
     ],
-  },
-  {
-    name: "Enterprise",
-    href: "/enterprise",
-    segments: ["/enterprise"],
   },
   {
     name: "Customers",
