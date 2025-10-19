@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|mcp__repo_prompt__apply_edits",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/ts_validator.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}
