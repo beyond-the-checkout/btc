@@ -20,23 +20,22 @@ export function FeaturesSection({
     <div className="mt-20">
       <div className="mx-auto w-full max-w-xl px-4 text-center">
         <div className="mx-auto flex h-7 w-fit items-center rounded-full border border-neutral-200 bg-white px-4 text-xs text-neutral-800">
-          What is Dub?
+          Platform Features
         </div>
         <h2 className="font-display mt-2 text-balance text-3xl font-medium text-neutral-900">
-          Powerful features for modern marketing teams
+          Everything you need to turn packages into performance media
         </h2>
         <p className="mt-3 text-pretty text-lg text-neutral-500">
-          Dub is more than just a link shortener. We've built a suite of
-          powerful features that gives you marketing superpowers.
+          Beyond The Checkout combines dynamic QR codes, instant Bitcoin rewards, and real-time analytics to transform your packaging into an engagement channel.
         </p>
       </div>
       <div className="mx-auto mt-14 grid w-full max-w-screen-lg grid-cols-1 px-4 sm:grid-cols-2">
         <div className="contents divide-neutral-200 max-sm:divide-y sm:divide-x">
           <FeatureCard
-            title="Stand out with custom domains"
-            description="Create branded short links with your own domain and [improve click-through rates by 30%](/blog/custom-domains). Paid plans also include a [complimentary custom domain](/help/article/free-dot-link-domain)."
+            title="Dynamic QR at scale"
+            description="Create, version, and update codes per SKU, lot, or region—no reprint required. Manage thousands of unique QR codes with variable data printing support."
             linkText="Learn more"
-            href={createHref("/help/article/how-to-add-custom-domain", domain, {
+            href={createHref("/help/article/dynamic-qr-codes", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
@@ -45,8 +44,8 @@ export function FeaturesSection({
             <Domains />
           </FeatureCard>
           <FeatureCard
-            title="Branded QR codes"
-            description="QR codes and short links are like peas in a pod. Dub offers free QR codes for every short link you create. Feeling artsy? [Customize them with your own logo](/help/article/custom-qr-codes)."
+            title="Instant Bitcoin rewards"
+            description="Automated micropayments in sats via Lightning Network. We handle all crypto operations—no wallets or technical setup needed on your end."
             linkText="Try the demo"
             href={createHref("/tools/qr-code", domain, {
               utm_campaign: domain,
@@ -61,8 +60,8 @@ export function FeaturesSection({
         <FeatureCard
           className="border-y border-neutral-200 pt-12 sm:col-span-2"
           graphicClassName="sm:h-96"
-          title="Analytics that matter"
-          description="Dub provides powerful analytics for your links, including geolocation, device, browser, and referrer information."
+          title="Real-time analytics"
+          description="Track scans, plays, claims, cohorts, and SKU performance. Monitor repeat purchase signals and measure campaign ROI down to the product level."
           linkText="Explore analytics"
           href={createHref("/help/article/dub-analytics", domain, {
             utm_campaign: domain,
@@ -79,19 +78,20 @@ export function FeaturesSection({
               <Analytics />
             </div>
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <span className="flex items-center text-sm font-medium text-slate-900">
+              <span className="flex items-center text-sm font-medium text-content-emphasis">
                 View live demo <ExpandingArrow className="size-4" />
               </span>
             </div>
           </a>
         </FeatureCard>
 
-        <div className="contents divide-neutral-200 max-sm:divide-y sm:divide-x [&>*]:border-t [&>*]:border-neutral-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t border-neutral-200">
           <FeatureCard
-            title="Advanced link features"
-            description="Supercharge your links with [custom link previews](/help/article/custom-link-previews), [device targeting](/help/article/device-targeting), [geo targeting](/help/article/geo-targeting), [link cloaking](/help/article/link-cloaking), [password protection](/help/article/password-protected-links), and more."
+            className="border-r-0 sm:border-r lg:border-r border-neutral-200"
+            title="10-second micro-games"
+            description="Tap-to-win games built for mobile attention spans. Customize themes and mechanics to match your brand identity and campaign goals."
             linkText="Learn more"
-            href={createHref("/help/article/how-to-create-link", domain, {
+            href={createHref("/help/article/micro-games", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
@@ -100,16 +100,29 @@ export function FeaturesSection({
             <Personalization />
           </FeatureCard>
           <FeatureCard
-            title="Collaborate with your team"
-            description="Invite your teammates to collaborate on your links. For [enterprises](/enterprise), Dub offers [SAML SSO](/help/category/saml-sso) with Okta, Google, and Azure AD for higher security."
+            className="border-r-0 lg:border-r border-neutral-200"
+            title="Compliance-ready"
+            description="Built-in consent flows, reward limits, and regional toggles. Designed to support regulations including EU Digital Product Passport requirements."
             linkText="Learn more"
-            href={createHref("/help/article/how-to-invite-teammates", domain, {
+            href={createHref("/help/article/compliance", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
             })}
           >
             <Collaboration />
+          </FeatureCard>
+          <FeatureCard
+            title="Packaging workflow friendly"
+            description="Export vector assets, variable data printing support, and printer partner integrations. Fits seamlessly into your existing packaging production process."
+            linkText="Learn more"
+            href={createHref("/help/article/packaging-workflow", domain, {
+              utm_campaign: domain,
+              utm_content: "Learn more",
+              ...utmParams,
+            })}
+          >
+            <Domains />
           </FeatureCard>
         </div>
       </div>

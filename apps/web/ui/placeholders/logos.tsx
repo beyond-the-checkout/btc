@@ -47,7 +47,7 @@ export default function Logos({
       {copy !== null && (
         <p
           className={cn(
-            "mx-auto max-w-sm text-balance text-center text-sm text-slate-500",
+            "mx-auto max-w-sm text-balance text-center text-sm text-content-subtle",
             variant === "default"
               ? "transition-[filter,opacity] duration-300 group-hover:opacity-30 group-hover:blur-sm sm:max-w-xl"
               : "sm:text-left",
@@ -88,7 +88,7 @@ export default function Logos({
         ))}
       </div>
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <span className="flex items-center text-sm font-medium text-slate-900">
+        <span className="flex items-center text-sm font-medium text-content-emphasis">
           See more of our fantastic customers{" "}
           <ExpandingArrow className="size-4" />
         </span>

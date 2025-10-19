@@ -29,8 +29,8 @@ const RATINGS = [
 export function CTA({
   domain,
   utmParams,
-  title = "Supercharge your marketing efforts",
-  subtitle = "See why Dub is the link management platform of choice for modern marketing teams.",
+  title = "Make your next print run your best performing channel",
+  subtitle = "Run a pilot on one SKU and see real lifts in engagement and first-party data—without changing your martech stack.",
   className,
 }: {
   domain: string;
@@ -101,18 +101,18 @@ export function CTA({
 
       <div className="relative mx-auto mt-10 flex max-w-fit space-x-4">
         <ButtonLink variant="primary" href="https://app.dub.co/register">
-          Start for free
+          Get a Live Demo
         </ButtonLink>
         <ButtonLink
           variant="secondary"
-          href={createHref("/enterprise", domain, {
+          href={createHref("/demo", domain, {
             utm_source: "Custom Domain",
             utm_medium: "Welcome Page",
             utm_campaign: domain,
-            utm_content: "Get a demo",
+            utm_content: "Try Free QR Demo",
           })}
         >
-          Get a demo
+          Try Free QR Demo
         </ButtonLink>
       </div>
 

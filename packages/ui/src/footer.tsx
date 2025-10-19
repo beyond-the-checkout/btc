@@ -47,7 +47,7 @@ const socials = [
 
 const navigation = {
   product: [
-    ...FEATURES_LIST.filter(({ title }) => title !== "Dub Integrations").map(
+    ...FEATURES_LIST.filter(({ id }) => id !== "integrations").map(
       ({ id, title, href }) => ({
         id,
         name: title,

@@ -17,9 +17,9 @@ const products = [
         <DubLinksIcon className="size-2.5 text-orange-900" />
       </div>
     ),
-    title: "Dub Links",
-    description: "Short links with superpowers for modern marketing teams.",
-    href: "/links",
+    title: "Dynamic QR Campaigns",
+    description: "Create and manage QR codes at scale for your products.",
+    href: "/campaigns",
     color: "#f4950c",
     graphicsContainerClassName: "px-2",
     graphic: <LinksGraphic className="absolute left-0 top-0 h-auto w-full" />,
@@ -30,8 +30,8 @@ const products = [
         <DubAnalyticsIcon className="size-2.5 text-green-900" />
       </div>
     ),
-    title: "Dub Analytics",
-    description: "Powerful analytics delivered instantly.",
+    title: "Analytics Dashboard",
+    description: "Real-time engagement and conversion metrics.",
     href: "/analytics",
     color: "#36D78F",
     graphicsContainerClassName: "h-[170%] bottom-0 top-[unset]",
@@ -45,9 +45,9 @@ const products = [
         <DubPartnersIcon className="size-2.5 text-violet-900" />
       </div>
     ),
-    title: "Dub Partners",
-    description: "Grow your revenue on auto-pilot with partnerships.",
-    href: "/partners",
+    title: "Bitcoin Rewards",
+    description: "Instant incentives via Lightning Network.",
+    href: "/rewards",
     color: "#818cf8",
     graphicsContainerClassName: "pl-2",
     graphic: <PartnersGraphic />,
@@ -56,8 +56,8 @@ const products = [
 
 const largeLinks = [
   {
-    title: "Dub Integrations",
-    description: "Enhance your short links",
+    title: "Integrations",
+    description: "Connect with packaging partners",
     href: "/integrations",
     graphic: (
       <div className="absolute -right-4 top-1/2 h-[180px] w-[240px] -translate-y-1/2 [mask-image:linear-gradient(90deg,black_50%,transparent_95%)] dark:opacity-80">
@@ -70,8 +70,8 @@ const largeLinks = [
     ),
   },
   {
-    title: "Dub API",
-    description: "Unlock further capabilities",
+    title: "Developer API",
+    description: "Integrate with your workflow",
     href: "/docs/api-reference/introduction",
     graphic: (
       <div className="absolute -right-4 top-2.5 h-[180px] w-[240px] [mask-image:linear-gradient(90deg,black_50%,transparent_95%)] dark:opacity-60">

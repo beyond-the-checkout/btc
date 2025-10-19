@@ -34,7 +34,7 @@ export default function PlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            Welcome to Dub
+            Turn every scan into a reward
           </h1>
           <p
             className={cn(
@@ -42,8 +42,7 @@ export default function PlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            This custom domain is powered by Dub &ndash; the link management
-            platform designed for modern marketing teams.
+            Beyond The Checkout makes your packaging playable. Customers scan a dynamic QR and win real Bitcoin—while you capture rich post-purchase data.
           </p>
         </div>
 
@@ -54,17 +53,17 @@ export default function PlaceholderContent() {
           )}
         >
           <ButtonLink variant="primary" href="https://app.dub.co/register">
-            Try Dub today
+            Get a Live Demo
           </ButtonLink>
           <ButtonLink
             variant="secondary"
             href={createHref("/links", domain, {
               ...UTM_PARAMS,
               utm_campaign: domain,
-              utm_content: "Learn more",
+              utm_content: "Try Free QR Demo",
             })}
           >
-            Learn more
+            Try Free QR Demo
           </ButtonLink>
         </div>
       </Hero>

@@ -3,6 +3,7 @@ import { DubAnalyticsIcon } from "./dub-analytics";
 import { DubApiIcon } from "./dub-api";
 import { DubLinksIcon } from "./dub-links";
 import { DubPartnersIcon } from "./dub-partners";
+import { Toggle2Fill } from "./nucleo/toggle2-fill";
 
 const icons = {
   links: {
@@ -19,6 +20,10 @@ const icons = {
   },
   api: {
     icon: DubApiIcon,
+    className: "text-neutral-900 bg-neutral-400",
+  },
+  integrations: {
+    icon: Toggle2Fill,
     className: "text-neutral-900 bg-neutral-400",
   },
 };
