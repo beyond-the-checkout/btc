@@ -39,10 +39,11 @@ export function NavWordmark({
 
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
-  const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsPopoverOpen(true);
-  }, []);
+  // TEMPORARILY DISABLED: Right-click context menu for logo
+  // const handleContextMenu = useCallback((e: MouseEvent<HTMLDivElement>) => {
+  //   e.preventDefault();
+  //   setIsPopoverOpen(true);
+  // }, []);
 
   const [, copyToClipboard] = useCopyToClipboard();
 
@@ -56,8 +57,17 @@ export function NavWordmark({
   return (
     <Popover.Root open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
       <Popover.Anchor asChild>
-        <div onContextMenu={handleContextMenu} className="max-w-fit">
-          {variant === "full" ? (
+        <div className="max-w-fit">
+          {/* NEW: Using Beyond The Checkout QR code logo */}
+          <img
+            src="/logos/beyond-the-checkout-logo.png"
+            alt="Beyond The Checkout"
+            width={40}
+            height={40}
+            className={cn("h-10 w-10 object-contain", className)}
+          />
+          {/* ORIGINAL LOGO (commented out) */}
+          {/* {variant === "full" ? (
             <Wordmark className={className} />
           ) : (
             <Logo
@@ -66,10 +76,11 @@ export function NavWordmark({
                 className,
               )}
             />
-          )}
+          )} */}
         </div>
       </Popover.Anchor>
-      <Popover.Portal>
+      {/* CONTEXT MENU TEMPORARILY DISABLED */}
+      {/* <Popover.Portal>
         <Popover.Content
           sideOffset={14}
           align="start"
@@ -102,7 +113,6 @@ export function NavWordmark({
               onClick={() => window.open("https://dub.co/brand", "_blank")}
               icon={<BoxSelect strokeWidth={2} className="h-4 w-4" />}
             />
-            {/* If it's in the app or it's a domain placeholder page (not dub.co homepage), show the home button */}
             {isInApp || domain != "dub.co" ? (
               <ContextMenuButton
                 text="Home Page"
@@ -125,7 +135,7 @@ export function NavWordmark({
             )}
           </div>
         </Popover.Content>
-      </Popover.Portal>
+      </Popover.Portal> */}
     </Popover.Root>
   );
 }

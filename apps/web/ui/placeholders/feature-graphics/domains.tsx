@@ -35,7 +35,14 @@ export function Domains() {
               style={{ "--idx": idx } as CSSProperties}
             >
               <div className="flex-none rounded-full border border-neutral-200 bg-gradient-to-t from-neutral-100 p-2">
-                <LinkLogo apexDomain="dub.co" className="size-6 sm:size-6" />
+                {/* NEW: Using Beyond The Checkout QR code logo */}
+                <img
+                  src="/logos/beyond-the-checkout-logo.png"
+                  alt="Beyond The Checkout"
+                  className="size-6 sm:size-6 object-contain"
+                />
+                {/* ORIGINAL LOGO (commented out) */}
+                {/* <LinkLogo apexDomain="dub.co" className="size-6 sm:size-6" /> */}
               </div>
 
               <span className="text-base font-medium text-neutral-900">
