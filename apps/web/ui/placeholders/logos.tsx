@@ -2,27 +2,57 @@ import { ExpandingArrow } from "@dub/ui";
 import { cn, createHref, UTMTags } from "@dub/utils";
 import Link from "next/link";
 
+// TODO: Move these logo images from the checkout.tech CDN to a dedicated assets CDN
+// Currently loading from: https://checkout.tech/_next/image/...
+// Should move to: https://assets.checkout.tech/partners/ or similar
 const logos = [
-  "cal",
-  "framer",
-  "twilio",
-  "hubermanlab",
-  "vercel",
-  "perplexity",
-  "raycast",
-  "clerk",
-  "whop",
-  "viator",
-  "sketch",
-  "supabase",
-  "hashnode",
+  {
+    name: "fmk",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FFMK%2FFMK_Logo.webp&w=384&q=75",
+    href: "https://www.freemarketkids.com/",
+  },
+  {
+    name: "foundation",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2Ffoundation_brand.png&w=384&q=75",
+    href: "https://foundation.xyz/",
+  },
+  {
+    name: "btc-tc",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FBTC-TC%2FBTC-TC_Gold-Black.jpg&w=384&q=75",
+    href: "https://btc-tc.com/",
+  },
+  {
+    name: "shamory",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FShamory%2FShamoryLogo.jpg&w=384&q=75",
+    href: "https://shamory.com/",
+  },
+  {
+    name: "panties4bitcoin",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2FP4B_RoundLogo.png&w=384&q=75",
+    href: "https://www.pantiesforbitcoin.com/",
+  },
+  {
+    name: "nihowdy",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2F241120_NiHowdy_Logo.png&w=384&q=75",
+    href: "https://nihowdy.com/",
+  },
+  {
+    name: "proofofpod",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2FProofOfPod_Logo.png&w=384&q=75",
+    href: "https://www.youtube.com/@ProofofPod",
+  },
+  {
+    name: "jippi",
+    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2FJippi_Logo.png&w=384&q=75",
+    href: "https://jippi.app/",
+  },
 ];
 
 export default function Logos({
   domain,
   utmParams,
   variant = "default",
-  copy = "Giving marketing superpowers to world-class companies",
+  copy = "Trusted by our partners",
   className,
 }: {
   domain: string;
@@ -69,19 +99,13 @@ export default function Logos({
           >
             {logos.map((logo) => (
               <img
-                key={logo}
-                src={`https://assets.dub.co/clients/${logo}.svg`}
-                alt={logo.toUpperCase()}
-                width={520}
-                height={182}
+                key={logo.name}
+                src={logo.url}
+                alt={logo.name.toUpperCase()}
+                width={180}
+                height={180}
                 draggable={false}
-                className={cn(
-                  "h-12 w-auto",
-                  logo === "cal" && "-mx-5 h-14",
-                  logo === "viator" && "h-11",
-                  logo === "perplexity" && "h-14",
-                  logo === "hubermanlab" && "h-14",
-                )}
+                className="size-12 object-contain"
               />
             ))}
           </div>
@@ -89,7 +113,7 @@ export default function Logos({
       </div>
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
         <span className="flex items-center text-sm font-medium text-content-emphasis">
-          See more of our fantastic customers{" "}
+          See more of our partners{" "}
           <ExpandingArrow className="size-4" />
         </span>
       </div>
