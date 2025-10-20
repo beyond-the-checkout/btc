@@ -81,9 +81,17 @@ export function Nav({
   staticDomain?: string;
   maxWidthWrapperClassName?: string;
 }) {
-  let { domain = "dub.co" } = useParams() as { domain: string };
+  let { domain } = useParams() as { domain: string };
+
   if (staticDomain) {
     domain = staticDomain;
+  } else if (!domain) {
+    // Use environment variable or throw error
+    const defaultDomain = process.env.NEXT_PUBLIC_DEFAULT_DOMAIN;
+    if (!defaultDomain) {
+      throw new Error("NEXT_PUBLIC_DEFAULT_DOMAIN environment variable is required when no domain parameter is present");
+    }
+    domain = defaultDomain;
   }
 
   const layoutGroupId = useId();
