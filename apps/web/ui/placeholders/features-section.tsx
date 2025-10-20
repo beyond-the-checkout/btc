@@ -85,7 +85,7 @@ export function FeaturesSection({
           </a>
         </FeatureCard>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t border-neutral-200">
+        <div className="grid grid-cols-1 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3 border-t border-neutral-200">
           <FeatureCard
             className="border-r-0 sm:border-r lg:border-r border-neutral-200"
             title="10-second micro-games"
