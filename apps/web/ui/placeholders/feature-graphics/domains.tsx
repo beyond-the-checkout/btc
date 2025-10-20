@@ -1,20 +1,20 @@
-import { CursorRays, FlagWavy, LinkLogo } from "@dub/ui";
+import { QRCode, FlagWavy, LinkLogo } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { CSSProperties } from "react";
 
 const DOMAINS = [
   {
-    domain: "acme.co",
-    clicks: "15.6K",
+    domain: "chko.sh",
+    scans: "15.6K",
     primary: true,
   },
   {
-    domain: "acme.li",
-    clicks: "3.7K",
+    domain: "chko.sh",
+    scans: "3.7K",
   },
   {
-    domain: "acme.me",
-    clicks: "2.4K",
+    domain: "chko.sh",
+    scans: "2.4K",
   },
 ];
 
@@ -22,7 +22,7 @@ export function Domains() {
   return (
     <div className="flex size-full flex-col justify-center" aria-hidden>
       <div className="flex flex-col gap-2.5 [mask-image:linear-gradient(90deg,black_70%,transparent)]">
-        {DOMAINS.map(({ domain, clicks, primary }, idx) => (
+        {DOMAINS.map(({ domain, scans, primary }, idx) => (
           <div
             key={domain}
             className="transition-transform duration-300 hover:translate-x-[-2%]"
@@ -43,10 +43,10 @@ export function Domains() {
               </span>
 
               <div className="ml-2 flex items-center gap-x-1 rounded-md border border-neutral-200 bg-neutral-50 px-2 py-[0.2rem]">
-                <CursorRays className="h-4 w-4 text-neutral-700" />
+                <QRCode className="h-4 w-4 text-neutral-700" />
                 <div className="flex items-center whitespace-nowrap text-sm text-neutral-500">
-                  {clicks}
-                  <span className="ml-1 hidden sm:inline-block">clicks</span>
+                  {scans}
+                  <span className="ml-1 hidden sm:inline-block">scans</span>
                 </div>
               </div>
 
