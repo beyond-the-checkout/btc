@@ -26,22 +26,17 @@ const socials = [
   {
     name: "Twitter",
     icon: Twitter,
-    href: "https://twitter.com/dubdotco",
+    href: "https://x.com/BTCheckoutTech",
   },
   {
     name: "LinkedIn",
     icon: LinkedIn,
-    href: "https://www.linkedin.com/company/dubinc",
+    href: "https://www.linkedin.com/company/beyond-the-checkout-inc",
   },
   {
     name: "GitHub",
     icon: Github,
-    href: "https://github.com/dubinc/dub",
-  },
-  {
-    name: "YouTube",
-    icon: YouTube,
-    href: "https://www.youtube.com/@dubdotco",
+    href: "https://github.com/beyond-the-checkout",
   },
 ];
 
@@ -54,28 +49,18 @@ const navigation = {
         href,
       }),
     ),
-    { id: null, name: "Dub Enterprise", href: "/enterprise" },
   ],
   solutions: [
-    { name: "Marketing attribution", href: "/analytics" },
-    { name: "Content creators", href: "/solutions/creators" },
-    { name: "Affiliate management", href: "/partners" },
+    { name: "Physical packaging", href: "/solutions/physical-packaging" },
   ],
   resources: [
     { name: "Docs", href: "/docs/introduction" },
     { name: "Help Center", href: "/help" },
-    { name: "Integrations", href: "/integrations" },
     { name: "Pricing", href: "/pricing" },
-    {
-      name: "Affiliates",
-      href: "https://partners.dub.co/dub",
-      target: "_blank",
-    },
   ],
   company: [
     { name: "About", href: "/about" },
     { name: "Blog", href: "/blog" },
-    { name: "Careers", href: "/careers" },
     { name: "Changelog", href: "/changelog" },
     { name: "Customers", href: "/customers" },
     { name: "Brand", href: "/brand" },
@@ -86,16 +71,7 @@ const navigation = {
     name,
     href: `/compare/${slug}`,
     product: "links",
-  })).concat(
-    ["Rewardful", "PartnerStack", "FirstPromoter", "Tolt"].map((name) => ({
-      name,
-      href:
-        name === "Rewardful"
-          ? "/blog/dub-vs-rewardful"
-          : `/help/article/migrating-from-${name.toLowerCase()}`,
-      product: "partners",
-    })),
-  ),
+  })),
 };
 
 const linkListHeaderClassName = "text-sm font-medium text-neutral-900";
@@ -217,11 +193,9 @@ export function Footer({
                           utm_campaign: domain,
                           utm_content: item.name,
                         })}
-                        target={item.target}
-                        className={cn(linkListItemClassName, "gap-1")}
+                        className={linkListItemClassName}
                       >
                         {item.name}
-                        {item.target && <ReferredVia className="size-3.5" />}
                       </Link>
                     </li>
                   ))}
