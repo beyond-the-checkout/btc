@@ -1,4 +1,6 @@
 import { getQRAsCanvas, getQRAsSVGDataUri, getQRData, DotType } from "@/lib/qr";
+import { DOT_TYPES } from "@/lib/qr/constants";
+import { generatePath } from "@/lib/qr/utils";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
@@ -55,6 +57,42 @@ const DEFAULT_COLORS = [
   "#2146B7",
   "#AE49BF",
 ];
+
+// Pattern preview using actual QR rendering functions
+function PatternPreview({ pattern, color }: { pattern: DotType; color: string }) {
+  const size = 32;
+
+  // Create a small module grid with an S-pattern to demonstrate the pattern style
+  // X X X
+  // X
+  //   X
+  // X X X
+  const modules: boolean[][] = [
+    [true,  true,  true],
+    [true,  false, false],
+    [false, true,  false],
+    [true,  true,  true],
+  ];
+
+  // Use the actual generatePath function from our QR rendering
+  const path = generatePath(modules, 0, pattern);
+
+  const viewBoxSize = 3;
+  const viewBoxHeight = 4;
+  const padding = 0.2;
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`${-padding} ${-padding} ${viewBoxSize + padding * 2} ${viewBoxHeight + padding * 2}`}
+      fill="none"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <path d={path} fill={color} />
+    </svg>
+  );
+}
 
 export type QRCodeDesign = {
   fgColor: string;
@@ -249,6 +287,7 @@ function LinkQRModalInner({
                   hideLogo={data.hideLogo}
                   logo={logo}
                   scale={1}
+                  dotsOptions={{ type: data.dotType }}
                 />
               </motion.div>
             </AnimatePresence>
@@ -297,6 +336,46 @@ function LinkQRModalInner({
             ) : undefined
           }
         />
+      </div>
+
+      {/* Dot Pattern selector */}
+      <div>
+        <span className="block text-sm font-medium text-neutral-700">
+          Dot Pattern
+        </span>
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          {DOT_TYPES.map((pattern) => {
+            const isSelected = data.dotType === pattern;
+            const patternLabels: Record<DotType, string> = {
+              square: "Square",
+              rounded: "Rounded",
+              dots: "Dots",
+              classy: "Classy",
+              "extra-rounded": "Extra Rounded",
+            };
+            return (
+              <Tooltip
+                key={pattern}
+                content={patternLabels[pattern]}
+              >
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  aria-label={`Select ${patternLabels[pattern]} pattern`}
+                  onClick={() => setData((d) => ({ ...d, dotType: pattern }))}
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    isSelected
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                  )}
+                >
+                  <PatternPreview pattern={pattern} color={data.fgColor} />
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
       </div>
 
       {/* Color selector */}
