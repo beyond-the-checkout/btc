@@ -1,6 +1,7 @@
 import qrcodegen from "./codegen";
 import {
   DEFAULT_BGCOLOR,
+  DEFAULT_DOT_TYPE,
   DEFAULT_FGCOLOR,
   DEFAULT_LEVEL,
   DEFAULT_MARGIN,
@@ -19,6 +20,7 @@ export async function getQRAsSVG(props: QRPropsSVG) {
     fgColor = DEFAULT_FGCOLOR,
     margin = DEFAULT_MARGIN,
     imageSettings,
+    dotsOptions,
     ...otherProps
   } = props;
 
@@ -63,7 +65,8 @@ export async function getQRAsSVG(props: QRPropsSVG) {
   // way faster than DOM ops.
   // For level 1, 441 nodes -> 2
   // For level 40, 31329 -> 2
-  const fgPath = generatePath(cells, margin);
+  const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  const fgPath = generatePath(cells, margin, dotType);
 
   return (
     <svg

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, type JSX } from "react";
 import qrcodegen from "./codegen";
 import {
   DEFAULT_BGCOLOR,
+  DEFAULT_DOT_TYPE,
   DEFAULT_FGCOLOR,
   DEFAULT_LEVEL,
   DEFAULT_MARGIN,
@@ -168,6 +169,7 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     fgColor = DEFAULT_FGCOLOR,
     margin = DEFAULT_MARGIN,
     imageSettings,
+    dotsOptions,
   } = props;
 
   let cells = qrcodegen.QrCode.encodeText(
@@ -200,7 +202,8 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     ].join(" ");
   }
 
-  const fgPath = generatePath(cells, margin);
+  const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  const fgPath = generatePath(cells, margin, dotType);
 
   const svgData = [
     `<svg xmlns="http://www.w3.org/2000/svg" height="${size}" width="${size}" viewBox="0 0 ${numCells} ${numCells}">`,

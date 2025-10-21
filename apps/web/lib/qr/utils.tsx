@@ -1,6 +1,7 @@
 import qrcodegen from "./codegen";
 import {
   DEFAULT_BGCOLOR,
+  DEFAULT_DOT_TYPE,
   DEFAULT_FGCOLOR,
   DEFAULT_IMG_SCALE,
   DEFAULT_LEVEL,
@@ -8,7 +9,7 @@ import {
   DEFAULT_SIZE,
   ERROR_LEVEL_MAP,
 } from "./constants";
-import { Excavation, ImageSettings, Modules, QRPropsSVG } from "./types";
+import { DotType, Excavation, ImageSettings, Modules, QRPropsSVG } from "./types";
 
 import type { JSX } from "react";
 
@@ -31,8 +32,66 @@ export function excavateModules(
   });
 }
 
-export function generatePath(modules: Modules, margin = 0): string {
+// Helper functions for generating different dot patterns
+function generateSquarePath(x: number, y: number, margin: number): string {
+  return `M${x + margin},${y + margin} h1v1H${x + margin}z`;
+}
+
+function generateRoundedPath(x: number, y: number, margin: number): string {
+  const mx = x + margin;
+  const my = y + margin;
+  const r = 0.25; // Corner radius
+  // Rounded rectangle using arc commands
+  return `M${mx + r},${my} h${1 - 2 * r} a${r},${r} 0 0 1 ${r},${r} v${1 - 2 * r} a${r},${r} 0 0 1 ${-r},${r} h${-(1 - 2 * r)} a${r},${r} 0 0 1 ${-r},${-r} v${-(1 - 2 * r)} a${r},${r} 0 0 1 ${r},${-r}z`;
+}
+
+function generateDotsPath(x: number, y: number, margin: number): string {
+  const cx = x + margin + 0.5;
+  const cy = y + margin + 0.5;
+  const r = 0.45; // Circle radius (slightly smaller than square to maintain same visual weight)
+  // Circle using arc commands (two semicircles)
+  return `M${cx - r},${cy} a${r},${r} 0 1 0 ${r * 2},0 a${r},${r} 0 1 0 ${-r * 2},0z`;
+}
+
+function generateClassyPath(x: number, y: number, margin: number): string {
+  const mx = x + margin;
+  const my = y + margin;
+  const r = 0.4; // Larger corner radius for classy look
+  // More pronounced rounded corners
+  return `M${mx + r},${my} h${1 - 2 * r} a${r},${r} 0 0 1 ${r},${r} v${1 - 2 * r} a${r},${r} 0 0 1 ${-r},${r} h${-(1 - 2 * r)} a${r},${r} 0 0 1 ${-r},${-r} v${-(1 - 2 * r)} a${r},${r} 0 0 1 ${r},${-r}z`;
+}
+
+function generateExtraRoundedPath(x: number, y: number, margin: number): string {
+  const cx = x + margin + 0.5;
+  const cy = y + margin + 0.5;
+  const r = 0.5; // Maximum rounding (creates a circle)
+  // Full circle
+  return `M${cx - r},${cy} a${r},${r} 0 1 0 ${r * 2},0 a${r},${r} 0 1 0 ${-r * 2},0z`;
+}
+
+export function generatePath(modules: Modules, margin = 0, dotType: DotType = DEFAULT_DOT_TYPE): string {
   const ops: Array<string> = [];
+
+  // For non-square patterns, we need to generate individual shapes for each module
+  if (dotType !== "square") {
+    const patternGenerator =
+      dotType === "rounded" ? generateRoundedPath :
+      dotType === "dots" ? generateDotsPath :
+      dotType === "classy" ? generateClassyPath :
+      dotType === "extra-rounded" ? generateExtraRoundedPath :
+      generateSquarePath;
+
+    modules.forEach(function (row, y) {
+      row.forEach(function (cell, x) {
+        if (cell) {
+          ops.push(patternGenerator(x, y, margin));
+        }
+      });
+    });
+    return ops.join("");
+  }
+
+  // Original optimized square path generation (single-path strategy for rectangles)
   modules.forEach(function (row, y) {
     let start: number | null = null;
     row.forEach(function (cell, x) {
@@ -146,6 +205,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
     margin = DEFAULT_MARGIN,
     isOGContext = false,
     imageSettings,
+    dotsOptions,
     ...otherProps
   } = props;
 
@@ -217,7 +277,8 @@ export function QRCodeSVG(props: QRPropsSVG) {
   // way faster than DOM ops.
   // For level 1, 441 nodes -> 2
   // For level 40, 31329 -> 2
-  const fgPath = generatePath(cells, margin);
+  const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  const fgPath = generatePath(cells, margin, dotType);
 
   return (
     <svg
