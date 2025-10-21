@@ -9,9 +9,20 @@ import {
   DEFAULT_SIZE,
   ERROR_LEVEL_MAP,
 } from "./constants";
-import { DotType, Excavation, ImageSettings, Modules, QRPropsSVG } from "./types";
+import { DotType, Excavation, GetNeighbor, ImageSettings, Modules, QRPropsSVG } from "./types";
 
 import type { JSX } from "react";
+
+// Helper function to create a neighbor checker for a specific module position
+export function createGetNeighbor(modules: Modules, x: number, y: number): GetNeighbor {
+  return (dx: number, dy: number): boolean => {
+    const newX = x + dx;
+    const newY = y + dy;
+    if (newY < 0 || newY >= modules.length) return false;
+    if (newX < 0 || newX >= modules[newY].length) return false;
+    return modules[newY][newX];
+  };
+}
 
 // We could just do this in generatePath, except that we want to support
 // non-Path2D canvas, so we need to keep it an explicit step.
@@ -69,22 +80,227 @@ function generateExtraRoundedPath(x: number, y: number, margin: number): string 
   return `M${cx - r},${cy} a${r},${r} 0 1 0 ${r * 2},0 a${r},${r} 0 1 0 ${-r * 2},0z`;
 }
 
+// ============================================================================
+// Neighbor-aware shape generation functions
+//
+// Based on qr-code-styling by Denys Kozak
+// Repository: https://github.com/kozakdenys/qr-code-styling
+// License: MIT License
+//
+// Copyright (c) 2019 Denys Kozak
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+// The following functions implement neighbor-aware QR dot rendering where
+// shapes adapt based on adjacent modules to create seamless connections
+// while maintaining QR code scannability.
+// ============================================================================
+
+/**
+ * Generates a side-rounded shape where one side is rounded based on neighbor position.
+ * When a module has exactly 1 neighbor, the side facing AWAY from the neighbor is rounded,
+ * while the side touching the neighbor remains square to avoid gaps.
+ *
+ * @param x - Module x coordinate
+ * @param y - Module y coordinate
+ * @param margin - Margin offset
+ * @param neighborSide - Which side has the neighbor: 'left' | 'right' | 'top' | 'bottom'
+ *
+ * Based on _basicSideRounded from qr-code-styling
+ */
+function generateSideRoundedPath(
+  x: number,
+  y: number,
+  margin: number,
+  neighborSide: 'left' | 'right' | 'top' | 'bottom'
+): string {
+  const mx = x + margin;
+  const my = y + margin;
+  const size = 1;
+  const r = size / 2; // Half the size for semicircle
+
+  // Generate path based on which side has the neighbor
+  // The OPPOSITE side from the neighbor gets rounded
+  switch (neighborSide) {
+    case 'left': // Neighbor on left, round the right side
+      return `M${mx},${my} v${size} h${size / 2} a${r},${r} 0 0 0 0,${-size} z`;
+    case 'right': // Neighbor on right, round the left side
+      return `M${mx + size},${my} v${size} h${-size / 2} a${r},${r} 0 0 1 0,${-size} z`;
+    case 'top': // Neighbor on top, round the bottom side
+      return `M${mx},${my} h${size} v${size / 2} a${r},${r} 0 0 1 ${-size},0 z`;
+    case 'bottom': // Neighbor on bottom, round the top side
+      return `M${mx},${my + size} h${size} v${-size / 2} a${r},${r} 0 0 0 ${-size},0 z`;
+  }
+}
+
+/**
+ * Generates a corner-rounded shape matching qr-code-styling reference rotation logic.
+ *
+ * Reference implementation (_drawRounded, _drawExtraRounded) generates one base path
+ * and rotates it via SVG transform. We generate mathematically equivalent rotated paths.
+ *
+ * @param x - Module x coordinate
+ * @param y - Module y coordinate
+ * @param margin - Margin offset
+ * @param corner - Which corner to round based on neighbor detection
+ * @param extraRounded - Use extra-rounded variant (larger arc, different path structure)
+ *
+ * Based on _basicCornerRounded and _basicCornerExtraRounded from qr-code-styling
+ * https://github.com/kozakdenys/qr-code-styling/blob/master/src/figures/dot/QRDot.ts
+ */
+function generateCornerRoundedPath(
+  x: number,
+  y: number,
+  margin: number,
+  corner: 'top-left' | 'top-right' | 'bottom-right' | 'bottom-left',
+  extraRounded: boolean = false
+): string {
+  const mx = x + margin;
+  const my = y + margin;
+  const size = 1;
+  const r = extraRounded ? size : size / 2;
+
+  // Generate SVG paths using arc commands (A) to match Canvas arcTo behavior
+  // SVG arc: A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+
+  switch (corner) {
+    case 'top-left':
+      // Square with top-left corner rounded
+      // Start at left edge (below rounded corner)
+      return `M${mx},${my + r} A${r},${r} 0 0 1 ${mx + r},${my} L${mx + size},${my} L${mx + size},${my + size} L${mx},${my + size} z`;
+
+    case 'top-right':
+      // Square with top-right corner rounded
+      // Start at top-left corner
+      return `M${mx},${my} L${mx + size - r},${my} A${r},${r} 0 0 1 ${mx + size},${my + r} L${mx + size},${my + size} L${mx},${my + size} z`;
+
+    case 'bottom-right':
+      // Square with bottom-right corner rounded
+      // Start at top-left corner
+      return `M${mx},${my} L${mx + size},${my} L${mx + size},${my + size - r} A${r},${r} 0 0 1 ${mx + size - r},${my + size} L${mx},${my + size} z`;
+
+    case 'bottom-left':
+      // Square with bottom-left corner rounded
+      // Start at top edge (right of top-left)
+      return `M${mx + r},${my} L${mx + size},${my} L${mx + size},${my + size} L${mx + r},${my + size} A${r},${r} 0 0 1 ${mx},${my + size - r} L${mx},${my} z`;
+  }
+}
+
+/**
+ * Generates a corners-rounded shape for isolated modules (0 neighbors).
+ * Rounds only TWO diagonal corners (bottom-left and top-right) with large arcs.
+ *
+ * Based on _basicCornersRounded from qr-code-styling
+ * Reference path creates a shape with smooth concave curves at diagonal corners
+ */
+function generateCornersRoundedPath(x: number, y: number, margin: number): string {
+  const mx = x + margin;
+  const my = y + margin;
+  const size = 1;
+  const r = size / 2; // Large radius (0.5) for pronounced rounding
+
+  // Path: start at top-left, go down halfway, arc at bottom-left,
+  // continue across bottom halfway, go up halfway, arc at top-right, close
+  return `M${mx},${my} v${r} a${r},${r} 0 0 0 ${r},${r} h${r} v${-r} a${r},${r} 0 0 0 ${-r},${-r} z`;
+}
+
+
 export function generatePath(modules: Modules, margin = 0, dotType: DotType = DEFAULT_DOT_TYPE): string {
   const ops: Array<string> = [];
 
   // For non-square patterns, we need to generate individual shapes for each module
   if (dotType !== "square") {
-    const patternGenerator =
-      dotType === "rounded" ? generateRoundedPath :
-      dotType === "dots" ? generateDotsPath :
-      dotType === "classy" ? generateClassyPath :
-      dotType === "extra-rounded" ? generateExtraRoundedPath :
-      generateSquarePath;
-
     modules.forEach(function (row, y) {
       row.forEach(function (cell, x) {
-        if (cell) {
-          ops.push(patternGenerator(x, y, margin));
+        if (!cell) return;
+
+        // Create neighbor checker for this module
+        const getNeighbor = createGetNeighbor(modules, x, y);
+
+        // Count neighbors - following qr-code-styling reference
+        const left = getNeighbor(-1, 0);
+        const right = getNeighbor(1, 0);
+        const top = getNeighbor(0, -1);
+        const bottom = getNeighbor(0, 1);
+
+        const neighborCount = [left, right, top, bottom].filter(Boolean).length;
+
+        // Check for opposite pairs (inline configuration)
+        const hasOpposites = (left && right) || (top && bottom);
+
+        // Determine if 2 neighbors form a corner (perpendicular, not opposite)
+        const isCorner = neighborCount === 2 && !hasOpposites;
+
+        // Following qr-code-styling reference implementation
+        switch (dotType) {
+          case "dots": {
+            // Always use circles for dots pattern
+            ops.push(generateDotsPath(x, y, margin));
+            break;
+          }
+          case "rounded":
+          case "extra-rounded": {
+            const useExtraRounded = dotType === "extra-rounded";
+
+            // Following qr-code-styling logic
+            if (neighborCount > 2 || hasOpposites) {
+              // Junction or inline: use square for full coverage
+              ops.push(generateSquarePath(x, y, margin));
+            } else if (neighborCount === 0) {
+              // Isolated: use circle
+              ops.push(useExtraRounded ? generateExtraRoundedPath(x, y, margin) : generateDotsPath(x, y, margin));
+            } else if (neighborCount === 1) {
+              // Single neighbor: use side-rounded (round the side WITHOUT neighbor)
+              const neighborSide = left ? 'left' : right ? 'right' : top ? 'top' : 'bottom';
+              ops.push(generateSideRoundedPath(x, y, margin, neighborSide));
+            } else if (isCorner) {
+              // Two perpendicular neighbors: use corner-rounded (round the corner WITHOUT neighbors)
+              const corner = (left && top) ? 'bottom-right' :
+                            (top && right) ? 'bottom-left' :
+                            (right && bottom) ? 'top-left' : 'top-right';
+              ops.push(generateCornerRoundedPath(x, y, margin, corner, useExtraRounded));
+            } else {
+              // Fallback to square
+              ops.push(generateSquarePath(x, y, margin));
+            }
+            break;
+          }
+          case "classy": {
+            // Reference: qr-code-styling _drawClassy method (lines 236-256)
+            // Uses EXACTLY 2 conditional cases matching reference algorithm
+            if (neighborCount === 0) {
+              // 0 neighbors → corners-rounded (diagonal)
+              ops.push(generateCornersRoundedPath(x, y, margin));
+            } else if (!left && !top) {
+              // Missing left+top neighbors → corner-rounded (rotation -π/2)
+              ops.push(generateCornerRoundedPath(x, y, margin, 'top-left'));
+            } else if (!right && !bottom) {
+              // Missing right+bottom neighbors → corner-rounded (rotation π/2)
+              ops.push(generateCornerRoundedPath(x, y, margin, 'bottom-right'));
+            } else {
+              // Otherwise → square
+              ops.push(generateSquarePath(x, y, margin));
+            }
+            break;
+          }
+          default:
+            ops.push(generateSquarePath(x, y, margin));
         }
       });
     });

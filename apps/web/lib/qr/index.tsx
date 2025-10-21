@@ -3,6 +3,33 @@
  * Copyright (c) Paul O'Shannessy
  * SPDX-License-Identifier: ISC
  */
+
+/**
+ * Neighbor-aware QR dot rendering based on qr-code-styling by Denys Kozak
+ * Repository: https://github.com/kozakdenys/qr-code-styling
+ * License: MIT License
+ *
+ * Copyright (c) 2019 Denys Kozak
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 import { DUB_QR_LOGO } from "@dub/utils/src/constants";
 import { useEffect, useRef, useState, type JSX } from "react";
 import qrcodegen from "./codegen";
@@ -18,12 +45,82 @@ import {
 import { DotType, DotsOptions, Modules, QRProps, QRPropsCanvas } from "./types";
 import {
   SUPPORTS_PATH2D,
+  createGetNeighbor,
   excavateModules,
   generatePath,
   getImageSettings,
 } from "./utils";
 export * from "./types";
 export * from "./utils";
+
+/**
+ * Helper: Draw base corner-rounded shape (regular, radius = 0.5)
+ * Base shape has top-right corner rounded
+ * Reference: _basicCornerRounded from qr-code-styling
+ */
+function drawBaseCornerRounded(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+) {
+  const r = size / 2;
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y + size);
+  ctx.lineTo(x + size, y + size);
+  ctx.lineTo(x + size, y + r);
+  ctx.arcTo(x + size, y, x + size - r, y, r);
+  ctx.closePath();
+}
+
+/**
+ * Helper: Draw base corner-extra-rounded shape (radius = 1.0)
+ * Base shape has top-right corner rounded with large arc
+ * Reference: _basicCornerExtraRounded from qr-code-styling
+ */
+function drawBaseCornerExtraRounded(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+) {
+  ctx.moveTo(x, y);
+  ctx.lineTo(x, y + size);
+  ctx.lineTo(x + size, y + size);
+  ctx.arcTo(x + size, y, x, y, size);
+  ctx.closePath();
+}
+
+/**
+ * Helper: Draw corner-rounded shape with rotation
+ * Matches qr-code-styling approach: draw base shape, apply rotation transform
+ */
+function drawCornerRoundedWithRotation(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  rotation: number,
+  extraRounded: boolean,
+) {
+  const cx = x + size / 2;
+  const cy = y + size / 2;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation);
+  ctx.translate(-cx, -cy);
+
+  ctx.beginPath();
+  if (extraRounded) {
+    drawBaseCornerExtraRounded(ctx, x, y, size);
+  } else {
+    drawBaseCornerRounded(ctx, x, y, size);
+  }
+  ctx.fill();
+
+  ctx.restore();
+}
 
 // Helper function to render QR modules with different dot patterns on canvas
 function renderCanvasModules(
@@ -56,47 +153,154 @@ function renderCanvasModules(
 
       const cx = x + margin + 0.5;
       const cy = y + margin + 0.5;
+      const mx = x + margin;
+      const my = y + margin;
+
+      // Create neighbor checker for this module
+      const getNeighbor = createGetNeighbor(cells, x, y);
+
+      // Count neighbors - following qr-code-styling reference
+      const left = getNeighbor(-1, 0);
+      const right = getNeighbor(1, 0);
+      const top = getNeighbor(0, -1);
+      const bottom = getNeighbor(0, 1);
+      const neighborCount = [left, right, top, bottom].filter(Boolean).length;
+
+      // Check for opposite pairs (inline configuration)
+      const hasOpposites = (left && right) || (top && bottom);
 
       ctx.beginPath();
 
+      // Following qr-code-styling reference implementation
       switch (dotType) {
-        case "rounded": {
-          // Rounded rectangle
-          const mx = x + margin;
-          const my = y + margin;
-          const r = 0.25;
-          ctx.moveTo(mx + r, my);
-          ctx.arcTo(mx + 1, my, mx + 1, my + 1, r);
-          ctx.arcTo(mx + 1, my + 1, mx, my + 1, r);
-          ctx.arcTo(mx, my + 1, mx, my, r);
-          ctx.arcTo(mx, my, mx + 1, my, r);
-          ctx.closePath();
-          break;
-        }
         case "dots": {
-          // Circle
+          // Always use circles for dots pattern
           const r = 0.45;
           ctx.arc(cx, cy, r, 0, Math.PI * 2);
           break;
         }
-        case "classy": {
-          // More rounded rectangle
-          const mx = x + margin;
-          const my = y + margin;
-          const r = 0.4;
-          ctx.moveTo(mx + r, my);
-          ctx.arcTo(mx + 1, my, mx + 1, my + 1, r);
-          ctx.arcTo(mx + 1, my + 1, mx, my + 1, r);
-          ctx.arcTo(mx, my + 1, mx, my, r);
-          ctx.arcTo(mx, my, mx + 1, my, r);
-          ctx.closePath();
+        case "rounded":
+        case "extra-rounded": {
+          const useExtraRounded = dotType === "extra-rounded";
+
+          // Reference logic: neighborCount > 2 OR opposite pairs → square
+          if (neighborCount > 2 || hasOpposites) {
+            ctx.fillRect(mx, my, 1, 1);
+            return;
+          } else if (neighborCount === 0) {
+            // Isolated dot → circle
+            const r = useExtraRounded ? 0.5 : 0.45;
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          } else if (neighborCount === 1) {
+            // Single neighbor: use side-rounded (round the side WITHOUT neighbor)
+            const size = 1;
+            const r = size / 2; // Half the size for semicircle
+
+            if (left) {
+              // Neighbor on left, round the right side
+              ctx.moveTo(mx, my);
+              ctx.lineTo(mx, my + size);
+              ctx.lineTo(mx + size / 2, my + size);
+              ctx.arc(mx + size / 2, cy, r, Math.PI / 2, -Math.PI / 2, false);
+              ctx.closePath();
+            } else if (right) {
+              // Neighbor on right, round the left side
+              ctx.moveTo(mx + size, my);
+              ctx.lineTo(mx + size, my + size);
+              ctx.lineTo(mx + size / 2, my + size);
+              ctx.arc(mx + size / 2, cy, r, Math.PI / 2, -Math.PI / 2, true);
+              ctx.closePath();
+            } else if (top) {
+              // Neighbor on top, round the bottom side
+              ctx.moveTo(mx, my);
+              ctx.lineTo(mx + size, my);
+              ctx.lineTo(mx + size, my + size / 2);
+              ctx.arc(cx, my + size / 2, r, 0, Math.PI, false);
+              ctx.closePath();
+            } else if (bottom) {
+              // Neighbor on bottom, round the top side
+              ctx.moveTo(mx, my + size);
+              ctx.lineTo(mx + size, my + size);
+              ctx.lineTo(mx + size, my + size / 2);
+              ctx.arc(cx, my + size / 2, r, 0, Math.PI, true);
+              ctx.closePath();
+            }
+          } else {
+            // 2 neighbors - check if it's a corner (perpendicular neighbors)
+            const isCorner = neighborCount === 2 && !hasOpposites;
+
+            if (isCorner) {
+              // Two perpendicular neighbors: use corner-rounded with rotation
+              // Matching qr-code-styling reference approach
+              //
+              // Rotation mapping from _drawRounded/_drawExtraRounded:
+              // - bottom && left: rotation 0° → top-right corner rounded
+              // - left && top: rotation π/2 (90°) → bottom-right corner rounded
+              // - top && right: rotation π (180°) → bottom-left corner rounded
+              // - right && bottom: rotation -π/2 (-90°) → top-left corner rounded
+
+              let rotation = 0;
+              if (left && top) {
+                rotation = Math.PI / 2;
+              } else if (top && right) {
+                rotation = Math.PI;
+              } else if (right && bottom) {
+                rotation = -Math.PI / 2;
+              }
+              // bottom && left uses rotation = 0 (default)
+
+              drawCornerRoundedWithRotation(ctx, mx, my, 1, rotation, useExtraRounded);
+              return; // drawCornerRoundedWithRotation handles fill
+            } else {
+              // Inline neighbors (opposite) - use square
+              ctx.fillRect(mx, my, 1, 1);
+              return;
+            }
+          }
           break;
         }
-        case "extra-rounded": {
-          // Full circle
-          const r = 0.5;
-          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        case "classy": {
+          // Reference: qr-code-styling _drawClassy method (lines 236-256)
+          // Uses EXACTLY 2 conditional cases matching reference algorithm
+          const size = 1;
+          const r = size / 2; // Radius (0.5) for corner rounding
+
+          if (neighborCount === 0) {
+            // 0 neighbors → corners-rounded (diagonal)
+            ctx.moveTo(mx, my);
+            ctx.lineTo(mx, my + r);
+            ctx.arcTo(mx, my + size, mx + r, my + size, r); // Bottom-left arc
+            ctx.lineTo(mx + size, my + size);
+            ctx.lineTo(mx + size, my + r);
+            ctx.arcTo(mx + size, my, mx + size - r, my, r); // Top-right arc
+            ctx.closePath();
+          } else if (!left && !top) {
+            // Missing left+top neighbors → corner-rounded (rotation -π/2)
+            ctx.moveTo(mx, my + r);
+            ctx.arcTo(mx, my, mx + r, my, r); // Top-left arc
+            ctx.lineTo(mx + size, my);
+            ctx.lineTo(mx + size, my + size);
+            ctx.lineTo(mx, my + size);
+            ctx.closePath();
+          } else if (!right && !bottom) {
+            // Missing right+bottom neighbors → corner-rounded (rotation π/2)
+            ctx.moveTo(mx, my);
+            ctx.lineTo(mx + size, my);
+            ctx.lineTo(mx + size, my + r);
+            ctx.arcTo(mx + size, my + size, mx + size - r, my + size, r); // Bottom-right arc
+            ctx.lineTo(mx, my + size);
+            ctx.closePath();
+          } else {
+            // Otherwise → square
+            ctx.fillRect(mx, my, 1, 1);
+            return;
+          }
           break;
+        }
+        default: {
+          // Square fallback
+          ctx.fillRect(mx, my, 1, 1);
+          return; // Skip fill below since fillRect already filled
         }
       }
 
