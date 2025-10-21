@@ -15,7 +15,7 @@ import {
   DEFAULT_SIZE,
   ERROR_LEVEL_MAP,
 } from "./constants";
-import { QRProps, QRPropsCanvas } from "./types";
+import { DotType, DotsOptions, Modules, QRProps, QRPropsCanvas } from "./types";
 import {
   SUPPORTS_PATH2D,
   excavateModules,
@@ -24,6 +24,86 @@ import {
 } from "./utils";
 export * from "./types";
 export * from "./utils";
+
+// Helper function to render QR modules with different dot patterns on canvas
+function renderCanvasModules(
+  ctx: CanvasRenderingContext2D,
+  cells: Modules,
+  margin: number,
+  dotType: DotType,
+) {
+  if (dotType === "square") {
+    // For square patterns, use Path2D optimization if available
+    if (SUPPORTS_PATH2D) {
+      ctx.fill(new Path2D(generatePath(cells, margin)));
+    } else {
+      // Fallback: draw individual rectangles
+      cells.forEach(function (row, rdx) {
+        row.forEach(function (cell, cdx) {
+          if (cell) {
+            ctx.fillRect(cdx + margin, rdx + margin, 1, 1);
+          }
+        });
+      });
+    }
+    return;
+  }
+
+  // For non-square patterns, render individual shapes
+  cells.forEach(function (row, y) {
+    row.forEach(function (cell, x) {
+      if (!cell) return;
+
+      const cx = x + margin + 0.5;
+      const cy = y + margin + 0.5;
+
+      ctx.beginPath();
+
+      switch (dotType) {
+        case "rounded": {
+          // Rounded rectangle
+          const mx = x + margin;
+          const my = y + margin;
+          const r = 0.25;
+          ctx.moveTo(mx + r, my);
+          ctx.arcTo(mx + 1, my, mx + 1, my + 1, r);
+          ctx.arcTo(mx + 1, my + 1, mx, my + 1, r);
+          ctx.arcTo(mx, my + 1, mx, my, r);
+          ctx.arcTo(mx, my, mx + 1, my, r);
+          ctx.closePath();
+          break;
+        }
+        case "dots": {
+          // Circle
+          const r = 0.45;
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          break;
+        }
+        case "classy": {
+          // More rounded rectangle
+          const mx = x + margin;
+          const my = y + margin;
+          const r = 0.4;
+          ctx.moveTo(mx + r, my);
+          ctx.arcTo(mx + 1, my, mx + 1, my + 1, r);
+          ctx.arcTo(mx + 1, my + 1, mx, my + 1, r);
+          ctx.arcTo(mx, my + 1, mx, my, r);
+          ctx.arcTo(mx, my, mx + 1, my, r);
+          ctx.closePath();
+          break;
+        }
+        case "extra-rounded": {
+          // Full circle
+          const r = 0.5;
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          break;
+        }
+      }
+
+      ctx.fill();
+    });
+  });
+}
 
 export function QRCodeCanvas(props: QRPropsCanvas) {
   const {
@@ -35,6 +115,7 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
     margin = DEFAULT_MARGIN,
     style,
     imageSettings,
+    dotsOptions,
     ...otherProps
   } = props;
   const imgSrc = imageSettings?.src;
@@ -99,18 +180,8 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
       ctx.fillRect(0, 0, numCells, numCells);
 
       ctx.fillStyle = fgColor;
-      if (SUPPORTS_PATH2D) {
-        // $FlowFixMe: Path2D c'tor doesn't support args yet.
-        ctx.fill(new Path2D(generatePath(cells, margin)));
-      } else {
-        cells.forEach(function (row, rdx) {
-          row.forEach(function (cell, cdx) {
-            if (cell) {
-              ctx.fillRect(cdx + margin, rdx + margin, 1, 1);
-            }
-          });
-        });
-      }
+      const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+      renderCanvasModules(ctx, cells, margin, dotType);
 
       if (haveImageToRender) {
         ctx.drawImage(
@@ -268,6 +339,7 @@ export async function getQRAsCanvas(
     fgColor = DEFAULT_FGCOLOR,
     margin = DEFAULT_MARGIN,
     imageSettings,
+    dotsOptions,
   } = props;
 
   const canvas = document.createElement("canvas");
@@ -305,18 +377,8 @@ export async function getQRAsCanvas(
   ctx.fillRect(0, 0, numCells, numCells);
 
   ctx.fillStyle = fgColor;
-  if (SUPPORTS_PATH2D) {
-    // $FlowFixMe: Path2D c'tor doesn't support args yet.
-    ctx.fill(new Path2D(generatePath(cells, margin)));
-  } else {
-    cells.forEach(function (row, rdx) {
-      row.forEach(function (cell, cdx) {
-        if (cell) {
-          ctx.fillRect(cdx + margin, rdx + margin, 1, 1);
-        }
-      });
-    });
-  }
+  const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  renderCanvasModules(ctx, cells, margin, dotType);
 
   const haveImageToRender =
     calculatedImageSettings != null &&
@@ -348,12 +410,14 @@ export function getQRData({
   hideLogo,
   logo,
   margin,
+  dotsOptions,
 }: {
   url: string;
   fgColor?: string;
   hideLogo?: boolean;
   logo?: string;
   margin?: number;
+  dotsOptions?: DotsOptions;
 }) {
   return {
     value: `${url}?qr=1`,
@@ -363,6 +427,7 @@ export function getQRData({
     level: "Q", // QR Code error correction level: https://blog.qrstuff.com/general/qr-code-error-correction
     hideLogo,
     margin,
+    dotsOptions,
     ...(!hideLogo && {
       imageSettings: {
         src: logo || DUB_QR_LOGO,

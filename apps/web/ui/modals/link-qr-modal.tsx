@@ -1,4 +1,4 @@
-import { getQRAsCanvas, getQRAsSVGDataUri, getQRData } from "@/lib/qr";
+import { getQRAsCanvas, getQRAsSVGDataUri, getQRData, DotType } from "@/lib/qr";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
@@ -59,6 +59,7 @@ const DEFAULT_COLORS = [
 export type QRCodeDesign = {
   fgColor: string;
   hideLogo: boolean;
+  dotType: DotType;
 };
 
 type LinkQRModalProps = {
@@ -111,6 +112,7 @@ function LinkQRModalInner({
     {
       fgColor: "#000000",
       hideLogo: false,
+      dotType: "square",
     },
   );
 
@@ -128,9 +130,12 @@ function LinkQRModalInner({
             fgColor: data.fgColor,
             hideLogo,
             logo,
+            dotsOptions: {
+              type: data.dotType,
+            },
           })
         : null,
-    [url, data, hideLogo, logo],
+    [url, data.fgColor, data.dotType, hideLogo, logo],
   );
 
   const onColorChange = useDebouncedCallback(
@@ -231,7 +236,7 @@ function LinkQRModalInner({
           {url && (
             <AnimatePresence mode="wait">
               <motion.div
-                key={data.fgColor + data.hideLogo}
+                key={data.fgColor + data.hideLogo + data.dotType}
                 initial={{ filter: "blur(2px)", opacity: 0.4 }}
                 animate={{ filter: "blur(0px)", opacity: 1 }}
                 exit={{ filter: "blur(2px)", opacity: 0.4 }}
