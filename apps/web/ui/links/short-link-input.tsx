@@ -1,5 +1,6 @@
 "use client";
 
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { LinkProps } from "@/lib/types";
 import { DOMAINS_MAX_PAGE_SIZE } from "@/lib/zod/schemas/domains";
@@ -386,7 +387,7 @@ export const ShortLinkInput = forwardRef<HTMLInputElement, ShortLinkInputProps>(
             onChange={(domain) => onChange({ domain })}
           />
         )}
-        {!onboarding && !dotLinkClaimed && (
+        {!onboarding && !dotLinkClaimed && isFeatureEnabled("dotLinkOffer") && (
           <AnimatedSizeContainer
             height
             transition={{ ease: "linear", duration: 0.1 }}
