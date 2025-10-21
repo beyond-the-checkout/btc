@@ -15,6 +15,17 @@ export const DEFAULT_MARGIN = 2;
 
 export const QR_LEVELS = ["L", "M", "Q", "H"] as const;
 
+// Dot pattern types for QR code customization
+export const DOT_TYPES = [
+  "square",
+  "rounded",
+  "dots",
+  "classy",
+  "extra-rounded",
+] as const;
+
+export const DEFAULT_DOT_TYPE = "square";
+
 // This is *very* rough estimate of max amount of QRCode allowed to be covered.
 // It is "wrong" in a lot of ways (area is a terrible way to estimate, it
 // really should be number of modules covered), but if for some reason we don't

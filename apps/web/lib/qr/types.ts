@@ -1,8 +1,12 @@
 import type { CSSProperties } from "react";
 import qrcodegen from "./codegen";
+import { DOT_TYPES } from "./constants";
 
 export type Modules = ReturnType<qrcodegen.QrCode["getModules"]>;
 export type Excavation = { x: number; y: number; w: number; h: number };
+
+// Dot pattern type for QR code customization
+export type DotType = (typeof DOT_TYPES)[number];
 
 export type ImageSettings = {
   src: string;
@@ -11,6 +15,10 @@ export type ImageSettings = {
   excavate: boolean;
   x?: number;
   y?: number;
+};
+
+export type DotsOptions = {
+  type?: DotType;
 };
 
 export type QRProps = {
@@ -22,6 +30,7 @@ export type QRProps = {
   margin?: number;
   style?: CSSProperties;
   imageSettings?: ImageSettings;
+  dotsOptions?: DotsOptions;
   isOGContext?: boolean;
 };
 export type QRPropsCanvas = QRProps &
