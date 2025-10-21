@@ -41,6 +41,8 @@ import {
   DEFAULT_MARGIN,
   DEFAULT_SIZE,
   ERROR_LEVEL_MAP,
+  DEFAULT_CORNER_SQUARE_TYPE,
+  DEFAULT_CORNER_DOT_TYPE,
 } from "./constants";
 import { DotType, DotsOptions, Modules, QRProps, QRPropsCanvas } from "./types";
 import {
@@ -50,6 +52,13 @@ import {
   generatePath,
   getImageSettings,
 } from "./utils";
+import { detectEyes, isInEye } from "./eye-detector";
+import {
+  drawCornerSquareCanvas,
+  drawCornerDotCanvas,
+  generateCornerSquarePath,
+  generateCornerDotPath,
+} from "./eye-patterns";
 export * from "./types";
 export * from "./utils";
 
@@ -128,16 +137,17 @@ function renderCanvasModules(
   cells: Modules,
   margin: number,
   dotType: DotType,
+  eyes: ReturnType<typeof detectEyes> = []
 ) {
   if (dotType === "square") {
     // For square patterns, use Path2D optimization if available
     if (SUPPORTS_PATH2D) {
-      ctx.fill(new Path2D(generatePath(cells, margin)));
+      ctx.fill(new Path2D(generatePath(cells, margin, dotType, eyes)));
     } else {
       // Fallback: draw individual rectangles
       cells.forEach(function (row, rdx) {
         row.forEach(function (cell, cdx) {
-          if (cell) {
+          if (cell && !(eyes.length > 0 && isInEye(cdx, rdx, eyes))) {
             ctx.fillRect(cdx + margin, rdx + margin, 1, 1);
           }
         });
@@ -150,6 +160,9 @@ function renderCanvasModules(
   cells.forEach(function (row, y) {
     row.forEach(function (cell, x) {
       if (!cell) return;
+
+      // Skip eye regions - they will be rendered separately
+      if (eyes.length > 0 && isInEye(x, y, eyes)) return;
 
       const cx = x + margin + 0.5;
       const cy = y + margin + 0.5;
@@ -320,6 +333,7 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
     style,
     imageSettings,
     dotsOptions,
+    eyeOptions,
     ...otherProps
   } = props;
   const imgSrc = imageSettings?.src;
@@ -379,13 +393,30 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
       const scale = (size / numCells) * pixelRatio;
       ctx.scale(scale, scale);
 
+      // Detect eye positions for custom rendering
+      const eyes = detectEyes(cells);
+
       // Draw solid background, only paint dark modules.
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, numCells, numCells);
 
       ctx.fillStyle = fgColor;
       const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
-      renderCanvasModules(ctx, cells, margin, dotType);
+      renderCanvasModules(ctx, cells, margin, dotType, eyes);
+
+      // Render eyes with custom patterns
+      const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+      const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
+      const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
+      const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
+
+      eyes.forEach((eye) => {
+        ctx.fillStyle = cornerSquareColor;
+        drawCornerSquareCanvas(ctx, eye, cornerSquareType, margin);
+
+        ctx.fillStyle = cornerDotColor;
+        drawCornerDotCanvas(ctx, eye, cornerDotType, margin);
+      });
 
       if (haveImageToRender) {
         ctx.drawImage(
@@ -445,6 +476,7 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     margin = DEFAULT_MARGIN,
     imageSettings,
     dotsOptions,
+    eyeOptions,
   } = props;
 
   let cells = qrcodegen.QrCode.encodeText(
@@ -477,13 +509,30 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     ].join(" ");
   }
 
+  const eyes = detectEyes(cells);
   const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
-  const fgPath = generatePath(cells, margin, dotType);
+  const fgPath = generatePath(cells, margin, dotType, eyes);
+
+  // Generate eye patterns (inline to avoid JSX in this function)
+  const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+  const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
+  const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
+  const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
+
+  const eyePaths = eyes.map((eye) => {
+    const squarePath = generateCornerSquarePath(eye, cornerSquareType, margin);
+    const dotPath = generateCornerDotPath(eye, cornerDotType, margin);
+    return [
+      `<path fill="${cornerSquareColor}" d="${squarePath}" shapeRendering="crispEdges" fill-rule="evenodd" clip-rule="evenodd"></path>`,
+      `<path fill="${cornerDotColor}" d="${dotPath}" shapeRendering="crispEdges"></path>`,
+    ].join("");
+  }).join("");
 
   const svgData = [
     `<svg xmlns="http://www.w3.org/2000/svg" height="${size}" width="${size}" viewBox="0 0 ${numCells} ${numCells}">`,
     `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`,
     `<path fill="${fgColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
+    eyePaths,
     image,
     "</svg>",
   ].join("");
@@ -544,6 +593,7 @@ export async function getQRAsCanvas(
     margin = DEFAULT_MARGIN,
     imageSettings,
     dotsOptions,
+    eyeOptions,
   } = props;
 
   const canvas = document.createElement("canvas");
@@ -576,13 +626,29 @@ export async function getQRAsCanvas(
   const scale = (size / numCells) * pixelRatio;
   ctx.scale(scale, scale);
 
+  const eyes = detectEyes(cells);
+
   // Draw solid background, only paint dark modules.
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, numCells, numCells);
 
   ctx.fillStyle = fgColor;
   const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
-  renderCanvasModules(ctx, cells, margin, dotType);
+  renderCanvasModules(ctx, cells, margin, dotType, eyes);
+
+  // Render eyes with custom patterns
+  const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+  const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
+  const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
+  const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
+
+  eyes.forEach((eye) => {
+    ctx.fillStyle = cornerSquareColor;
+    drawCornerSquareCanvas(ctx, eye, cornerSquareType, margin);
+
+    ctx.fillStyle = cornerDotColor;
+    drawCornerDotCanvas(ctx, eye, cornerDotType, margin);
+  });
 
   const haveImageToRender =
     calculatedImageSettings != null &&
@@ -615,6 +681,7 @@ export function getQRData({
   logo,
   margin,
   dotsOptions,
+  eyeOptions,
 }: {
   url: string;
   fgColor?: string;
@@ -622,6 +689,7 @@ export function getQRData({
   logo?: string;
   margin?: number;
   dotsOptions?: DotsOptions;
+  eyeOptions?: import("./types").EyeOptions;
 }) {
   return {
     value: `${url}?qr=1`,
@@ -632,6 +700,7 @@ export function getQRData({
     hideLogo,
     margin,
     dotsOptions,
+    eyeOptions,
     ...(!hideLogo && {
       imageSettings: {
         src: logo || DUB_QR_LOGO,

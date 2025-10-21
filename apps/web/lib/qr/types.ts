@@ -1,9 +1,12 @@
 import type { CSSProperties } from "react";
 import qrcodegen from "./codegen";
-import { DOT_TYPES } from "./constants";
+import { DOT_TYPES, CornerSquareType, CornerDotType } from "./constants";
 
 export type Modules = ReturnType<qrcodegen.QrCode["getModules"]>;
 export type Excavation = { x: number; y: number; w: number; h: number };
+
+// Helper type for checking neighboring QR code modules
+export type GetNeighbor = (dx: number, dy: number) => boolean;
 
 // Dot pattern type for QR code customization
 export type DotType = (typeof DOT_TYPES)[number];
@@ -21,6 +24,21 @@ export type DotsOptions = {
   type?: DotType;
 };
 
+export type CornerSquareOptions = {
+  type?: CornerSquareType;
+  color?: string;
+};
+
+export type CornerDotOptions = {
+  type?: CornerDotType;
+  color?: string;
+};
+
+export type EyeOptions = {
+  cornerSquare?: CornerSquareOptions;
+  cornerDot?: CornerDotOptions;
+};
+
 export type QRProps = {
   value: string;
   size?: number;
@@ -31,6 +49,7 @@ export type QRProps = {
   style?: CSSProperties;
   imageSettings?: ImageSettings;
   dotsOptions?: DotsOptions;
+  eyeOptions?: EyeOptions;
   isOGContext?: boolean;
 };
 export type QRPropsCanvas = QRProps &

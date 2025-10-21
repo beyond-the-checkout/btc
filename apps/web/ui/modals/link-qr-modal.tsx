@@ -1,6 +1,7 @@
 import { getQRAsCanvas, getQRAsSVGDataUri, getQRData, DotType } from "@/lib/qr";
-import { DOT_TYPES } from "@/lib/qr/constants";
+import { DOT_TYPES, CORNER_SQUARE_TYPES, CORNER_DOT_TYPES, CornerSquareType, CornerDotType } from "@/lib/qr/constants";
 import { generatePath } from "@/lib/qr/utils";
+import { generateCornerSquarePath, generateCornerDotPath } from "@/lib/qr/eye-patterns";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
@@ -94,10 +95,62 @@ function PatternPreview({ pattern, color }: { pattern: DotType; color: string })
   );
 }
 
+// Corner Square preview (7x7 outer frame)
+function CornerSquarePreview({ type, color }: { type: CornerSquareType; color: string }) {
+  const size = 32;
+  const eyeSize = 7;
+
+  // Mock eye position for preview - use the actual path generation function
+  const eye = { x: 0, y: 0, size: eyeSize };
+  const margin = 0;
+
+  // Use the actual generateCornerSquarePath function
+  const path = generateCornerSquarePath(eye, type, margin);
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`-0.5 -0.5 ${eyeSize + 1} ${eyeSize + 1}`}
+      fill="none"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <path d={path} fill={color} fillRule="evenodd" shapeRendering="crispEdges" />
+    </svg>
+  );
+}
+
+// Corner Dot preview (3x3 inner dot)
+function CornerDotPreview({ type, color }: { type: CornerDotType; color: string }) {
+  const size = 32;
+  const eyeSize = 7;
+
+  // Mock eye position for preview - use the actual path generation function
+  const eye = { x: 0, y: 0, size: eyeSize };
+  const margin = 0;
+
+  // Use the actual generateCornerDotPath function
+  const path = generateCornerDotPath(eye, type, margin);
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`-0.5 -0.5 ${eyeSize + 1} ${eyeSize + 1}`}
+      fill="none"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <path d={path} fill={color} />
+    </svg>
+  );
+}
+
 export type QRCodeDesign = {
   fgColor: string;
   hideLogo: boolean;
   dotType: DotType;
+  cornerSquareType: CornerSquareType;
+  cornerDotType: CornerDotType;
 };
 
 type LinkQRModalProps = {
@@ -151,6 +204,8 @@ function LinkQRModalInner({
       fgColor: "#000000",
       hideLogo: false,
       dotType: "square",
+      cornerSquareType: "square",
+      cornerDotType: "square",
     },
   );
 
@@ -171,9 +226,19 @@ function LinkQRModalInner({
             dotsOptions: {
               type: data.dotType,
             },
+            eyeOptions: {
+              cornerSquare: {
+                type: data.cornerSquareType,
+                color: data.fgColor,
+              },
+              cornerDot: {
+                type: data.cornerDotType,
+                color: data.fgColor,
+              },
+            },
           })
         : null,
-    [url, data.fgColor, data.dotType, hideLogo, logo],
+    [url, data.fgColor, data.dotType, data.cornerSquareType, data.cornerDotType, hideLogo, logo],
   );
 
   const onColorChange = useDebouncedCallback(
@@ -274,7 +339,7 @@ function LinkQRModalInner({
           {url && (
             <AnimatePresence mode="wait">
               <motion.div
-                key={data.fgColor + data.hideLogo + data.dotType}
+                key={data.fgColor + data.hideLogo + data.dotType + data.cornerSquareType + data.cornerDotType}
                 initial={{ filter: "blur(2px)", opacity: 0.4 }}
                 animate={{ filter: "blur(0px)", opacity: 1 }}
                 exit={{ filter: "blur(2px)", opacity: 0.4 }}
@@ -288,6 +353,16 @@ function LinkQRModalInner({
                   logo={logo}
                   scale={1}
                   dotsOptions={{ type: data.dotType }}
+                  eyeOptions={{
+                    cornerSquare: {
+                      type: data.cornerSquareType,
+                      color: data.fgColor,
+                    },
+                    cornerDot: {
+                      type: data.cornerDotType,
+                      color: data.fgColor,
+                    },
+                  }}
                 />
               </motion.div>
             </AnimatePresence>
@@ -375,6 +450,92 @@ function LinkQRModalInner({
               </Tooltip>
             );
           })}
+        </div>
+      </div>
+
+      {/* Eye Pattern selectors */}
+      <div>
+        <span className="block text-sm font-medium text-neutral-700">
+          Corner Eyes
+        </span>
+        <div className="mt-3 space-y-3">
+          {/* Outer Frame (Corner Square) */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-neutral-600">
+              Outer Frame
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {CORNER_SQUARE_TYPES.map((type) => {
+                const isSelected = data.cornerSquareType === type;
+                const typeLabels: Record<CornerSquareType, string> = {
+                  square: "Square",
+                  rounded: "Rounded",
+                  dots: "Circle",
+                  "extra-rounded": "Extra Rounded",
+                  leaf: "Leaf",
+                };
+                return (
+                  <Tooltip
+                    key={type}
+                    content={typeLabels[type]}
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={isSelected}
+                      aria-label={`Select ${typeLabels[type]} outer frame`}
+                      onClick={() => setData((d) => ({ ...d, cornerSquareType: type }))}
+                      className={cn(
+                        "flex size-12 items-center justify-center rounded-md border transition-all",
+                        isSelected
+                          ? "border-black bg-neutral-50 ring-1 ring-black"
+                          : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                      )}
+                    >
+                      <CornerSquarePreview type={type} color={data.fgColor} />
+                    </button>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Inner Dot (Corner Dot) */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-neutral-600">
+              Inner Dot
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {CORNER_DOT_TYPES.map((type) => {
+                const isSelected = data.cornerDotType === type;
+                const typeLabels: Record<CornerDotType, string> = {
+                  square: "Square",
+                  dots: "Circle",
+                  rounded: "Rounded",
+                };
+                return (
+                  <Tooltip
+                    key={type}
+                    content={typeLabels[type]}
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={isSelected}
+                      aria-label={`Select ${typeLabels[type]} inner dot`}
+                      onClick={() => setData((d) => ({ ...d, cornerDotType: type }))}
+                      className={cn(
+                        "flex size-12 items-center justify-center rounded-md border transition-all",
+                        isSelected
+                          ? "border-black bg-neutral-50 ring-1 ring-black"
+                          : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                      )}
+                    >
+                      <CornerDotPreview type={type} color={data.fgColor} />
+                    </button>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -26,6 +26,27 @@ export const DOT_TYPES = [
 
 export const DEFAULT_DOT_TYPE = "square";
 
+// Eye pattern types for QR code corner customization
+export const CORNER_SQUARE_TYPES = [
+  "square",
+  "rounded",
+  "dots",
+  "extra-rounded",
+  "leaf",
+] as const;
+
+export const CORNER_DOT_TYPES = [
+  "square",
+  "dots",
+  "rounded",
+] as const;
+
+export type CornerSquareType = typeof CORNER_SQUARE_TYPES[number];
+export type CornerDotType = typeof CORNER_DOT_TYPES[number];
+
+export const DEFAULT_CORNER_SQUARE_TYPE = "square";
+export const DEFAULT_CORNER_DOT_TYPE = "square";
+
 // This is *very* rough estimate of max amount of QRCode allowed to be covered.
 // It is "wrong" in a lot of ways (area is a terrible way to estimate, it
 // really should be number of modules covered), but if for some reason we don't

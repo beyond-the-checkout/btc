@@ -8,8 +8,12 @@ import {
   DEFAULT_MARGIN,
   DEFAULT_SIZE,
   ERROR_LEVEL_MAP,
+  DEFAULT_CORNER_SQUARE_TYPE,
+  DEFAULT_CORNER_DOT_TYPE,
 } from "./constants";
 import { DotType, Excavation, GetNeighbor, ImageSettings, Modules, QRPropsSVG } from "./types";
+import { detectEyes, isInEye } from "./eye-detector";
+import { generateCornerSquarePath, generateCornerDotPath } from "./eye-patterns";
 
 import type { JSX } from "react";
 
@@ -221,7 +225,12 @@ function generateCornersRoundedPath(x: number, y: number, margin: number): strin
 }
 
 
-export function generatePath(modules: Modules, margin = 0, dotType: DotType = DEFAULT_DOT_TYPE): string {
+export function generatePath(
+  modules: Modules,
+  margin = 0,
+  dotType: DotType = DEFAULT_DOT_TYPE,
+  eyes: ReturnType<typeof detectEyes> = []
+): string {
   const ops: Array<string> = [];
 
   // For non-square patterns, we need to generate individual shapes for each module
@@ -229,6 +238,9 @@ export function generatePath(modules: Modules, margin = 0, dotType: DotType = DE
     modules.forEach(function (row, y) {
       row.forEach(function (cell, x) {
         if (!cell) return;
+
+        // Skip eye regions - they will be rendered separately
+        if (eyes.length > 0 && isInEye(x, y, eyes)) return;
 
         // Create neighbor checker for this module
         const getNeighbor = createGetNeighbor(modules, x, y);
@@ -311,7 +323,10 @@ export function generatePath(modules: Modules, margin = 0, dotType: DotType = DE
   modules.forEach(function (row, y) {
     let start: number | null = null;
     row.forEach(function (cell, x) {
-      if (!cell && start !== null) {
+      // Skip eye regions for square pattern too
+      const isEyeModule = eyes.length > 0 && isInEye(x, y, eyes);
+
+      if ((!cell || isEyeModule) && start !== null) {
         // M0 0h7v1H0z injects the space with the move and drops the comma,
         // saving a char per operation
         ops.push(
@@ -323,7 +338,7 @@ export function generatePath(modules: Modules, margin = 0, dotType: DotType = DE
 
       // end of row, clean up or skip
       if (x === row.length - 1) {
-        if (!cell) {
+        if (!cell || isEyeModule) {
           // We would have closed the op above already so this can only mean
           // 2+ light modules in a row.
           return;
@@ -342,7 +357,7 @@ export function generatePath(modules: Modules, margin = 0, dotType: DotType = DE
         return;
       }
 
-      if (cell && start === null) {
+      if (cell && !isEyeModule && start === null) {
         start = x;
       }
     });
@@ -422,6 +437,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
     isOGContext = false,
     imageSettings,
     dotsOptions,
+    eyeOptions,
     ...otherProps
   } = props;
 
@@ -487,6 +503,9 @@ export function QRCodeSVG(props: QRPropsSVG) {
     }
   }
 
+  // Detect eye positions for custom rendering
+  const eyes = detectEyes(cells);
+
   // Drawing strategy: instead of a rect per module, we're going to create a
   // single path for the dark modules and layer that on top of a light rect,
   // for a total of 2 DOM nodes. We pay a bit more in string concat but that's
@@ -494,7 +513,30 @@ export function QRCodeSVG(props: QRPropsSVG) {
   // For level 1, 441 nodes -> 2
   // For level 40, 31329 -> 2
   const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
-  const fgPath = generatePath(cells, margin, dotType);
+  const fgPath = generatePath(cells, margin, dotType, eyes);
+
+  // Generate eye patterns
+  const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+  const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
+  const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
+  const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
+
+  const eyePaths = eyes.map((eye, index) => {
+    const squarePath = generateCornerSquarePath(eye, cornerSquareType, margin);
+    const dotPath = generateCornerDotPath(eye, cornerDotType, margin);
+    return (
+      <g key={`eye-${index}`}>
+        <path
+          fill={cornerSquareColor}
+          d={squarePath}
+          shapeRendering="crispEdges"
+          fillRule="evenodd"
+          clipRule="evenodd"
+        />
+        <path fill={cornerDotColor} d={dotPath} shapeRendering="crispEdges" />
+      </g>
+    );
+  });
 
   return (
     <svg
@@ -509,6 +551,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
         shapeRendering="crispEdges"
       />
       <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+      {eyePaths}
       {image}
     </svg>
   );
