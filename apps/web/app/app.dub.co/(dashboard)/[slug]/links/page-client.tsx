@@ -1,5 +1,6 @@
 "use client";
 
+import { isFeatureEnabled } from "@/lib/feature-flags";
 import useCurrentFolderId from "@/lib/swr/use-current-folder-id";
 import {
   useCheckFolderPermission,
@@ -131,12 +132,14 @@ function WorkspaceLinks() {
     if (showedDotLinkModal) return;
 
     // We show the .link offer modal if:
+    // - The feature flag is enabled
     // - The upgraded modal is not open
     // - The user has a paid plan (and valid stripe ID)
     // - The user has no custom domains
     // - The user has not claimed their .link domain
     // - The user has not dismissed the .link offer modal
     if (
+      isFeatureEnabled("dotLinkOffer") &&
       !searchParams.has("upgraded") &&
       workspace.stripeId &&
       workspace.plan &&

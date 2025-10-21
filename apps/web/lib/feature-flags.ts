@@ -54,6 +54,11 @@ export const FEATURES = {
    * hide dashboards that rely on heavy analytics backends.
    */
   analytics: true,
+  /**
+   * Controls whether to show the free .link domain offer modal to paid users.
+   * Disable to prevent the modal from appearing on the links page.
+   */
+  dotLinkOffer: false,
 } as const;
 
 export type DeploymentFeatures = typeof FEATURES;
