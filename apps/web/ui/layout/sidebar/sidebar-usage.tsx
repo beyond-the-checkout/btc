@@ -96,7 +96,7 @@ function UsageInner() {
             />
             <UsageRow
               icon={Hyperlink}
-              label="Links"
+              label="Codes"
               usage={linksUsage}
               limit={linksLimit}
               showNextPlan={hovered}

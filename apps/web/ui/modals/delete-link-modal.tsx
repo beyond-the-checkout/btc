@@ -43,25 +43,25 @@ function DeleteLinkModalInner({
 
   const pattern =
     links.length > 1
-      ? `delete ${links.length} links`
+      ? `delete ${links.length} codes`
       : getPrettyUrl(links[0].shortLink);
 
   return (
     <>
       <div className="space-y-2 border-b border-neutral-200 p-4 sm:p-6">
         <h3 className="text-lg font-medium leading-none">
-          Delete {links.length > 1 ? `${links.length} links` : "link"}
+          Delete {links.length > 1 ? `${links.length} codes` : "code"}
         </h3>
       </div>
 
       <div className="bg-neutral-50 p-4 sm:p-6">
         <p className="text-sm text-neutral-800">
           Are you sure you want to delete the following{" "}
-          {pluralize("link", links.length)}?
+          {pluralize("code", links.length)}?
         </p>
 
         <p className="mt-4 text-sm font-medium text-neutral-800">
-          Deleting these links will remove all of their analytics. This action
+          Deleting these codes will remove all of their analytics. This action
           cannot be undone – proceed with caution.
         </p>
 
@@ -87,7 +87,7 @@ function DeleteLinkModalInner({
               setShowDeleteLinkModal(false);
               onSuccess?.();
               toast.success(
-                `Successfully deleted ${pluralize("link", links.length)}!`,
+                `Successfully deleted ${pluralize("code", links.length)}!`,
               );
             } else {
               const { error } = await res.json();
@@ -129,7 +129,7 @@ function DeleteLinkModalInner({
           />
           <Button
             variant="danger"
-            text={`Delete ${pluralize("link", links.length)}`}
+            text={`Delete ${pluralize("code", links.length)}`}
             loading={deleting}
             className="h-8 w-fit px-3"
           />

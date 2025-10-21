@@ -227,7 +227,7 @@ function LinkBuilderInner({
             <LinkFeatureButtons />
             {homepageDemo ? (
               <Button
-                disabledTooltip="This is a demo link. You can't edit it."
+                disabledTooltip="This is a demo code. You can't edit it."
                 text="Save changes"
                 className="h-8 w-fit"
               />
@@ -238,7 +238,7 @@ function LinkBuilderInner({
                 loading={isSubmitting || isSubmitSuccessful}
                 text={
                   <span className="flex items-center gap-2">
-                    {props ? "Save changes" : "Create link"}
+                    {props ? "Save changes" : "Create code"}
                     <div className="rounded border border-white/20 p-1">
                       <ArrowTurnLeft className="size-3.5" />
                     </div>
@@ -296,12 +296,12 @@ export function CreateLinkButton({
 
   return (
     <Button
-      text="Create link"
+      text="Create code"
       shortcut="C"
       disabledTooltip={
         exceededLinks && plan !== "enterprise" ? (
           <TooltipContent
-            title="Your workspace has exceeded its monthly links limit. We're still collecting data on your existing links, but you need to upgrade to add more links."
+            title="Your workspace has exceeded its monthly codes limit. We're still collecting data on your existing codes, but you need to upgrade to add more codes."
             cta={`Upgrade to ${nextPlan.name}`}
             href={`/${slug}/upgrade`}
           />

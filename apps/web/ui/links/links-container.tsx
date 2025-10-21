@@ -113,11 +113,11 @@ function LinksList({
           </CardList>)
         ) : (
           <AnimatedEmptyState
-            title={isFiltered ? "No links found" : "No links yet"}
+            title={isFiltered ? "No codes found" : "No codes yet"}
             description={
               isFiltered
-                ? "Bummer! There are no links that match your filters. Adjust your filters to yield more results."
-                : "Start creating short links for your marketing campaigns, referral programs, and more."
+                ? "Bummer! There are no codes that match your filters. Adjust your filters to yield more results."
+                : "Start creating QR codes for your marketing campaigns, referral programs, and more."
             }
             cardContent={
               <>

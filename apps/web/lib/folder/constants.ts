@@ -43,7 +43,7 @@ export const FOLDER_USER_ROLE_TO_PERMISSIONS: Record<
 
 export const unsortedLinks: FolderSummary = {
   id: "unsorted",
-  name: "Links",
-  description: "Unsorted links",
+  name: "Codes",
+  description: "Unsorted codes",
   accessLevel: "write",
 };

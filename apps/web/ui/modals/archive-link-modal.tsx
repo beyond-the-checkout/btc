@@ -82,7 +82,7 @@ function ArchiveLinkModalInner({
     setShowArchiveLinkModal(false);
     toastWithUndo({
       id: "link-archive-undo-toast",
-      message: `Successfully ${actionText}d ${pluralize("link", links.length)}!`,
+      message: `Successfully ${actionText}d ${pluralize("code", links.length)}!`,
       undo: undoAction,
       duration: 5000,
     });
@@ -111,14 +111,14 @@ function ArchiveLinkModalInner({
       <div className="space-y-2 border-b border-neutral-200 p-4 sm:p-6">
         <h3 className="text-lg font-medium leading-none">
           {capitalize(actionText)}{" "}
-          {links.length > 1 ? `${links.length} links` : "link"}
+          {links.length > 1 ? `${links.length} codes` : "code"}
         </h3>
       </div>
 
       <div className="bg-neutral-50 p-4 sm:p-6">
         <p className="text-sm text-neutral-800">
           Are you sure you want to {actionText} the following{" "}
-          {pluralize("link", links.length)}?
+          {pluralize("code", links.length)}?
         </p>
 
         <div className="scrollbar-hide mt-4 flex max-h-[190px] flex-col gap-2 overflow-y-auto rounded-2xl border border-neutral-200 p-2">
@@ -141,7 +141,7 @@ function ArchiveLinkModalInner({
           onClick={handleArchiveRequest}
           autoFocus
           loading={archiving}
-          text={`${capitalize(actionText)} ${pluralize("link", links.length)}`}
+          text={`${capitalize(actionText)} ${pluralize("code", links.length)}`}
           className="h-8 w-fit px-3"
         />
       </div>

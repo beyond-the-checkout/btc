@@ -98,9 +98,9 @@ const NAV_GROUPS: SidebarNavGroups<SidebarNavData> = ({
     // product area disappears from navigation in lockstep with route guards.
     isFeatureEnabled("links")
       ? {
-          name: "Short Links",
+          name: "QR Codes",
           description:
-            "Create, organize, and measure the performance of your short links.",
+            "Create, organize, and measure the performance of your QR codes.",
           learnMoreHref: "https://dub.co/links",
           icon: Compass,
           href: slug ? `/${slug}/links` : "/links",
@@ -142,7 +142,7 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
     if (!isFeatureEnabled("links")) {
       // Deployment flag disabled: render an empty shell so the sidebar closes.
       return {
-        title: "Short Links",
+        title: "",
         showNews: false,
         direction: "left",
         content: [],
@@ -150,14 +150,15 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
     }
 
     return {
-      title: "Short Links",
+      title: "",
       showNews,
       direction: "left",
       content: [
         {
+          name: "QR Codes",
           items: [
             {
-              name: "Links",
+              name: "Codes",
               icon: Hyperlink,
               href: `/${slug}/links${pathname === `/${slug}/links` ? "" : queryString}`,
               isActive: (pathname: string, href: string) => {
@@ -176,11 +177,6 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
 
                 return false;
               },
-            },
-            {
-              name: "Domains",
-              icon: Globe,
-              href: `/${slug}/links/domains`,
             },
           ],
         },
