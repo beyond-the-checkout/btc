@@ -10,7 +10,7 @@ export function AnalyticsFunnelChart({ demo = false }: { demo?: boolean }) {
     () => [
       {
         id: "clicks",
-        label: "Clicks",
+        label: "Scans",
         value: demo ? 130 : totalEvents?.clicks ?? 0,
         colorClassName: "text-blue-600",
       },

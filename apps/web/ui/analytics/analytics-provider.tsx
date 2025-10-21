@@ -278,7 +278,7 @@ export default function AnalyticsProvider({
       value={{
         basePath, // basePath for the page (e.g. /[slug]/analytics, /share/[dashboardId])
         baseApiPath, // baseApiPath for analytics API endpoints (e.g. /api/analytics)
-        selectedTab, // selected event tab (clicks, leads, sales)
+        selectedTab, // selected event tab (scans, leads, sales)
         eventsApiPath, // eventsApiPath for events API endpoints (e.g. /api/events)
         saleUnit,
         view,

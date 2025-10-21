@@ -81,7 +81,7 @@ export default function EventsTabs() {
           onClick={() => onEventTabClick(event)}
         >
           <div>
-            <p className="text-sm text-neutral-600">{capitalize(event)}</p>
+            <p className="text-sm text-neutral-600">{event === 'clicks' ? 'Scans' : capitalize(event)}</p>
             <div className="mt-2">
               {totalEvents ? (
                 <NumberFlow

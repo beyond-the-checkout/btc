@@ -116,10 +116,10 @@ export function LinkAnalyticsBadge({
             ))}
             <p className="text-xs leading-none text-neutral-400">
               {link.lastClicked
-                ? `Last clicked ${timeAgo(link.lastClicked, {
+                ? `Last scanned ${timeAgo(link.lastClicked, {
                     withAgo: true,
                   })}`
-                : "No clicks yet"}
+                : "No scans yet"}
             </p>
 
             {sharingEnabled && (
@@ -174,7 +174,7 @@ export function LinkAnalyticsBadge({
                           trailingZeroDisplay: "stripIfInteger",
                         })
                       : nFormatter(value)}
-                    {stats.length === 1 && " clicks"}
+                    {stats.length === 1 && " scans"}
                   </span>
                 </div>
               ),

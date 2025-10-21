@@ -13,7 +13,7 @@ export default function WorkspaceExceededClicks() {
       <div className="my-10 flex flex-col items-center justify-center rounded-md border border-neutral-200 bg-white py-12">
         <AnimatedEmptyState
           title="Stats Locked"
-          description="Your workspace has exceeded your monthly clicks limits. We're still collecting data on your links, but you need to upgrade to view them."
+          description="Your workspace has exceeded your monthly scans limits. We're still collecting data on your links, but you need to upgrade to view them."
           cardContent={() => (
             <>
               <CursorRays className="size-4 text-neutral-700" />

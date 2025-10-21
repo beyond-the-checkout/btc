@@ -149,7 +149,7 @@ export default function AnalyticsAreaChart({
                           )}
                         />
                       )}
-                      <p className="capitalize text-neutral-600">{resource}</p>
+                      <p className="capitalize text-neutral-600">{resource === 'clicks' ? 'scans' : resource}</p>
                     </div>
                     <p className="text-right font-medium text-neutral-900">
                       {resource === "sales" && saleUnit === "saleAmount"

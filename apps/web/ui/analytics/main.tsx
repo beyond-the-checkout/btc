@@ -35,7 +35,7 @@ export default function Main() {
       [
         {
           id: "clicks",
-          label: "Clicks",
+          label: "Scans",
           colorClassName: "text-blue-500/50",
           conversions: false,
         },
@@ -141,7 +141,7 @@ function ConversionTrackingPaywall() {
           Conversion Tracking
         </h2>
         <p className="mt-4 max-w-sm text-center text-sm text-neutral-500">
-          Want to see how your clicks are converting to revenue? Upgrade to our
+          Want to see how your scans are converting to revenue? Upgrade to our
           Business Plan and start tracking conversion events with Dub.{" "}
           <Link
             href="https://d.to/conversions"

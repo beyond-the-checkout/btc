@@ -41,7 +41,7 @@ export function AnalyticsTabs({
       [
         {
           id: "clicks",
-          label: "Clicks",
+          label: "Scans",
           colorClassName: "text-blue-500/50",
           conversions: false,
         },

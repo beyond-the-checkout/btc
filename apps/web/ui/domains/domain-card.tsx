@@ -192,7 +192,7 @@ export default function DomainCard({ props }: { props: DomainProps }) {
                   <CursorRays className="h-4 w-4 text-neutral-700" />
                   <p className="text-xs font-medium text-neutral-900">
                     {nFormatter(props.link?.clicks || 0)}
-                    <span className="ml-1 hidden sm:inline-block">clicks</span>
+                    <span className="ml-1 hidden sm:inline-block">scans</span>
                   </p>
                 </Link>
               </NumberTooltip>

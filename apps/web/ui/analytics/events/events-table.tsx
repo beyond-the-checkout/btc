@@ -720,7 +720,7 @@ export default function EventsTable({
       <EmptyState
         icon={Magnifier}
         title="No events recorded"
-        description={`Events will appear here when your links ${tab === "clicks" ? "are clicked on" : `convert to ${tab}`}`}
+        description={`Events will appear here when your links ${tab === "clicks" ? "are scanned" : `convert to ${tab}`}`}
       />
     ),
     resourceName: (plural) => `event${plural ? "s" : ""}`,

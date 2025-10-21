@@ -374,7 +374,7 @@ export function useAnalyticsFilters({
         ? []
         : [
             {
-              value: `Clicks on ${primaryDomain} domain this year`,
+                value: `Scans on ${primaryDomain} domain this year`,
               icon: Globe2,
             },
           ]),
