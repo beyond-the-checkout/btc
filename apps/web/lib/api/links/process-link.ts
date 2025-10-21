@@ -6,6 +6,7 @@ import { NewLinkProps, ProcessedLinkProps, WorkspaceProps } from "@/lib/types";
 import { prisma } from "@dub/prisma";
 import {
   DUB_DOMAINS,
+  SHORT_DOMAIN,
   UTMTags,
   constructURLFromUTMParams,
   getApexDomain,
@@ -157,8 +158,8 @@ export async function processLink<T extends Record<string, any>>({
     domain = domains?.find((d) => d.primary)?.slug || "dub.sh";
   }
 
-  // checks for dub.sh and dub.link links
-  if (domain === "dub.sh" || domain === "dub.link") {
+  // checks for default short domain (configured) and dub.link
+  if (domain === SHORT_DOMAIN || domain === "dub.link") {
     // for dub.link: check if workspace plan is pro+
     if (domain === "dub.link" && (!workspace || workspace.plan === "free")) {
       return {
@@ -169,8 +170,8 @@ export async function processLink<T extends Record<string, any>>({
       };
     }
 
-    // for dub.sh: check if user exists (if userId is passed)
-    if (domain === "dub.sh" && userId) {
+    // for configured default short domain: check if user exists (if userId is passed)
+    if (domain === SHORT_DOMAIN && userId) {
       const userExists = await checkIfUserExists(userId);
       if (!userExists) {
         return {
