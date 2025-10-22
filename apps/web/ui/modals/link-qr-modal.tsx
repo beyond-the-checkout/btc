@@ -279,6 +279,51 @@ function FramePreview({ type, color }: { type: FrameType; color: string }) {
   );
 }
 
+// Compact inline color picker component
+function InlineColorPicker({
+  value,
+  onChange,
+  isDefault = false,
+}: {
+  value: string;
+  onChange: (color: string) => void;
+  isDefault?: boolean;
+}) {
+  const debouncedOnChange = useDebouncedCallback(onChange, 500);
+
+  return (
+    <div
+      className={cn(
+        "relative flex h-12 w-full shrink-0 rounded-md shadow-sm transition-opacity sm:w-32 sm:ml-auto",
+        isDefault && "opacity-40 grayscale hover:opacity-100 hover:grayscale-0",
+      )}
+    >
+      <Tooltip
+        content={
+          <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
+            <HexColorPicker color={value} onChange={debouncedOnChange} />
+          </div>
+        }
+      >
+        <div
+          className="h-full w-10 rounded-l-md border"
+          style={{
+            backgroundColor: value,
+            borderColor: value,
+          }}
+        />
+      </Tooltip>
+      <HexColorInput
+        color={value}
+        onChange={debouncedOnChange}
+        prefixed
+        style={{ borderColor: value }}
+        className="block w-full rounded-r-md border-2 border-l-0 px-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black"
+      />
+    </div>
+  );
+}
+
 export type QRCodeDesign = {
   fgColor: string;
   hideLogo: boolean;
@@ -286,6 +331,10 @@ export type QRCodeDesign = {
   cornerSquareType: CornerSquareType;
   cornerDotType: CornerDotType;
   frameType: FrameType;
+  dotsColor?: string;
+  eyeOuterColor?: string;
+  eyeInnerColor?: string;
+  frameColor?: string;
 };
 
 type LinkQRModalProps = {
@@ -342,6 +391,10 @@ function LinkQRModalInner({
       cornerSquareType: "square",
       cornerDotType: "square",
       frameType: "none",
+      dotsColor: undefined,
+      eyeOuterColor: undefined,
+      eyeInnerColor: undefined,
+      frameColor: undefined,
     },
   );
 
@@ -356,10 +409,10 @@ function LinkQRModalInner({
       frameType !== "none"
         ? {
             type: frameType,
-            color: data.fgColor,
+            color: data.frameColor || data.fgColor,
           }
         : undefined,
-    [frameType, data.fgColor],
+    [frameType, data.frameColor, data.fgColor],
   );
 
   const hideLogo = data.hideLogo && plan !== "free";
@@ -376,21 +429,34 @@ function LinkQRModalInner({
             logo,
             dotsOptions: {
               type: data.dotType,
+              color: data.dotsColor,
             },
             eyeOptions: {
               cornerSquare: {
                 type: data.cornerSquareType,
-                color: data.fgColor,
+                color: data.eyeOuterColor || data.fgColor,
               },
               cornerDot: {
                 type: data.cornerDotType,
-                color: data.fgColor,
+                color: data.eyeInnerColor || data.fgColor,
               },
             },
             frameOptions,
           })
         : null,
-    [url, data.fgColor, data.dotType, data.cornerSquareType, data.cornerDotType, hideLogo, logo, frameOptions],
+    [
+      url,
+      data.fgColor,
+      data.dotType,
+      data.dotsColor,
+      data.cornerSquareType,
+      data.eyeOuterColor,
+      data.cornerDotType,
+      data.eyeInnerColor,
+      hideLogo,
+      logo,
+      frameOptions,
+    ],
   );
 
   const qrDataForActions = useMemo(
@@ -496,7 +562,18 @@ function LinkQRModalInner({
           {url && (
             <AnimatePresence mode="wait">
               <motion.div
-                key={data.fgColor + data.hideLogo + data.dotType + data.cornerSquareType + data.cornerDotType + frameType}
+                key={
+                  data.fgColor +
+                  data.hideLogo +
+                  data.dotType +
+                  data.dotsColor +
+                  data.cornerSquareType +
+                  data.eyeOuterColor +
+                  data.cornerDotType +
+                  data.eyeInnerColor +
+                  frameType +
+                  data.frameColor
+                }
                 initial={{ filter: "blur(2px)", opacity: 0.4 }}
                 animate={{ filter: "blur(0px)", opacity: 1 }}
                 exit={{ filter: "blur(2px)", opacity: 0.4 }}
@@ -509,15 +586,18 @@ function LinkQRModalInner({
                   hideLogo={data.hideLogo}
                   logo={logo}
                   scale={1}
-                  dotsOptions={{ type: data.dotType }}
+                  dotsOptions={{
+                    type: data.dotType,
+                    color: data.dotsColor,
+                  }}
                   eyeOptions={{
                     cornerSquare: {
                       type: data.cornerSquareType,
-                      color: data.fgColor,
+                      color: data.eyeOuterColor || data.fgColor,
                     },
                     cornerDot: {
                       type: data.cornerDotType,
-                      color: data.fgColor,
+                      color: data.eyeInnerColor || data.fgColor,
                     },
                   }}
                   frameOptions={frameOptions}
@@ -573,10 +653,10 @@ function LinkQRModalInner({
 
       {/* Dot Pattern selector */}
       <div>
-        <span className="block text-sm font-medium text-neutral-700">
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
           Dot Pattern
         </span>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {DOT_TYPES.map((pattern) => {
             const isSelected = data.dotType === pattern;
             const patternLabels: Record<DotType, string> = {
@@ -603,11 +683,19 @@ function LinkQRModalInner({
                       : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                   )}
                 >
-                  <PatternPreview pattern={pattern} color={data.fgColor} />
+                  <PatternPreview
+                    pattern={pattern}
+                    color={data.dotsColor || data.fgColor}
+                  />
                 </button>
               </Tooltip>
             );
           })}
+          <InlineColorPicker
+            value={data.dotsColor || data.fgColor}
+            onChange={(color) => setData((d) => ({ ...d, dotsColor: color }))}
+            isDefault={!data.dotsColor}
+          />
         </div>
       </div>
 
@@ -649,11 +737,21 @@ function LinkQRModalInner({
                           : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                       )}
                     >
-                      <CornerSquarePreview type={type} color={data.fgColor} />
+                      <CornerSquarePreview
+                        type={type}
+                        color={data.eyeOuterColor || data.fgColor}
+                      />
                     </button>
                   </Tooltip>
                 );
               })}
+              <InlineColorPicker
+                value={data.eyeOuterColor || data.fgColor}
+                onChange={(color) =>
+                  setData((d) => ({ ...d, eyeOuterColor: color }))
+                }
+                isDefault={!data.eyeOuterColor}
+              />
             </div>
           </div>
 
@@ -687,11 +785,21 @@ function LinkQRModalInner({
                           : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                       )}
                     >
-                      <CornerDotPreview type={type} color={data.fgColor} />
+                      <CornerDotPreview
+                        type={type}
+                        color={data.eyeInnerColor || data.fgColor}
+                      />
                     </button>
                   </Tooltip>
                 );
               })}
+              <InlineColorPicker
+                value={data.eyeInnerColor || data.fgColor}
+                onChange={(color) =>
+                  setData((d) => ({ ...d, eyeInnerColor: color }))
+                }
+                isDefault={!data.eyeInnerColor}
+              />
             </div>
           </div>
         </div>
@@ -699,10 +807,10 @@ function LinkQRModalInner({
 
       {/* Frame selector */}
       <div>
-        <span className="block text-sm font-medium text-neutral-700">
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
           Frame
         </span>
-        <div className="mt-2 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {FRAME_TYPES.map((type) => {
             const isSelected = frameType === type;
             const frameLabels: Record<FrameType, string> = {
@@ -729,11 +837,21 @@ function LinkQRModalInner({
                       : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                   )}
                 >
-                  <FramePreview type={type} color={data.fgColor} />
+                  <FramePreview
+                    type={type}
+                    color={data.frameColor || data.fgColor}
+                  />
                 </button>
               </Tooltip>
             );
           })}
+          {frameType !== "none" && (
+            <InlineColorPicker
+              value={data.frameColor || data.fgColor}
+              onChange={(color) => setData((d) => ({ ...d, frameColor: color }))}
+              isDefault={!data.frameColor}
+            />
+          )}
         </div>
       </div>
 

@@ -27,6 +27,7 @@ export type ImageSettings = {
 
 export type DotsOptions = {
   type?: DotType;
+  color?: string;
 };
 
 export type CornerSquareOptions = {

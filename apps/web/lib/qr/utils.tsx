@@ -516,6 +516,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
   // For level 1, 441 nodes -> 2
   // For level 40, 31329 -> 2
   const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  const dotsColor = dotsOptions?.color ?? fgColor;
   const fgPath = generatePath(cells, margin, dotType, eyes);
 
   // Generate eye patterns
@@ -580,7 +581,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
             d={`M0,0 h${numCells}v${numCells}H0z`}
             shapeRendering="crispEdges"
           />
-          <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+          <path fill={dotsColor} d={fgPath} shapeRendering="crispEdges" />
           {eyePaths}
           {image}
         </svg>
@@ -603,7 +604,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
         d={`M0,0 h${numCells}v${numCells}H0z`}
         shapeRendering="crispEdges"
       />
-      <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+      <path fill={dotsColor} d={fgPath} shapeRendering="crispEdges" />
       {eyePaths}
       {image}
     </svg>

@@ -8,6 +8,10 @@ import z from "@/lib/zod";
 import { booleanQuerySchema } from "./misc";
 import { parseUrlSchema } from "./utils";
 
+const hexColorSchema = z
+  .string()
+  .regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color");
+
 export const getQRCodeQuerySchema = z.object({
   url: parseUrlSchema.describe("The URL to generate a QR code for."),
   logo: z
@@ -64,4 +68,16 @@ export const getQRCodeQuerySchema = z.object({
       "DEPRECATED: Margin is included by default. Use the `margin` prop to customize the margin size.",
     )
     .openapi({ deprecated: true }),
+  dotsColor: hexColorSchema
+    .optional()
+    .describe("The color of QR code dots in hex format."),
+  eyeOuterColor: hexColorSchema
+    .optional()
+    .describe("The color of QR code eye outer frames in hex format."),
+  eyeInnerColor: hexColorSchema
+    .optional()
+    .describe("The color of QR code eye inner dots in hex format."),
+  frameColor: hexColorSchema
+    .optional()
+    .describe("The color of the QR code frame in hex format."),
 });

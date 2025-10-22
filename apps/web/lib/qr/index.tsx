@@ -416,8 +416,9 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
       ctx.fillStyle = bgColor;
       ctx.fillRect(0, 0, numCells, numCells);
 
-      ctx.fillStyle = fgColor;
       const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+      const dotsColor = dotsOptions?.color ?? fgColor;
+      ctx.fillStyle = dotsColor;
       renderCanvasModules(ctx, cells, margin, dotType, eyes);
 
       // Render eyes with custom patterns
@@ -547,6 +548,7 @@ export async function getQRAsSVGDataUri(props: QRProps) {
 
   const eyes = detectEyes(cells);
   const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  const dotsColor = dotsOptions?.color ?? fgColor;
   const fgPath = generatePath(cells, margin, dotType, eyes);
 
   // Generate eye patterns (inline to avoid JSX in this function)
@@ -583,7 +585,7 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     ? [
         `<svg x="${framePadding}" y="${framePadding}" width="${size}" height="${size}" viewBox="0 0 ${numCells} ${numCells}">`,
         `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`,
-        `<path fill="${fgColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
+        `<path fill="${dotsColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
         eyePaths,
         image,
         `</svg>`,
@@ -591,7 +593,7 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     : [
         `<svg viewBox="0 0 ${numCells} ${numCells}" width="${size}" height="${size}">`,
         `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`,
-        `<path fill="${fgColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
+        `<path fill="${dotsColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
         eyePaths,
         image,
         `</svg>`,
@@ -714,8 +716,9 @@ export async function getQRAsCanvas(
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, numCells, numCells);
 
-  ctx.fillStyle = fgColor;
   const dotType = dotsOptions?.type ?? DEFAULT_DOT_TYPE;
+  const dotsColor = dotsOptions?.color ?? fgColor;
+  ctx.fillStyle = dotsColor;
   renderCanvasModules(ctx, cells, margin, dotType, eyes);
 
   // Render eyes with custom patterns
