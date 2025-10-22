@@ -275,6 +275,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -282,7 +283,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
@@ -328,6 +328,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -335,7 +336,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
@@ -368,6 +368,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -375,7 +376,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
@@ -410,6 +410,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -417,7 +418,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
@@ -481,6 +481,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -488,7 +489,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
@@ -517,6 +517,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -524,7 +525,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
@@ -553,6 +553,7 @@ export default async function LinkMiddleware(
       recordClick({
         req,
         clickId,
+        workspaceId,
         linkId,
         domain,
         key,
@@ -560,7 +561,6 @@ export default async function LinkMiddleware(
         programId: cachedLink.programId,
         partnerId: cachedLink.partnerId,
         webhookIds,
-        workspaceId,
         shouldCacheClickId,
       }),
     );
