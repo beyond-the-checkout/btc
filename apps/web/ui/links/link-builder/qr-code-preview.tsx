@@ -46,6 +46,10 @@ export function QRCodePreview() {
     {
       fgColor: "#000000",
       hideLogo: true,
+      dotType: "square",
+      cornerSquareType: "square",
+      cornerDotType: "square",
+      frameType: "none",
     },
   );
 
@@ -58,6 +62,14 @@ export function QRCodePreview() {
     workspacePlan === "free"
       ? DUB_QR_LOGO
       : domainLogo || workspaceLogo || DUB_QR_LOGO;
+  const frameType = data.frameType ?? "none";
+  const frameOptions =
+    frameType !== "none"
+      ? {
+          type: frameType,
+          color: data.fgColor,
+        }
+      : undefined;
 
   const { LinkQRModal, setShowLinkQRModal } = useLinkQRModal({
     props: {
@@ -115,6 +127,18 @@ export function QRCodePreview() {
                 hideLogo={hideLogo}
                 logo={logo}
                 scale={0.5}
+                dotsOptions={{ type: data.dotType }}
+                eyeOptions={{
+                  cornerSquare: {
+                    type: data.cornerSquareType,
+                    color: data.fgColor,
+                  },
+                  cornerDot: {
+                    type: data.cornerDotType,
+                    color: data.fgColor,
+                  },
+                }}
+                frameOptions={frameOptions}
               />
             </motion.div>
           </AnimatePresence>

@@ -1,5 +1,5 @@
 import { getQRAsCanvas, getQRAsSVGDataUri, getQRData, DotType } from "@/lib/qr";
-import { DOT_TYPES, CORNER_SQUARE_TYPES, CORNER_DOT_TYPES, CornerSquareType, CornerDotType } from "@/lib/qr/constants";
+import { DOT_TYPES, CORNER_SQUARE_TYPES, CORNER_DOT_TYPES, FRAME_TYPES, CornerSquareType, CornerDotType, FrameType } from "@/lib/qr/constants";
 import { generatePath } from "@/lib/qr/utils";
 import { generateCornerSquarePath, generateCornerDotPath } from "@/lib/qr/eye-patterns";
 import useDomain from "@/lib/swr/use-domain";
@@ -145,12 +145,147 @@ function CornerDotPreview({ type, color }: { type: CornerDotType; color: string 
   );
 }
 
+// Frame preview component
+function FramePreview({ type, color }: { type: FrameType; color: string }) {
+  const size = 32;
+  const viewBoxSize = 24;
+  const padding = 2;
+  const innerSize = viewBoxSize - padding * 2;
+  const borderWidth = 1.5;
+
+  if (type === "none") {
+    // Show a simple square with an X through it to indicate "no frame"
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+        fill="none"
+      >
+        <rect
+          x={padding}
+          y={padding}
+          width={innerSize}
+          height={innerSize}
+          fill="#f5f5f5"
+          stroke={color}
+          strokeWidth={borderWidth}
+          opacity={0.5}
+        />
+        <line
+          x1={padding}
+          y1={padding}
+          x2={viewBoxSize - padding}
+          y2={viewBoxSize - padding}
+          stroke={color}
+          strokeWidth={borderWidth}
+          opacity={0.5}
+        />
+        <line
+          x1={viewBoxSize - padding}
+          y1={padding}
+          x2={padding}
+          y2={viewBoxSize - padding}
+          stroke={color}
+          strokeWidth={borderWidth}
+          opacity={0.5}
+        />
+      </svg>
+    );
+  }
+
+  // Create a small QR-like pattern in the center
+  const qrSize = innerSize - 4;
+  const qrX = padding + 2;
+  const qrY = padding + 2;
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
+      fill="none"
+    >
+      {/* Inner QR pattern */}
+      <rect
+        x={qrX}
+        y={qrY}
+        width={qrSize}
+        height={qrSize}
+        fill="#f5f5f5"
+      />
+
+      {/* Frame based on type */}
+      {type === "square" && (
+        <rect
+          x={padding}
+          y={padding}
+          width={innerSize}
+          height={innerSize}
+          fill="none"
+          stroke={color}
+          strokeWidth={borderWidth}
+        />
+      )}
+
+      {type === "rounded-square" && (
+        <rect
+          x={padding}
+          y={padding}
+          width={innerSize}
+          height={innerSize}
+          rx={3}
+          ry={3}
+          fill="none"
+          stroke={color}
+          strokeWidth={borderWidth}
+        />
+      )}
+
+      {type === "circle" && (
+        <circle
+          cx={viewBoxSize / 2}
+          cy={viewBoxSize / 2}
+          r={(innerSize / 2) * 0.9}
+          fill="none"
+          stroke={color}
+          strokeWidth={borderWidth}
+        />
+      )}
+
+      {type === "dots-circle" && (
+        <>
+          {Array.from({ length: 16 }).map((_, i) => {
+            const angle = (i / 16) * Math.PI * 2;
+            const circleCenterRadius = (innerSize / 2) * 0.9;
+            const dotRadius = 0.8;
+            // Match the outer extent of the solid circle: adjust dot centers
+            const dotCenterRadius = circleCenterRadius - (dotRadius - borderWidth / 2);
+            const cx = viewBoxSize / 2 + Math.cos(angle) * dotCenterRadius;
+            const cy = viewBoxSize / 2 + Math.sin(angle) * dotCenterRadius;
+            return (
+              <circle
+                key={i}
+                cx={cx}
+                cy={cy}
+                r={dotRadius}
+                fill={color}
+              />
+            );
+          })}
+        </>
+      )}
+    </svg>
+  );
+}
+
 export type QRCodeDesign = {
   fgColor: string;
   hideLogo: boolean;
   dotType: DotType;
   cornerSquareType: CornerSquareType;
   cornerDotType: CornerDotType;
+  frameType: FrameType;
 };
 
 type LinkQRModalProps = {
@@ -206,10 +341,26 @@ function LinkQRModalInner({
       dotType: "square",
       cornerSquareType: "square",
       cornerDotType: "square",
+      frameType: "none",
     },
   );
 
-  const [data, setData] = useState(dataPersisted);
+  const [data, setData] = useState<QRCodeDesign>(() => ({
+    ...dataPersisted,
+    frameType: dataPersisted.frameType ?? "none",
+  }));
+
+  const frameType = data.frameType ?? "none";
+  const frameOptions = useMemo(
+    () =>
+      frameType !== "none"
+        ? {
+            type: frameType,
+            color: data.fgColor,
+          }
+        : undefined,
+    [frameType, data.fgColor],
+  );
 
   const hideLogo = data.hideLogo && plan !== "free";
   const logo =
@@ -236,9 +387,15 @@ function LinkQRModalInner({
                 color: data.fgColor,
               },
             },
+            frameOptions,
           })
         : null,
-    [url, data.fgColor, data.dotType, data.cornerSquareType, data.cornerDotType, hideLogo, logo],
+    [url, data.fgColor, data.dotType, data.cornerSquareType, data.cornerDotType, hideLogo, logo, frameOptions],
+  );
+
+  const qrDataForActions = useMemo(
+    () => (qrData ? { ...qrData, frameOptions } : null),
+    [qrData, frameOptions],
   );
 
   const onColorChange = useDebouncedCallback(
@@ -305,9 +462,9 @@ function LinkQRModalInner({
               }
             />
           </div>
-          {url && qrData && (
+          {url && qrDataForActions && (
             <div className="flex items-center gap-2">
-              <DownloadPopover qrData={qrData} props={props}>
+              <DownloadPopover qrData={qrDataForActions} props={props}>
                 <div>
                   <ButtonTooltip
                     tooltipProps={{
@@ -318,7 +475,7 @@ function LinkQRModalInner({
                   </ButtonTooltip>
                 </div>
               </DownloadPopover>
-              <CopyPopover qrData={qrData} props={props}>
+              <CopyPopover qrData={qrDataForActions} props={props}>
                 <div>
                   <ButtonTooltip
                     tooltipProps={{
@@ -339,7 +496,7 @@ function LinkQRModalInner({
           {url && (
             <AnimatePresence mode="wait">
               <motion.div
-                key={data.fgColor + data.hideLogo + data.dotType + data.cornerSquareType + data.cornerDotType}
+                key={data.fgColor + data.hideLogo + data.dotType + data.cornerSquareType + data.cornerDotType + frameType}
                 initial={{ filter: "blur(2px)", opacity: 0.4 }}
                 animate={{ filter: "blur(0px)", opacity: 1 }}
                 exit={{ filter: "blur(2px)", opacity: 0.4 }}
@@ -363,6 +520,7 @@ function LinkQRModalInner({
                       color: data.fgColor,
                     },
                   }}
+                  frameOptions={frameOptions}
                 />
               </motion.div>
             </AnimatePresence>
@@ -536,6 +694,46 @@ function LinkQRModalInner({
               })}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Frame selector */}
+      <div>
+        <span className="block text-sm font-medium text-neutral-700">
+          Frame
+        </span>
+        <div className="mt-2 flex flex-wrap items-center gap-3">
+          {FRAME_TYPES.map((type) => {
+            const isSelected = frameType === type;
+            const frameLabels: Record<FrameType, string> = {
+              none: "None",
+              square: "Square",
+              "rounded-square": "Rounded",
+              circle: "Circle",
+              "dots-circle": "Dots",
+            };
+            return (
+              <Tooltip
+                key={type}
+                content={frameLabels[type]}
+              >
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  aria-label={`Select ${frameLabels[type]} frame`}
+                  onClick={() => setData((d) => ({ ...d, frameType: type }))}
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    isSelected
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                  )}
+                >
+                  <FramePreview type={type} color={data.fgColor} />
+                </button>
+              </Tooltip>
+            );
+          })}
         </div>
       </div>
 

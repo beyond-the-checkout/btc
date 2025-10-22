@@ -43,6 +43,7 @@ import {
   ERROR_LEVEL_MAP,
   DEFAULT_CORNER_SQUARE_TYPE,
   DEFAULT_CORNER_DOT_TYPE,
+  DEFAULT_FRAME_TYPE,
 } from "./constants";
 import { DotType, DotsOptions, Modules, QRProps, QRPropsCanvas } from "./types";
 import {
@@ -59,6 +60,7 @@ import {
   generateCornerSquarePath,
   generateCornerDotPath,
 } from "./eye-patterns";
+import { renderCanvasFrame, getFramePadding, renderSVGFrame } from "./frames";
 export * from "./types";
 export * from "./utils";
 
@@ -334,6 +336,7 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
     imageSettings,
     dotsOptions,
     eyeOptions,
+    frameOptions,
     ...otherProps
   } = props;
   const imgSrc = imageSettings?.src;
@@ -384,13 +387,26 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
         }
       }
 
+      // Calculate frame size and padding
+      const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
+      const framePadding = getFramePadding(size, frameType);
+      const outputSize = framePadding > 0 ? size + framePadding * 2 : size;
+
       // We're going to scale this so that the number of drawable units
       // matches the number of cells. This avoids rounding issues, but does
       // result in some potentially unwanted single pixel issues between
       // blocks, only in environments that don't support Path2D.
       const pixelRatio = window.devicePixelRatio || 1;
-      canvas.height = canvas.width = size * pixelRatio;
+      canvas.height = canvas.width = outputSize * pixelRatio;
       const scale = (size / numCells) * pixelRatio;
+
+      // Fill entire background (including frame area)
+      ctx.fillStyle = bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Translate to account for frame padding
+      ctx.save();
+      ctx.translate(framePadding * pixelRatio, framePadding * pixelRatio);
       ctx.scale(scale, scale);
 
       // Detect eye positions for custom rendering
@@ -427,6 +443,21 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
           calculatedImageSettings.h,
         );
       }
+
+      // Restore context before rendering frame
+      ctx.restore();
+
+      // Render frame if specified
+      if (frameOptions && frameOptions.type && frameOptions.type !== "none") {
+        ctx.save();
+        ctx.scale(pixelRatio, pixelRatio);
+        renderCanvasFrame(ctx, {
+          frameOptions,
+          qrSize: size,
+          margin: 0,
+        });
+        ctx.restore();
+      }
     }
   });
 
@@ -436,7 +467,11 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
     setIsImageLoaded(false);
   }, [imgSrc]);
 
-  const canvasStyle = { height: size, width: size, ...style };
+  // Calculate output size for canvas style (including frame if present)
+  const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
+  const framePadding = getFramePadding(size, frameType);
+  const outputSize = framePadding > 0 ? size + framePadding * 2 : size;
+  const canvasStyle = { height: outputSize, width: outputSize, ...style };
   let img: JSX.Element | null = null;
   if (imgSrc != null) {
     img = (
@@ -456,8 +491,8 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
     <>
       <canvas
         style={canvasStyle}
-        height={size}
-        width={size}
+        height={outputSize}
+        width={outputSize}
         ref={_canvas}
         {...otherProps}
       />
@@ -477,6 +512,7 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     imageSettings,
     dotsOptions,
     eyeOptions,
+    frameOptions,
   } = props;
 
   let cells = qrcodegen.QrCode.encodeText(
@@ -528,12 +564,44 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     ].join("");
   }).join("");
 
+  // Calculate frame parameters
+  const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
+  const framePadding = getFramePadding(size, frameType);
+  const outputSize = framePadding > 0 ? size + framePadding * 2 : size;
+
+  // Generate frame SVG if needed
+  const frameSVG = frameOptions && frameOptions.type && frameOptions.type !== "none"
+    ? renderSVGFrame({
+        frameOptions,
+        qrSize: size,
+        margin: 0,
+      })
+    : "";
+
+  // If we have a frame, wrap QR code in a nested SVG at the correct position
+  const qrContent = framePadding > 0
+    ? [
+        `<svg x="${framePadding}" y="${framePadding}" width="${size}" height="${size}" viewBox="0 0 ${numCells} ${numCells}">`,
+        `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`,
+        `<path fill="${fgColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
+        eyePaths,
+        image,
+        `</svg>`,
+      ].join("")
+    : [
+        `<svg viewBox="0 0 ${numCells} ${numCells}" width="${size}" height="${size}">`,
+        `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`,
+        `<path fill="${fgColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
+        eyePaths,
+        image,
+        `</svg>`,
+      ].join("");
+
   const svgData = [
-    `<svg xmlns="http://www.w3.org/2000/svg" height="${size}" width="${size}" viewBox="0 0 ${numCells} ${numCells}">`,
-    `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`,
-    `<path fill="${fgColor}" d="${fgPath}" shapeRendering="crispEdges"></path>`,
-    eyePaths,
-    image,
+    `<svg xmlns="http://www.w3.org/2000/svg" height="${outputSize}" width="${outputSize}" viewBox="0 0 ${outputSize} ${outputSize}">`,
+    `<rect fill="${bgColor}" x="0" y="0" width="${outputSize}" height="${outputSize}" />`,
+    qrContent,
+    frameSVG,
     "</svg>",
   ].join("");
 
@@ -594,6 +662,7 @@ export async function getQRAsCanvas(
     imageSettings,
     dotsOptions,
     eyeOptions,
+    frameOptions,
   } = props;
 
   const canvas = document.createElement("canvas");
@@ -621,9 +690,22 @@ export async function getQRAsCanvas(
     }
   }
 
+  // Calculate frame size and padding
+  const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
+  const framePadding = getFramePadding(size, frameType);
+  const outputSize = framePadding > 0 ? size + framePadding * 2 : size;
+
   const pixelRatio = window.devicePixelRatio || 1;
-  canvas.height = canvas.width = size * pixelRatio;
+  canvas.height = canvas.width = outputSize * pixelRatio;
   const scale = (size / numCells) * pixelRatio;
+
+  // Fill entire background (including frame area)
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Translate to account for frame padding
+  ctx.save();
+  ctx.translate(framePadding * pixelRatio, framePadding * pixelRatio);
   ctx.scale(scale, scale);
 
   const eyes = detectEyes(cells);
@@ -666,6 +748,21 @@ export async function getQRAsCanvas(
     );
   }
 
+  // Restore context before rendering frame
+  ctx.restore();
+
+  // Render frame if specified
+  if (frameOptions && frameOptions.type && frameOptions.type !== "none") {
+    ctx.save();
+    ctx.scale(pixelRatio, pixelRatio);
+    renderCanvasFrame(ctx, {
+      frameOptions,
+      qrSize: size,
+      margin: 0,
+    });
+    ctx.restore();
+  }
+
   if (getCanvas) return canvas;
 
   const url = canvas.toDataURL(type, 1.0);
@@ -682,6 +779,7 @@ export function getQRData({
   margin,
   dotsOptions,
   eyeOptions,
+  frameOptions,
 }: {
   url: string;
   fgColor?: string;
@@ -690,6 +788,7 @@ export function getQRData({
   margin?: number;
   dotsOptions?: DotsOptions;
   eyeOptions?: import("./types").EyeOptions;
+  frameOptions?: import("./types").FrameOptions;
 }) {
   return {
     value: `${url}?qr=1`,
@@ -701,6 +800,7 @@ export function getQRData({
     margin,
     dotsOptions,
     eyeOptions,
+    frameOptions,
     ...(!hideLogo && {
       imageSettings: {
         src: logo || DUB_QR_LOGO,

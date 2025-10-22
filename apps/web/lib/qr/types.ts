@@ -1,6 +1,11 @@
 import type { CSSProperties } from "react";
 import qrcodegen from "./codegen";
-import { DOT_TYPES, CornerSquareType, CornerDotType } from "./constants";
+import {
+  DOT_TYPES,
+  CornerSquareType,
+  CornerDotType,
+  FrameType,
+} from "./constants";
 
 export type Modules = ReturnType<qrcodegen.QrCode["getModules"]>;
 export type Excavation = { x: number; y: number; w: number; h: number };
@@ -39,6 +44,14 @@ export type EyeOptions = {
   cornerDot?: CornerDotOptions;
 };
 
+export type FrameOptions = {
+  type?: FrameType;
+  color?: string;
+  text?: string;
+  textColor?: string;
+  textSize?: number;
+};
+
 export type QRProps = {
   value: string;
   size?: number;
@@ -50,6 +63,7 @@ export type QRProps = {
   imageSettings?: ImageSettings;
   dotsOptions?: DotsOptions;
   eyeOptions?: EyeOptions;
+  frameOptions?: FrameOptions;
   isOGContext?: boolean;
 };
 export type QRPropsCanvas = QRProps &

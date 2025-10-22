@@ -10,10 +10,12 @@ import {
   ERROR_LEVEL_MAP,
   DEFAULT_CORNER_SQUARE_TYPE,
   DEFAULT_CORNER_DOT_TYPE,
+  DEFAULT_FRAME_TYPE,
 } from "./constants";
 import { DotType, Excavation, GetNeighbor, ImageSettings, Modules, QRPropsSVG } from "./types";
 import { detectEyes, isInEye } from "./eye-detector";
 import { generateCornerSquarePath, generateCornerDotPath } from "./eye-patterns";
+import { getFramePadding, renderSVGFrame } from "./frames";
 
 import type { JSX } from "react";
 
@@ -438,6 +440,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
     imageSettings,
     dotsOptions,
     eyeOptions,
+    frameOptions,
     ...otherProps
   } = props;
 
@@ -538,6 +541,56 @@ export function QRCodeSVG(props: QRPropsSVG) {
     );
   });
 
+  // Calculate frame padding and total output size
+  const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
+  const framePadding = getFramePadding(size, frameType);
+  const outputSize = framePadding > 0 ? size + framePadding * 2 : size;
+
+  // Generate frame SVG if needed
+  const frameSVG = frameOptions && frameOptions.type && frameOptions.type !== "none"
+    ? renderSVGFrame({
+        frameOptions,
+        qrSize: size,
+        margin: 0,
+      })
+    : null;
+
+  // Render QR content with frame support
+  if (framePadding > 0 && frameSVG) {
+    // When there's a frame, wrap QR in a nested SVG at the correct position
+    return (
+      <svg
+        height={outputSize}
+        width={outputSize}
+        viewBox={`0 0 ${outputSize} ${outputSize}`}
+        {...otherProps}
+      >
+        {/* Background across entire output including frame padding */}
+        <rect fill={bgColor} x={0} y={0} width={outputSize} height={outputSize} />
+        {/* QR code content, positioned with padding for the frame */}
+        <svg
+          x={framePadding}
+          y={framePadding}
+          width={size}
+          height={size}
+          viewBox={`0 0 ${numCells} ${numCells}`}
+        >
+          <path
+            fill={bgColor}
+            d={`M0,0 h${numCells}v${numCells}H0z`}
+            shapeRendering="crispEdges"
+          />
+          <path fill={fgColor} d={fgPath} shapeRendering="crispEdges" />
+          {eyePaths}
+          {image}
+        </svg>
+        {/* Frame elements rendered at the outer level */}
+        <g dangerouslySetInnerHTML={{ __html: frameSVG }} />
+      </svg>
+    );
+  }
+
+  // No frame - render normally
   return (
     <svg
       height={size}

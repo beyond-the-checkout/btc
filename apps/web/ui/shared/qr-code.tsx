@@ -1,4 +1,4 @@
-import { getQRData, QRCodeSVG, DotsOptions, EyeOptions } from "@/lib/qr";
+import { getQRData, QRCodeSVG, DotsOptions, EyeOptions, FrameOptions } from "@/lib/qr";
 import { DEFAULT_MARGIN } from "@/lib/qr/constants";
 import { memo, useMemo } from "react";
 
@@ -12,6 +12,7 @@ export const QRCode = memo(
     margin = DEFAULT_MARGIN,
     dotsOptions,
     eyeOptions,
+    frameOptions,
   }: {
     url: string;
     fgColor?: string;
@@ -21,10 +22,11 @@ export const QRCode = memo(
     margin?: number;
     dotsOptions?: DotsOptions;
     eyeOptions?: EyeOptions;
+    frameOptions?: FrameOptions;
   }) => {
     const qrData = useMemo(
-      () => getQRData({ url, fgColor, hideLogo, logo, margin, dotsOptions, eyeOptions }),
-      [url, fgColor, hideLogo, logo, margin, dotsOptions, eyeOptions],
+      () => getQRData({ url, fgColor, hideLogo, logo, margin, dotsOptions, eyeOptions, frameOptions }),
+      [url, fgColor, hideLogo, logo, margin, dotsOptions, eyeOptions, frameOptions],
     );
 
     return (
@@ -37,6 +39,7 @@ export const QRCode = memo(
         margin={qrData.margin}
         dotsOptions={qrData.dotsOptions}
         eyeOptions={qrData.eyeOptions}
+        frameOptions={qrData.frameOptions}
         {...(qrData.imageSettings && {
           imageSettings: {
             ...qrData.imageSettings,

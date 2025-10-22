@@ -47,6 +47,19 @@ export type CornerDotType = typeof CORNER_DOT_TYPES[number];
 export const DEFAULT_CORNER_SQUARE_TYPE = "square";
 export const DEFAULT_CORNER_DOT_TYPE = "square";
 
+// Frame types for QR code borders and decorative frames
+export const FRAME_TYPES = [
+  "none",
+  "square",
+  "rounded-square",
+  "circle",
+  "dots-circle",
+] as const;
+
+export type FrameType = typeof FRAME_TYPES[number];
+
+export const DEFAULT_FRAME_TYPE = "none";
+
 // This is *very* rough estimate of max amount of QRCode allowed to be covered.
 // It is "wrong" in a lot of ways (area is a terrible way to estimate, it
 // really should be number of modules covered), but if for some reason we don't
