@@ -441,6 +441,56 @@ export const createLinkBodySchema = z.object({
     .nullish()
     .describe("The date and time when the tests were or will be completed."),
 
+  // QR Code Design
+  qrDotType: z
+    .string()
+    .nullish()
+    .describe(
+      'The dot pattern type for the QR code. Options: "square", "rounded", "dots", "classy", "extra-rounded".',
+    ),
+  qrDotsColor: z
+    .string()
+    .nullish()
+    .describe("The hex color for QR code dots (e.g., #000000)."),
+  qrCornerSquareType: z
+    .string()
+    .nullish()
+    .describe(
+      'The corner square (outer eye frame) type. Options: "square", "rounded", "dots", "extra-rounded", "leaf".',
+    ),
+  qrCornerSquareColor: z
+    .string()
+    .nullish()
+    .describe("The hex color for QR code corner square (outer eye frame)."),
+  qrCornerDotType: z
+    .string()
+    .nullish()
+    .describe(
+      'The corner dot (inner eye) type. Options: "square", "dots", "rounded".',
+    ),
+  qrCornerDotColor: z
+    .string()
+    .nullish()
+    .describe("The hex color for QR code corner dot (inner eye)."),
+  qrShape: z
+    .string()
+    .nullish()
+    .describe('The overall QR code shape. Options: "square", "circle".'),
+  qrFrameStyle: z
+    .string()
+    .nullish()
+    .describe(
+      'The frame style around the QR code. Options: "square", "rounded", "solid-circle", "dotted-circle", or null for no frame.',
+    ),
+  qrFrameColor: z
+    .string()
+    .nullish()
+    .describe("The hex color for the QR code frame."),
+  qrHideLogo: z
+    .boolean()
+    .nullish()
+    .describe("Whether to hide the logo in the QR code."),
+
   // deprecated fields
   publicStats: z
     .boolean()

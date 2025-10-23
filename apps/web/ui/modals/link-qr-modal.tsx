@@ -19,9 +19,9 @@ import {
   Tooltip,
   TooltipContent,
   useCopyToClipboard,
-  useLocalStorage,
   useMediaQuery,
 } from "@dub/ui";
+import { useLocalStorage } from "@/ui/hooks/use-local-storage";
 import {
   Check,
   Check2,
@@ -38,6 +38,7 @@ import {
   PropsWithChildren,
   SetStateAction,
   useCallback,
+  useEffect,
   useId,
   useMemo,
   useRef,
@@ -280,15 +281,19 @@ function FramePreview({ type, color }: { type: FrameType; color: string }) {
 }
 
 export type QRCodeDesign = {
-  fgColor: string;
-  hideLogo: boolean;
-  dotType: DotType;
-  cornerSquareType: CornerSquareType;
-  cornerDotType: CornerDotType;
+  fgColor: string; // Legacy field, used as fallback
+  qrHideLogo: boolean;
+  qrDotType: DotType;
+  qrCornerSquareType: CornerSquareType;
+  qrCornerDotType: CornerDotType;
   qrShape: "square" | "circle";
-  hasFrame: boolean;
-  frameStyle?: "square" | "rounded" | "solid-circle" | "dotted-circle";
-  frameColor?: string;
+  hasFrame: boolean; // Computed from qrFrameStyle - not stored in DB
+  qrFrameStyle?: "square" | "rounded" | "solid-circle" | "dotted-circle";
+  qrFrameColor?: string;
+  // Separate color fields for individual customization
+  qrDotsColor?: string;
+  qrCornerSquareColor?: string;
+  qrCornerDotColor?: string;
 };
 
 type LinkQRModalProps = {
@@ -336,65 +341,113 @@ function LinkQRModalInner({
       : undefined;
   }, [props.key, props.domain]);
 
-  const [dataPersisted, setDataPersisted] = useLocalStorage<any>(
-    `qr-code-design-${workspaceId}`,
+  // Use per-link localStorage key instead of workspace-level
+  // This ensures each link has its own QR customization
+  const localStorageKey = props.domain && props.key
+    ? `qr-code-design-${props.domain}-${props.key}`
+    : `qr-code-design-new-link`; // Fallback for links being created
+
+  const [rawData, setData] = useLocalStorage<QRCodeDesign>(
+    localStorageKey,
     {
       fgColor: "#000000",
-      hideLogo: false,
-      dotType: "square",
-      cornerSquareType: "square",
-      cornerDotType: "square",
+      qrHideLogo: false,
+      qrDotType: "square",
+      qrCornerSquareType: "square",
+      qrCornerDotType: "square",
       qrShape: "square",
-      frameStyle: undefined, // undefined = no frame
-      frameColor: undefined,
+      hasFrame: false,
+      qrFrameStyle: undefined,
+      qrFrameColor: undefined,
+      qrDotsColor: undefined,
+      qrCornerSquareColor: undefined,
+      qrCornerDotColor: undefined,
     },
   );
 
-  // Migrate old frameType data to new structure
-  const [data, setData] = useState<QRCodeDesign>(() => {
-    const persisted = dataPersisted;
-
-    // Migration: convert old frameType to new qrShape + frameStyle
-    if ('frameType' in persisted && !('qrShape' in persisted)) {
-      const oldFrameType = persisted.frameType;
-      const migrated: QRCodeDesign = {
-        ...persisted,
-        qrShape: (oldFrameType === "circle" || oldFrameType === "dots-circle") ? "circle" : "square",
-        frameStyle: oldFrameType === "none" ? undefined :
-                   oldFrameType === "square" ? "square" :
-                   oldFrameType === "rounded-square" ? "rounded" :
-                   oldFrameType === "circle" ? "solid-circle" :
-                   oldFrameType === "dots-circle" ? "dotted-circle" : undefined,
-      };
-      delete (migrated as any).frameType;
-      delete (migrated as any).hasFrame; // Remove old hasFrame if exists
-      return migrated;
+  // Migrate any legacy schema to the new qr* fields
+  function migrateQRCodeDesign(d: any): QRCodeDesign {
+    if (!d || typeof d !== "object") {
+      return {
+        fgColor: "#000000",
+        qrHideLogo: false,
+        qrDotType: "square",
+        qrCornerSquareType: "square",
+        qrCornerDotType: "square",
+        qrShape: "square",
+        hasFrame: false,
+        qrFrameStyle: undefined,
+        qrFrameColor: undefined,
+        qrDotsColor: undefined,
+        qrCornerSquareColor: undefined,
+        qrCornerDotColor: undefined,
+      } as QRCodeDesign;
     }
 
-    // Remove hasFrame from persisted data if it exists (legacy cleanup)
-    const cleanedData = { ...persisted };
-    delete (cleanedData as any).hasFrame;
-
-    return {
-      ...cleanedData,
-      qrShape: persisted.qrShape ?? "square",
-      frameStyle: persisted.frameStyle ?? undefined, // undefined = no frame by default
+    const migrated: QRCodeDesign = {
+      fgColor: d.fgColor ?? "#000000",
+      qrHideLogo: d.qrHideLogo ?? d.hideLogo ?? false,
+      qrDotType: d.qrDotType ?? d.dotType ?? "square",
+      qrCornerSquareType: d.qrCornerSquareType ?? d.cornerSquareType ?? "square",
+      qrCornerDotType: d.qrCornerDotType ?? d.cornerDotType ?? "square",
+      qrShape: d.qrShape ?? "square",
+      hasFrame: Boolean(d.qrFrameStyle ?? d.frameStyle),
+      qrFrameStyle:
+        (d.qrFrameStyle ?? (d.frameStyle === "none" ? undefined : d.frameStyle)) ??
+        undefined,
+      qrFrameColor: d.qrFrameColor ?? d.frameColor ?? undefined,
+      qrDotsColor: d.qrDotsColor ?? d.dotsColor ?? undefined,
+      qrCornerSquareColor:
+        d.qrCornerSquareColor ?? d.cornerSquareColor ?? undefined,
+      qrCornerDotColor: d.qrCornerDotColor ?? d.cornerDotColor ?? undefined,
     };
-  }));
+
+    return migrated;
+  }
+
+  const data = migrateQRCodeDesign(rawData);
+
+  // Local draft state: edits apply here and only persist on Save
+  const [draft, setDraft] = useState<QRCodeDesign>(data);
+
+  // Reset draft when opening the modal to the latest persisted design
+  useEffect(() => {
+    if (showLinkQRModal) {
+      setDraft(migrateQRCodeDesign(rawData));
+    }
+  }, [showLinkQRModal]);
+
+  // If migration changed structure, persist the new version once
+  useEffect(() => {
+    if (!rawData) return;
+    const hasLegacyFields =
+      (rawData as any).hideLogo !== undefined ||
+      (rawData as any).dotType !== undefined ||
+      (rawData as any).cornerSquareType !== undefined ||
+      (rawData as any).cornerDotType !== undefined ||
+      (rawData as any).frameStyle !== undefined ||
+      (rawData as any).frameColor !== undefined ||
+      (rawData as any).dotsColor !== undefined ||
+      (rawData as any).cornerSquareColor !== undefined ||
+      (rawData as any).cornerDotColor !== undefined;
+    if (hasLegacyFields) {
+      setData(data);
+    }
+  }, [rawData, setData, data]);
 
   const frameOptions = useMemo(
     () =>
-      data.frameStyle
+      draft.qrFrameStyle
         ? {
-            type: data.frameStyle,
-            shape: data.qrShape,
-            color: data.frameColor || data.fgColor,
+            type: draft.qrFrameStyle,
+            shape: draft.qrShape,
+            color: draft.qrFrameColor || draft.fgColor,
           }
         : undefined,
-    [data.frameStyle, data.qrShape, data.frameColor, data.fgColor],
+    [draft.qrFrameStyle, draft.qrShape, draft.qrFrameColor, draft.fgColor],
   );
 
-  const hideLogo = data.hideLogo && plan !== "free";
+  const hideLogo = draft.qrHideLogo && plan !== "free";
   const logo =
     plan === "free" ? DUB_QR_LOGO : domainLogo || workspaceLogo || DUB_QR_LOGO;
 
@@ -403,22 +456,22 @@ function LinkQRModalInner({
       url
         ? getQRData({
             url,
-            fgColor: data.fgColor,
+            fgColor: draft.qrDotsColor || draft.fgColor, // Use dotsColor if available, fallback to fgColor
             hideLogo,
             logo,
-            qrShape: data.qrShape,
+            qrShape: draft.qrShape,
             dotsOptions: {
-              type: data.dotType,
-              color: data.fgColor,
+              type: draft.qrDotType,
+              color: draft.qrDotsColor || draft.fgColor,
             },
             eyeOptions: {
               cornerSquare: {
-                type: data.cornerSquareType,
-                color: data.fgColor,
+                type: draft.qrCornerSquareType,
+                color: draft.qrCornerSquareColor || draft.fgColor,
               },
               cornerDot: {
-                type: data.cornerDotType,
-                color: data.fgColor,
+                type: draft.qrCornerDotType,
+                color: draft.qrCornerDotColor || draft.fgColor,
               },
             },
             frameOptions,
@@ -426,11 +479,14 @@ function LinkQRModalInner({
         : null,
     [
       url,
-      data.fgColor,
-      data.qrShape,
-      data.dotType,
-      data.cornerSquareType,
-      data.cornerDotType,
+      draft.fgColor,
+      draft.qrDotsColor,
+      draft.qrCornerSquareColor,
+      draft.qrCornerDotColor,
+      draft.qrShape,
+      draft.qrDotType,
+      draft.qrCornerSquareType,
+      draft.qrCornerDotType,
       hideLogo,
       logo,
       frameOptions,
@@ -443,12 +499,19 @@ function LinkQRModalInner({
   );
 
   const onColorChange = useDebouncedCallback(
-    (color: string) => setData((d) => ({ ...d, fgColor: color })),
+    (color: string) =>
+      setDraft((d) => ({
+        ...d,
+        fgColor: color,
+        qrDotsColor: color,
+        qrCornerSquareColor: color,
+        qrCornerDotColor: color,
+      })),
     500,
   );
 
   const onFrameColorChange = useDebouncedCallback(
-    (color: string) => setData((d) => ({ ...d, frameColor: color })),
+    (color: string) => setDraft((d) => ({ ...d, qrFrameColor: color })),
     500,
   );
 
@@ -458,10 +521,19 @@ function LinkQRModalInner({
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        // Flush any pending debounced updates before closing
+        // so the last change (e.g., color) persists
+        // @ts-ignore - flush is provided by use-debounce
+        onColorChange.flush?.();
+        // @ts-ignore - flush is provided by use-debounce
+        onFrameColorChange.flush?.();
+        // Persist final draft state
+        setData(draft);
         setShowLinkQRModal(false);
 
-        setDataPersisted(data);
-        onSave?.(data);
+        // Data is automatically persisted to per-link localStorage via useLocalStorage hook
+        // onSave callback available for future database persistence (Phase 2)
+        onSave?.(draft);
       }}
     >
       <div className="flex items-center justify-between">
@@ -538,24 +610,24 @@ function LinkQRModalInner({
             </div>
           )}
         </div>
-        <div className="relative mt-2 flex h-44 items-center justify-center overflow-hidden rounded-md border border-neutral-300">
+        <div className="relative mt-2 flex h-52 items-center justify-center overflow-hidden rounded-md border border-neutral-300">
           {!isMobile && (
             <ShimmerDots className="opacity-30 [mask-image:radial-gradient(40%_80%,transparent_50%,black)]" />
           )}
           {url && (
             <AnimatePresence mode="wait">
               <motion.div
-                key={
-                  data.fgColor +
-                  data.hideLogo +
-                  data.dotType +
-                  data.cornerSquareType +
-                  data.cornerDotType +
-                  data.qrShape +
-                  data.hasFrame +
-                  data.frameStyle +
-                  data.frameColor
-                }
+              key={
+                draft.fgColor +
+                draft.qrHideLogo +
+                draft.qrDotType +
+                draft.qrCornerSquareType +
+                draft.qrCornerDotType +
+                draft.qrShape +
+                draft.hasFrame +
+                draft.qrFrameStyle +
+                draft.qrFrameColor
+              }
                 initial={{ filter: "blur(2px)", opacity: 0.4 }}
                 animate={{ filter: "blur(0px)", opacity: 1 }}
                 exit={{ filter: "blur(2px)", opacity: 0.4 }}
@@ -564,23 +636,23 @@ function LinkQRModalInner({
               >
                 <QRCode
                   url={url}
-                  fgColor={data.fgColor}
-                  hideLogo={data.hideLogo}
+                  fgColor={draft.fgColor}
+                  hideLogo={draft.qrHideLogo}
                   logo={logo}
                   scale={1}
-                  qrShape={data.qrShape}
+                  qrShape={draft.qrShape}
                   dotsOptions={{
-                    type: data.dotType,
-                    color: data.fgColor,
+                    type: draft.qrDotType,
+                    color: draft.fgColor,
                   }}
                   eyeOptions={{
                     cornerSquare: {
-                      type: data.cornerSquareType,
-                      color: data.fgColor,
+                      type: draft.qrCornerSquareType,
+                      color: draft.fgColor,
                     },
                     cornerDot: {
-                      type: data.cornerDotType,
-                      color: data.fgColor,
+                      type: draft.qrCornerDotType,
+                      color: draft.fgColor,
                     },
                   }}
                   frameOptions={frameOptions}
@@ -612,9 +684,9 @@ function LinkQRModalInner({
         </div>
         <Switch
           id={`${id}-hide-logo`}
-          checked={!data.hideLogo}
+          checked={!draft.qrHideLogo}
           fn={() => {
-            setData((d) => ({ ...d, hideLogo: !d.hideLogo }));
+            setDraft((d) => ({ ...d, qrHideLogo: !d.qrHideLogo }));
           }}
           disabledTooltip={
             !plan || plan === "free" ? (
@@ -641,7 +713,7 @@ function LinkQRModalInner({
         </span>
         <div className="flex flex-wrap items-center gap-3">
           {DOT_TYPES.map((pattern) => {
-            const isSelected = data.dotType === pattern;
+            const isSelected = draft.qrDotType === pattern;
             const patternLabels: Record<DotType, string> = {
               square: "Square",
               rounded: "Rounded",
@@ -658,7 +730,7 @@ function LinkQRModalInner({
                   type="button"
                   aria-pressed={isSelected}
                   aria-label={`Select ${patternLabels[pattern]} pattern`}
-                  onClick={() => setData((d) => ({ ...d, dotType: pattern }))}
+                  onClick={() => setDraft((d) => ({ ...d, qrDotType: pattern }))}
                   className={cn(
                     "flex size-12 items-center justify-center rounded-md border transition-all",
                     isSelected
@@ -668,7 +740,7 @@ function LinkQRModalInner({
                 >
                   <PatternPreview
                     pattern={pattern}
-                    color={data.fgColor}
+                    color={draft.fgColor}
                   />
                 </button>
               </Tooltip>
@@ -690,7 +762,7 @@ function LinkQRModalInner({
             </label>
             <div className="flex flex-wrap items-center gap-3">
               {CORNER_SQUARE_TYPES.map((type) => {
-                const isSelected = data.cornerSquareType === type;
+                const isSelected = draft.qrCornerSquareType === type;
                 const typeLabels: Record<CornerSquareType, string> = {
                   square: "Square",
                   rounded: "Rounded",
@@ -707,7 +779,7 @@ function LinkQRModalInner({
                       type="button"
                       aria-pressed={isSelected}
                       aria-label={`Select ${typeLabels[type]} outer frame`}
-                      onClick={() => setData((d) => ({ ...d, cornerSquareType: type }))}
+                      onClick={() => setDraft((d) => ({ ...d, qrCornerSquareType: type }))}
                       className={cn(
                         "flex size-12 items-center justify-center rounded-md border transition-all",
                         isSelected
@@ -717,7 +789,7 @@ function LinkQRModalInner({
                     >
                       <CornerSquarePreview
                         type={type}
-                        color={data.fgColor}
+                        color={draft.fgColor}
                       />
                     </button>
                   </Tooltip>
@@ -733,7 +805,7 @@ function LinkQRModalInner({
             </label>
             <div className="flex flex-wrap items-center gap-3">
               {CORNER_DOT_TYPES.map((type) => {
-                const isSelected = data.cornerDotType === type;
+                const isSelected = draft.qrCornerDotType === type;
                 const typeLabels: Record<CornerDotType, string> = {
                   square: "Square",
                   dots: "Circle",
@@ -748,7 +820,7 @@ function LinkQRModalInner({
                       type="button"
                       aria-pressed={isSelected}
                       aria-label={`Select ${typeLabels[type]} inner dot`}
-                      onClick={() => setData((d) => ({ ...d, cornerDotType: type }))}
+                      onClick={() => setDraft((d) => ({ ...d, qrCornerDotType: type }))}
                       className={cn(
                         "flex size-12 items-center justify-center rounded-md border transition-all",
                         isSelected
@@ -758,7 +830,7 @@ function LinkQRModalInner({
                     >
                       <CornerDotPreview
                         type={type}
-                        color={data.fgColor}
+                        color={draft.fgColor}
                       />
                     </button>
                   </Tooltip>
@@ -778,20 +850,20 @@ function LinkQRModalInner({
           <Tooltip content="Square">
             <button
               type="button"
-              aria-pressed={data.qrShape === "square"}
+              aria-pressed={draft.qrShape === "square"}
               aria-label="Select square shape"
-              onClick={() => setData((d) => {
+              onClick={() => setDraft((d) => {
                 // Auto-convert circle frames to square frames when switching shape
-                const newFrameStyle = d.frameStyle
-                  ? (d.frameStyle === "solid-circle" || d.frameStyle === "dotted-circle")
+                const newFrameStyle = d.qrFrameStyle
+                  ? (d.qrFrameStyle === "solid-circle" || d.qrFrameStyle === "dotted-circle")
                     ? "square" // Convert circle frame to default square frame
-                    : d.frameStyle // Keep existing square frame (square/rounded)
+                    : d.qrFrameStyle // Keep existing square frame (square/rounded)
                   : undefined; // Keep no frame
-                return { ...d, qrShape: "square", frameStyle: newFrameStyle };
+                return { ...d, qrShape: "square", qrFrameStyle: newFrameStyle };
               })}
               className={cn(
                 "flex size-12 items-center justify-center rounded-md border transition-all",
-                data.qrShape === "square"
+                draft.qrShape === "square"
                   ? "border-black bg-neutral-50 ring-1 ring-black"
                   : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
               )}
@@ -804,20 +876,20 @@ function LinkQRModalInner({
           <Tooltip content="Circle">
             <button
               type="button"
-              aria-pressed={data.qrShape === "circle"}
+              aria-pressed={draft.qrShape === "circle"}
               aria-label="Select circle shape"
-              onClick={() => setData((d) => {
+              onClick={() => setDraft((d) => {
                 // Auto-convert square frames to circle frames when switching shape
-                const newFrameStyle = d.frameStyle
-                  ? (d.frameStyle === "square" || d.frameStyle === "rounded")
+                const newFrameStyle = d.qrFrameStyle
+                  ? (d.qrFrameStyle === "square" || d.qrFrameStyle === "rounded")
                     ? "solid-circle" // Convert square frame to default circle frame
-                    : d.frameStyle // Keep existing circle frame (solid-circle/dotted-circle)
+                    : d.qrFrameStyle // Keep existing circle frame (solid-circle/dotted-circle)
                   : undefined; // Keep no frame
-                return { ...d, qrShape: "circle", frameStyle: newFrameStyle };
+                return { ...d, qrShape: "circle", qrFrameStyle: newFrameStyle };
               })}
               className={cn(
                 "flex size-12 items-center justify-center rounded-md border transition-all",
-                data.qrShape === "circle"
+                draft.qrShape === "circle"
                   ? "border-black bg-neutral-50 ring-1 ring-black"
                   : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
               )}
@@ -840,12 +912,12 @@ function LinkQRModalInner({
             <Tooltip content="No Frame">
               <button
                 type="button"
-                aria-pressed={data.frameStyle === undefined}
+                aria-pressed={draft.qrFrameStyle === undefined}
                 aria-label="No frame"
-                onClick={() => setData((d) => ({ ...d, frameStyle: undefined }))}
+                onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: undefined }))}
                 className={cn(
                   "flex size-12 items-center justify-center rounded-md border transition-all",
-                  data.frameStyle === undefined
+                  draft.qrFrameStyle === undefined
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                 )}
@@ -855,17 +927,17 @@ function LinkQRModalInner({
                 </svg>
               </button>
             </Tooltip>
-            {data.qrShape === "square" ? (
+            {draft.qrShape === "square" ? (
               <>
                 <Tooltip content="Square">
                   <button
                     type="button"
-                    aria-pressed={data.frameStyle === "square"}
+                    aria-pressed={draft.qrFrameStyle === "square"}
                     aria-label="Select square frame"
-                    onClick={() => setData((d) => ({ ...d, frameStyle: "square" }))}
+                    onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "square" }))}
                     className={cn(
                       "flex size-12 items-center justify-center rounded-md border transition-all",
-                      data.frameStyle === "square"
+                      draft.qrFrameStyle === "square"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                     )}
@@ -878,12 +950,12 @@ function LinkQRModalInner({
                 <Tooltip content="Rounded">
                   <button
                     type="button"
-                    aria-pressed={data.frameStyle === "rounded"}
+                    aria-pressed={draft.qrFrameStyle === "rounded"}
                     aria-label="Select rounded frame"
-                    onClick={() => setData((d) => ({ ...d, frameStyle: "rounded" }))}
+                    onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "rounded" }))}
                     className={cn(
                       "flex size-12 items-center justify-center rounded-md border transition-all",
-                      data.frameStyle === "rounded"
+                      draft.qrFrameStyle === "rounded"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                     )}
@@ -899,12 +971,12 @@ function LinkQRModalInner({
                 <Tooltip content="Solid Circle">
                   <button
                     type="button"
-                    aria-pressed={data.frameStyle === "solid-circle"}
+                    aria-pressed={draft.qrFrameStyle === "solid-circle"}
                     aria-label="Select solid circle frame"
-                    onClick={() => setData((d) => ({ ...d, frameStyle: "solid-circle" }))}
+                    onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "solid-circle" }))}
                     className={cn(
                       "flex size-12 items-center justify-center rounded-md border transition-all",
-                      data.frameStyle === "solid-circle"
+                      draft.qrFrameStyle === "solid-circle"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                     )}
@@ -917,12 +989,12 @@ function LinkQRModalInner({
                 <Tooltip content="Dotted Circle">
                   <button
                     type="button"
-                    aria-pressed={data.frameStyle === "dotted-circle"}
+                    aria-pressed={draft.qrFrameStyle === "dotted-circle"}
                     aria-label="Select dotted circle frame"
-                    onClick={() => setData((d) => ({ ...d, frameStyle: "dotted-circle" }))}
+                    onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "dotted-circle" }))}
                     className={cn(
                       "flex size-12 items-center justify-center rounded-md border transition-all",
-                      data.frameStyle === "dotted-circle"
+                      draft.qrFrameStyle === "dotted-circle"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                     )}
@@ -938,21 +1010,21 @@ function LinkQRModalInner({
         </div>
 
       {/* Frame Color selector - Always visible, disabled when no frame selected */}
-      <div className={cn("transition-opacity", !data.frameStyle && "opacity-40")}>
+      <div className={cn("transition-opacity", !draft.qrFrameStyle && "opacity-40")}>
         <span className="mb-2 block text-sm font-medium text-neutral-700">
           Frame Color
         </span>
         <div className="flex gap-6">
           <div className={cn(
             "relative flex h-9 w-32 shrink-0 rounded-md shadow-sm",
-            !data.frameStyle && "pointer-events-none cursor-not-allowed"
+            !draft.qrFrameStyle && "pointer-events-none cursor-not-allowed"
           )}>
             <Tooltip
               content={
-                data.frameStyle ? (
+                draft.qrFrameStyle ? (
                   <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
                     <HexColorPicker
-                      color={data.frameColor || data.fgColor}
+                      color={draft.qrFrameColor || draft.fgColor}
                       onChange={onFrameColorChange}
                     />
                   </div>
@@ -964,17 +1036,17 @@ function LinkQRModalInner({
               <div
                 className="h-full w-12 rounded-l-md border"
                 style={{
-                  backgroundColor: data.frameColor || data.fgColor,
-                  borderColor: data.frameColor || data.fgColor,
+                  backgroundColor: draft.qrFrameColor || draft.fgColor,
+                  borderColor: draft.qrFrameColor || draft.fgColor,
                 }}
               />
             </Tooltip>
             <HexColorInput
-              color={data.frameColor || data.fgColor}
+              color={draft.qrFrameColor || draft.fgColor}
               onChange={onFrameColorChange}
               prefixed
-              disabled={!data.frameStyle}
-              style={{ borderColor: data.frameColor || data.fgColor }}
+              disabled={!draft.qrFrameStyle}
+              style={{ borderColor: draft.qrFrameColor || draft.fgColor }}
               className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm disabled:cursor-not-allowed disabled:bg-neutral-50"
             />
           </div>
@@ -992,7 +1064,7 @@ function LinkQRModalInner({
               content={
                 <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
                   <HexColorPicker
-                    color={data.fgColor}
+                    color={draft.fgColor}
                     onChange={onColorChange}
                   />
                 </div>
@@ -1001,30 +1073,30 @@ function LinkQRModalInner({
               <div
                 className="h-full w-12 rounded-l-md border"
                 style={{
-                  backgroundColor: data.fgColor,
-                  borderColor: data.fgColor,
+                  backgroundColor: draft.fgColor,
+                  borderColor: draft.fgColor,
                 }}
               />
             </Tooltip>
             <HexColorInput
               id="color"
               name="color"
-              color={data.fgColor}
+              color={draft.fgColor}
               onChange={onColorChange}
               prefixed
-              style={{ borderColor: data.fgColor }}
+              style={{ borderColor: draft.fgColor }}
               className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm"
             />
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-3">
             {DEFAULT_COLORS.map((color) => {
-              const isSelected = data.fgColor === color;
+              const isSelected = draft.fgColor === color;
               return (
                 <button
                   key={color}
                   type="button"
                   aria-pressed={isSelected}
-                  onClick={() => setData((d) => ({ ...d, fgColor: color }))}
+                  onClick={() => setDraft((d) => ({ ...d, fgColor: color }))}
                   className={cn(
                     "flex size-7 items-center justify-center rounded-full transition-all",
                     isSelected

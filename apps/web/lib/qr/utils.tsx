@@ -707,11 +707,13 @@ function generateCornerDots(numCells: number, margin: number, dotType: DotType):
       // Adjust coordinates to account for grid offset
       const cx = x + 0.5 - params.gridOffset;
       const cy = y + 0.5 - params.gridOffset;
-      const dotX = x - params.gridOffset;
-      const dotY = y - params.gridOffset;
 
       // Local size tweak to eliminate inner gap
       const localSize = getBorderDotSizeAt(x, y, params);
+
+      // Center dots on their grid cell to handle varying sizes
+      const dotX = cx - localSize / 2;
+      const dotY = cy - localSize / 2;
 
       // Neighbor lookup
       const getNeighbor = (dx: number, dy: number) => {
@@ -738,6 +740,7 @@ function generateCornerDots(numCells: number, margin: number, dotType: DotType):
         }
         case "rounded":
         case "extra-rounded": {
+          const useExtraRounded = dotType === "extra-rounded";
           if (neighborCount > 2 || hasOpposites) {
             dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
           } else if (neighborCount === 0) {
@@ -753,6 +756,24 @@ function generateCornerDots(numCells: number, margin: number, dotType: DotType):
               dotPath = `M${dotX},${dotY} h${localSize} v${localSize / 2} a${r},${r} 0 0 1 ${-localSize},0 z`;
             } else {
               dotPath = `M${dotX},${dotY + localSize} h${localSize} v${-localSize / 2} a${r},${r} 0 0 0 ${-localSize},0 z`;
+            }
+          } else if (neighborCount === 2 && !hasOpposites) {
+            // Two perpendicular neighbors: corner-rounded (round the corner WITHOUT neighbors)
+            console.log('[Border Dot] Perpendicular corner detected:', { x, y, left, right, top, bottom, localSize, useExtraRounded });
+            // Cap radius to avoid gaps between adjacent dots
+            const r = useExtraRounded ? localSize : Math.min(localSize / 2, 0.45);
+            if (left && top) {
+              // Neighbors on left and top, round bottom-right corner
+              dotPath = `M${dotX},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize - r} A${r},${r} 0 0 1 ${dotX + localSize - r},${dotY + localSize} L${dotX},${dotY + localSize} z`;
+            } else if (top && right) {
+              // Neighbors on top and right, round bottom-left corner
+              dotPath = `M${dotX + r},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize} L${dotX + r},${dotY + localSize} A${r},${r} 0 0 1 ${dotX},${dotY + localSize - r} L${dotX},${dotY} z`;
+            } else if (right && bottom) {
+              // Neighbors on right and bottom, round top-left corner
+              dotPath = `M${dotX},${dotY + r} A${r},${r} 0 0 1 ${dotX + r},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize} L${dotX},${dotY + localSize} z`;
+            } else {
+              // Neighbors on bottom and left (or default), round top-right corner
+              dotPath = `M${dotX},${dotY} L${dotX + localSize - r},${dotY} A${r},${r} 0 0 1 ${dotX + localSize},${dotY + r} L${dotX + localSize},${dotY + localSize} L${dotX},${dotY + localSize} z`;
             }
           } else {
             dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;

@@ -78,7 +78,8 @@ function drawBaseCornerRounded(
   y: number,
   size: number,
 ) {
-  const r = size / 2;
+  // Use smaller radius to avoid gaps between adjacent dots
+  const r = Math.min(size / 2, 0.45);
   ctx.moveTo(x, y);
   ctx.lineTo(x, y + size);
   ctx.lineTo(x + size, y + size);
@@ -161,10 +162,12 @@ function renderCanvasCornerDots(
 
       const cx = x + 0.5 - params.gridOffset;
       const cy = y + 0.5 - params.gridOffset;
-      const mx = x - params.gridOffset;
-      const my = y - params.gridOffset;
 
       const localSize = getBorderDotSizeAt(x, y, params);
+
+      // Center dots on their grid cell to handle varying sizes
+      const mx = cx - localSize / 2;
+      const my = cy - localSize / 2;
 
       // Neighbor-aware styling
       const getNeighbor = (dx: number, dy: number) => {
@@ -690,10 +693,12 @@ function generateCornerDotsString(numCells: number, margin: number, dotType: Dot
 
       const cx = x + 0.5 - params.gridOffset;
       const cy = y + 0.5 - params.gridOffset;
-      const dotX = x - params.gridOffset;
-      const dotY = y - params.gridOffset;
 
       const localSize = getBorderDotSizeAt(x, y, params);
+
+      // Center dots on their grid cell to handle varying sizes
+      const dotX = cx - localSize / 2;
+      const dotY = cy - localSize / 2;
 
       // Neighbor lookup
       const getNeighbor = (dx: number, dy: number) => {
@@ -717,6 +722,7 @@ function generateCornerDotsString(numCells: number, margin: number, dotType: Dot
           break;
         case "rounded":
         case "extra-rounded": {
+          const useExtraRounded = dotType === "extra-rounded";
           if (neighborCount > 2 || hasOpposites) {
             dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
           } else if (neighborCount === 0) {
@@ -732,8 +738,25 @@ function generateCornerDotsString(numCells: number, margin: number, dotType: Dot
             } else {
               dotPath = `M${dotX},${dotY + localSize} h${localSize} v${-localSize / 2} a${r},${r} 0 0 0 ${-localSize},0 z`;
             }
+          } else if (neighborCount === 2 && !hasOpposites) {
+            // Two perpendicular neighbors: corner-rounded (round the corner WITHOUT neighbors)
+            console.log('[SVG Export] Perpendicular corner detected:', { x, y, left, right, top, bottom, localSize, useExtraRounded });
+            // Cap radius to avoid gaps between adjacent dots
+            const r = useExtraRounded ? localSize : Math.min(localSize / 2, 0.45);
+            if (left && top) {
+              // Neighbors on left and top, round bottom-right corner
+              dotPath = `M${dotX},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize - r} A${r},${r} 0 0 1 ${dotX + localSize - r},${dotY + localSize} L${dotX},${dotY + localSize} z`;
+            } else if (top && right) {
+              // Neighbors on top and right, round bottom-left corner
+              dotPath = `M${dotX + r},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize} L${dotX + r},${dotY + localSize} A${r},${r} 0 0 1 ${dotX},${dotY + localSize - r} L${dotX},${dotY} z`;
+            } else if (right && bottom) {
+              // Neighbors on right and bottom, round top-left corner
+              dotPath = `M${dotX},${dotY + r} A${r},${r} 0 0 1 ${dotX + r},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize} L${dotX},${dotY + localSize} z`;
+            } else {
+              // Neighbors on bottom and left (or default), round top-right corner
+              dotPath = `M${dotX},${dotY} L${dotX + localSize - r},${dotY} A${r},${r} 0 0 1 ${dotX + localSize},${dotY + r} L${dotX + localSize},${dotY + localSize} L${dotX},${dotY + localSize} z`;
+            }
           } else {
-            // Perpendicular corner-rounded: approximate with rounded rect oriented effect by falling back to square for path simplicity
             dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
           }
           break;

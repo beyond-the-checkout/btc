@@ -4,7 +4,15 @@ function getItemFromLocalStorage(key: string) {
   if (typeof window === "undefined") return null;
 
   const item = window.localStorage.getItem(key);
-  if (item) return JSON.parse(item);
+  if (item === null) return null;
+
+  // Guard against invalid JSON values like the string "undefined"
+  try {
+    return JSON.parse(item);
+  } catch {
+    // If parsing fails, treat as missing value
+    return null;
+  }
 
   return null;
 }
@@ -20,7 +28,7 @@ export function useLocalStorage<T>(
   useEffect(() => {
     // Retrieve from localStorage
     const item = getItemFromLocalStorage(key);
-    if (item) setStoredValue(item);
+    if (item !== null) setStoredValue(item);
   }, [key]);
 
   const setValue = (value: T) => {

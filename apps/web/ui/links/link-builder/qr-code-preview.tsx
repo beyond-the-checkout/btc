@@ -8,9 +8,9 @@ import {
   ShimmerDots,
   SimpleTooltipContent,
   useInViewport,
-  useLocalStorage,
   useMediaQuery,
 } from "@dub/ui";
+import { useLocalStorage } from "@/ui/hooks/use-local-storage";
 import { Pen2, QRCode as QRCodeIcon } from "@dub/ui/icons";
 import { DUB_QR_LOGO, linkConstructor } from "@dub/utils";
 import { AnimatePresence, motion } from "motion/react";
@@ -18,6 +18,7 @@ import { useMemo, useRef } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { useDebounce } from "use-debounce";
 import { QRCodeDesign, useLinkQRModal } from "../../modals/link-qr-modal";
+import { useEffect } from "react";
 import { useLinkBuilderKeyboardShortcut } from "./use-link-builder-keyboard-shortcut";
 
 export function QRCodePreview() {
@@ -41,35 +42,108 @@ export function QRCodePreview() {
     enabled: isVisible,
   });
 
-  const [data, setData] = useLocalStorage<QRCodeDesign>(
-    `qr-code-design-${workspaceId}`,
+  // Use per-link localStorage key to match the modal
+  // This ensures each link shows its own QR customization
+  const localStorageKey = domain && key
+    ? `qr-code-design-${domain}-${key}`
+    : `qr-code-design-new-link`; // Fallback for links being created
+
+  const [rawData, setData] = useLocalStorage<QRCodeDesign>(
+    localStorageKey,
     {
       fgColor: "#000000",
-      hideLogo: true,
-      dotType: "square",
-      cornerSquareType: "square",
-      cornerDotType: "square",
-      frameType: "none",
+      qrHideLogo: false,
+      qrDotType: "square",
+      qrCornerSquareType: "square",
+      qrCornerDotType: "square",
+      qrShape: "square",
+      hasFrame: false,
+      qrFrameStyle: undefined,
+      qrFrameColor: undefined,
+      qrDotsColor: undefined,
+      qrCornerSquareColor: undefined,
+      qrCornerDotColor: undefined,
     },
   );
+
+  // Migrate any legacy schema to the new qr* fields
+  function migrateQRCodeDesign(d: any): QRCodeDesign {
+    if (!d || typeof d !== "object") {
+      return {
+        fgColor: "#000000",
+        qrHideLogo: false,
+        qrDotType: "square",
+        qrCornerSquareType: "square",
+        qrCornerDotType: "square",
+        qrShape: "square",
+        hasFrame: false,
+        qrFrameStyle: undefined,
+        qrFrameColor: undefined,
+        qrDotsColor: undefined,
+        qrCornerSquareColor: undefined,
+        qrCornerDotColor: undefined,
+      } as QRCodeDesign;
+    }
+
+    const migrated: QRCodeDesign = {
+      fgColor: d.fgColor ?? "#000000",
+      qrHideLogo: d.qrHideLogo ?? d.hideLogo ?? false,
+      qrDotType: d.qrDotType ?? d.dotType ?? "square",
+      qrCornerSquareType: d.qrCornerSquareType ?? d.cornerSquareType ?? "square",
+      qrCornerDotType: d.qrCornerDotType ?? d.cornerDotType ?? "square",
+      qrShape: d.qrShape ?? "square",
+      hasFrame: Boolean(d.qrFrameStyle ?? d.frameStyle),
+      qrFrameStyle:
+        (d.qrFrameStyle ?? (d.frameStyle === "none" ? undefined : d.frameStyle)) ??
+        undefined,
+      qrFrameColor: d.qrFrameColor ?? d.frameColor ?? undefined,
+      qrDotsColor: d.qrDotsColor ?? d.dotsColor ?? undefined,
+      qrCornerSquareColor:
+        d.qrCornerSquareColor ?? d.cornerSquareColor ?? undefined,
+      qrCornerDotColor: d.qrCornerDotColor ?? d.cornerDotColor ?? undefined,
+    };
+
+    return migrated;
+  }
+
+  const data = migrateQRCodeDesign(rawData);
+
+  // If migration changed structure, persist the new version once
+  useEffect(() => {
+    if (!rawData) return;
+    const hasLegacyFields =
+      (rawData as any).hideLogo !== undefined ||
+      (rawData as any).dotType !== undefined ||
+      (rawData as any).cornerSquareType !== undefined ||
+      (rawData as any).cornerDotType !== undefined ||
+      (rawData as any).frameStyle !== undefined ||
+      (rawData as any).frameColor !== undefined ||
+      (rawData as any).dotsColor !== undefined ||
+      (rawData as any).cornerSquareColor !== undefined ||
+      (rawData as any).cornerDotColor !== undefined;
+    if (hasLegacyFields) {
+      setData(data);
+    }
+  }, [rawData, setData, data]);
 
   const shortLinkUrl = useMemo(() => {
     return key && domain ? linkConstructor({ key, domain }) : undefined;
   }, [key, domain]);
 
-  const hideLogo = data.hideLogo && workspacePlan !== "free";
+  const hideLogo = data.qrHideLogo && workspacePlan !== "free";
   const logo =
     workspacePlan === "free"
       ? DUB_QR_LOGO
       : domainLogo || workspaceLogo || DUB_QR_LOGO;
-  const frameType = data.frameType ?? "none";
-  const frameOptions =
-    frameType !== "none"
-      ? {
-          type: frameType,
-          color: data.fgColor,
-        }
-      : undefined;
+
+  // Construct frame options from current data structure
+  const frameOptions = data.qrFrameStyle
+    ? {
+        type: data.qrFrameStyle,
+        shape: data.qrShape,
+        color: data.qrFrameColor || data.qrDotsColor || data.fgColor,
+      }
+    : undefined;
 
   const { LinkQRModal, setShowLinkQRModal } = useLinkQRModal({
     props: {
@@ -123,19 +197,23 @@ export function QRCodePreview() {
             >
               <QRCode
                 url={shortLinkUrl}
-                fgColor={data.fgColor}
+                fgColor={data.qrDotsColor || data.fgColor}
                 hideLogo={hideLogo}
                 logo={logo}
                 scale={0.5}
-                dotsOptions={{ type: data.dotType }}
+                qrShape={data.qrShape}
+                dotsOptions={{
+                  type: data.qrDotType,
+                  color: data.qrDotsColor || data.fgColor,
+                }}
                 eyeOptions={{
                   cornerSquare: {
-                    type: data.cornerSquareType,
-                    color: data.fgColor,
+                    type: data.qrCornerSquareType,
+                    color: data.qrCornerSquareColor || data.fgColor,
                   },
                   cornerDot: {
-                    type: data.cornerDotType,
-                    color: data.fgColor,
+                    type: data.qrCornerDotType,
+                    color: data.qrCornerDotColor || data.fgColor,
                   },
                 }}
                 frameOptions={frameOptions}
