@@ -24,7 +24,7 @@ export function Domains() {
       <div className="flex flex-col gap-2.5 [mask-image:linear-gradient(90deg,black_70%,transparent)]">
         {DOMAINS.map(({ domain, scans, primary }, idx) => (
           <div
-            key={domain}
+            key={idx}
             className="transition-transform duration-300 hover:translate-x-[-2%]"
           >
             <div
