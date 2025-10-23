@@ -943,7 +943,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
       {/* Corner dots for circular QR (drawn in outer space, scaled from cell units) */}
       {qrShape === "circle" && cornerDots && (
         <g
-          fill={dotsColor}
+          style={{ color: dotsColor }}
           transform={`translate(${framePaddingForFrame + shapePaddingPx}, ${framePaddingForFrame + shapePaddingPx}) scale(${scalePxPerCell})`}
         >
           {cornerDots}
