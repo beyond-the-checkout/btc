@@ -12,6 +12,23 @@ export interface FrameRenderProps {
 }
 
 /**
+ * Normalize frame type to handle both old and new naming conventions
+ * New: "rounded", "solid-circle", "dotted-circle"
+ * Old: "rounded-square", "circle", "dots-circle"
+ */
+function normalizeFrameType(frameType?: string): string | undefined {
+  if (!frameType) return frameType;
+
+  const typeMap: Record<string, string> = {
+    "rounded": "rounded-square",
+    "solid-circle": "circle",
+    "dotted-circle": "dots-circle",
+  };
+
+  return typeMap[frameType] || frameType;
+}
+
+/**
  * Calculate the total canvas size including frame
  */
 export function getFrameSize(props: FrameRenderProps): number {
@@ -35,18 +52,22 @@ export function getFramePadding(qrSize: number, frameType?: string): number {
     return 0;
   }
 
+  // Normalize frame type to handle new naming conventions
+  const normalizedType = normalizeFrameType(frameType);
+
   // Scale paddings relative to QR size so preview and exports match visually.
   // Calibrated so that at size=128px we match prior preview look:
   // - square/rounded-square ≈ 10px → ~0.078 ratio
-  // - circle ≈ 22px → ~0.172 ratio (ensures corners don’t clip the circle)
+  // - circle ≈ 22px → ~0.172 ratio (ensures corners don't clip the circle)
   // - dots-circle ≈ 40px → ~0.3125 ratio
   const ratios: Record<string, number> = {
     square: 0.078,
     "rounded-square": 0.078,
-    circle: 0.25,
-    "dots-circle": 0.25,
+    // Padding for circular frames to prevent QR border from peeking out (with rScale=0.9)
+    circle: 0.06,
+    "dots-circle": 0.06,
   };
-  const ratio = ratios[frameType] ?? 0.078;
+  const ratio = ratios[normalizedType || "square"] ?? 0.078;
   return Math.max(1, Math.round(qrSize * ratio));
 }
 
@@ -63,6 +84,7 @@ export function renderCanvasFrame(
     return;
   }
 
+  const normalizedType = normalizeFrameType(frameOptions.type);
   const padding = getFramePadding(qrSize, frameOptions.type);
   const totalSize = qrSize + padding * 2;
   const frameColor = frameOptions.color || "#000000";
@@ -72,7 +94,7 @@ export function renderCanvasFrame(
 
   ctx.save();
 
-  switch (frameOptions.type) {
+  switch (normalizedType) {
     case "square":
       renderSquareFrame(ctx, totalSize, borderWidth, frameColor);
       break;
@@ -107,6 +129,7 @@ export function renderSVGFrame(props: FrameRenderProps): string {
     return "";
   }
 
+  const normalizedType = normalizeFrameType(frameOptions.type);
   const padding = getFramePadding(qrSize, frameOptions.type);
   const totalSize = qrSize + padding * 2;
   const frameColor = frameOptions.color || "#000000";
@@ -116,7 +139,7 @@ export function renderSVGFrame(props: FrameRenderProps): string {
 
   let framePath = "";
 
-  switch (frameOptions.type) {
+  switch (normalizedType) {
     case "square":
       framePath = getSVGSquareFrame(totalSize, borderWidth, frameColor);
       break;
@@ -185,7 +208,8 @@ function renderCircleFrame(
   borderWidth: number,
   color: string,
 ): void {
-const rScale = 0.9; // increase from 0.85 by 10% (i.e., +10% over current)
+  // Match SVG rendering: scale to 90% for consistent visual spacing
+  const rScale = 0.9;
   const radius = ((totalSize - borderWidth) / 2) * rScale;
 
   ctx.strokeStyle = color;
@@ -203,10 +227,11 @@ function renderDotsCircleFrame(
 ): void {
   // Scale dot radius relative to QR size; ≈2px at size=128
   const dotRadius = Math.max(1, Math.round(qrSize * 0.015625));
+  // Match SVG rendering: use same dot count for consistency
   const dotCount = 48;
-  // Match the circle frame outer extent: center radius equals circle center radius adjusted for dot size vs stroke
+  // Match SVG rendering: scale to 90% for consistent visual spacing
   const borderWidth = Math.max(2, Math.round(qrSize * 0.023));
-const rScale = 0.9; // increase from 0.85 by 10% (i.e., +10% over current)
+  const rScale = 0.9;
   const circleCenterRadius = ((totalSize - borderWidth) / 2) * rScale;
   const radius = circleCenterRadius - (dotRadius - borderWidth / 2);
 

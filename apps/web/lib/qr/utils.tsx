@@ -19,7 +19,261 @@ import { getFramePadding, renderSVGFrame } from "./frames";
 
 import type { JSX } from "react";
 
+// ---------------------------------------------
+// Circular border dot placement helpers (shared)
+// ---------------------------------------------
+
+// Mode: 'pattern' uses a predefined band rotated per side, 'random' keeps noise approach
+const BORDER_PATTERN_MODE: 'pattern' | 'random' = 'pattern';
+
+// Tangent-wise thickness profile (cells from inner edge) — rotated to each side
+// Values emphasize 1–3 cell thickness, with occasional 4 for variety. Length should be >= 32.
+const BORDER_PATTERN_THICKNESS: number[] = [
+  2,1,2,1,3,2,1,1, 2,1,1,2, 3,2,1,1,
+  2,1,2,1,1,2,3,2, 1,1,2,1, 3,2,1,1,
+  2,1,1,2, 3,2,1,1, 2,1,3,2, 1,1,2,1,
+];
+
+// Radial masks (from inner edge → circle) used to cover the entire width
+// 1 = dot, 0 = gap. Designed with mixed segment lengths to resemble the screenshot.
+const BORDER_PATTERN_MASKS: number[][] = [
+  // mask length must be the same across entries
+  [1,1,1,0, 1,1,0,1,  1,0,1,1,  0,1,0,1],
+  [1,1,0,1,  1,0,1,1,  0,1,1,0,  1,0,1,0],
+  [1,0,1,1,  1,1,0,0,  1,0,1,0,  1,1,0,1],
+  [1,1,0,0,  1,1,1,0,  1,0,1,0,  1,0,1,1],
+  [1,0,1,0,  1,1,0,1,  1,0,1,1,  0,1,1,0],
+  [1,1,1,0,  1,0,1,0,  1,1,0,1,  0,1,0,1],
+];
+const BORDER_PATTERN_MASK_LEN = BORDER_PATTERN_MASKS[0].length;
+
+function getPatternMaskForU(u: number): number[] {
+  const idx = Math.floor(u * BORDER_PATTERN_MASKS.length) % BORDER_PATTERN_MASKS.length;
+  return BORDER_PATTERN_MASKS[idx];
+}
+
+function angleWrap(a: number): number {
+  // Wrap to [-PI, PI]
+  while (a <= -Math.PI) a += 2 * Math.PI;
+  while (a > Math.PI) a -= 2 * Math.PI;
+  return a;
+}
+
+function getSideIndexForAngle(theta: number): number {
+  // Side centers: right(0), top(1), left(2), bottom(3)
+  const centers = [0, -Math.PI / 2, Math.PI, Math.PI / 2];
+  let best = 0;
+  let bestDiff = Infinity;
+  for (let i = 0; i < 4; i++) {
+    const d = Math.abs(angleWrap(theta - centers[i]));
+    if (d < bestDiff) {
+      bestDiff = d;
+      best = i;
+    }
+  }
+  return best;
+}
+
+function getPatternThicknessForCoord(
+  dx: number,
+  dy: number,
+  circleRadius: number,
+  sideIndex: number,
+): number {
+  // Rotate (dx,dy) so that the side's tangent is aligned with +Y
+  const centers = [0, -Math.PI / 2, Math.PI, Math.PI / 2];
+  const rot = -centers[sideIndex];
+  const cosr = Math.cos(rot);
+  const sinr = Math.sin(rot);
+  const ry = dx * sinr + dy * cosr; // tangent axis
+
+  // Normalize tangent coordinate across full diameter, map to [0,1]
+  const u = Math.max(0, Math.min(1, 0.5 + ry / (2 * circleRadius)));
+  const idx = Math.floor(u * BORDER_PATTERN_THICKNESS.length) % BORDER_PATTERN_THICKNESS.length;
+  return Math.max(1, BORDER_PATTERN_THICKNESS[idx]);
+}
+
+// Simple deterministic 2D hash → [0,1)
+function hash2D(x: number, y: number, seed = 1337): number {
+  // Mix coordinates and seed into 32-bit space
+  let h = (Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263) ^ (seed | 0)) >>> 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177) >>> 0;
+  h = (h ^ (h >>> 16)) >>> 0;
+  return h / 0xffffffff;
+}
+
+function clamp01(v: number): number {
+  return v < 0 ? 0 : v > 1 ? 1 : v;
+}
+
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+export function getCircularBorderParams(numCells: number, margin: number) {
+  const center = numCells / 2;
+  const qrRadius = (numCells - margin * 2) / 2;
+  const qrDiagonalRadius = qrRadius * Math.sqrt(2);
+  const circleRadius = qrDiagonalRadius * 1.15; // matches all renderers
+
+  const dotSize = 0.9; // Slightly smaller than 1 for spacing
+  const dotRadius = dotSize / 2;
+
+  const gridSize = Math.ceil(circleRadius * 2) + 1;
+  const gridOffset = (gridSize - numCells) / 2;
+
+  return { center, qrRadius, qrDiagonalRadius, circleRadius, dotSize, dotRadius, gridSize, gridOffset };
+}
+
+// Decide if a decorative dot should be placed at grid cell (x,y)
+// Adds semi-randomness and density falloff from inner boundary → outer circle.
+export function shouldPlaceCircularBorderDot(
+  x: number,
+  y: number,
+  params: ReturnType<typeof getCircularBorderParams>,
+): boolean {
+  const { center, gridOffset, qrRadius, qrDiagonalRadius, circleRadius } = params;
+
+  // Convert grid index to QR-space coords (centered)
+  const dx = x + 0.5 - center - gridOffset;
+  const dy = y + 0.5 - center - gridOffset;
+
+  const r = Math.hypot(dx, dy);
+  const maxAxisDistance = Math.max(Math.abs(dx), Math.abs(dy));
+
+  const isOutsideSquare = maxAxisDistance > qrRadius;
+  const isInsideCircle = r < circleRadius;
+  if (!(isOutsideSquare && isInsideCircle)) return false;
+
+  if (BORDER_PATTERN_MODE === 'pattern') {
+    // Pattern-based radial occupancy from inner edge → circle, rotated per side
+    const theta = Math.atan2(dy, dx);
+    const side = getSideIndexForAngle(theta);
+
+    // Tangent coord normalized across the diameter
+    const centers = [0, -Math.PI / 2, Math.PI, Math.PI / 2];
+    const rot = -centers[side];
+    const cosr = Math.cos(rot);
+    const sinr = Math.sin(rot);
+    const ry = dx * sinr + dy * cosr; // tangent axis
+    const u = clamp01(0.5 + ry / (2 * circleRadius));
+
+    // Radial normalization: 0 at square edge, 1 at circle boundary for this angle
+    const absCos = Math.abs(Math.cos(theta));
+    const absSin = Math.abs(Math.sin(theta));
+    const rMin = qrRadius / Math.max(absCos || 1e-6, absSin || 1e-6);
+    const rhoNorm = clamp01((r - rMin) / Math.max(1e-6, (circleRadius - rMin)));
+
+    // Select a mask for this tangent position and blend across indices to soften bands
+    const mask = getPatternMaskForU(u);
+    const f = rhoNorm * BORDER_PATTERN_MASK_LEN;
+    const i0 = Math.min(BORDER_PATTERN_MASK_LEN - 1, Math.max(0, Math.floor(f)));
+    const i1 = Math.min(BORDER_PATTERN_MASK_LEN - 1, i0 + 1);
+    const w = f - Math.floor(f);
+
+    // Base probability from mask values (softer than hard 0/1)
+    const v0 = mask[i0] ? 0.78 : 0.12;
+    const v1 = mask[i1] ? 0.78 : 0.12;
+    let p = v0 * (1 - w) + v1 * w;
+
+    // Coarse angular/radial noise to break repetition
+    const ringBin = Math.floor(rhoNorm * 12) | 0;
+    const angleBin = Math.floor(((theta + Math.PI) / (2 * Math.PI)) * 16) | 0;
+    const coarse = hash2D(angleBin, ringBin, 901845);
+    p *= 1 + (coarse - 0.5) * 0.35; // ±17.5%
+
+    // Fine bias to dither edges
+    p += (hash2D(x, y, 131071) - 0.5) * 0.08; // ±0.04
+
+    // Near-edge attenuation to avoid a solid-looking border
+    if (rhoNorm <= 0.10) {
+      const k = rhoNorm / 0.10; // 0 at edge -> 1 at 10% of ring
+      const atten = 0.6 + 0.4 * k; // 0.6 at edge, ramps to 1.0 by 10%
+      p *= atten;
+      // Sparse micro-boost to keep occasional contacts (no white halo)
+      if (rhoNorm <= 0.025 && ((x + y) & 3) === 0) {
+        p += 0.12;
+      }
+      // Minimum near-edge coverage to eliminate visible white ring in high-res PNG
+      if (rhoNorm <= 0.03) {
+        p = Math.max(p, 0.82);
+      } else if (rhoNorm <= 0.08) {
+        const u3 = (rhoNorm - 0.03) / 0.05; // 0..1
+        p = Math.max(p, 0.82 - 0.35 * u3);
+      }
+    }
+
+    // Outer-edge support: avoid a visible white ring near the frame in high-res exports
+    if (rhoNorm >= 0.92) {
+      const uo = (rhoNorm - 0.92) / 0.08; // 0..1 last 8% of ring
+      p = Math.max(p, 0.25 + 0.35 * uo); // rises to ~0.6 at the boundary
+    }
+
+    // Final stochastic decision
+    p = clamp01(p);
+    const final = hash2D(x ^ 0x9e37, y ^ 0x79b9, 1337);
+    return final < p;
+  }
+
+  // Random mode (fallback) — currently unused when pattern is enabled
+  const tRadial = clamp01((r - qrDiagonalRadius) / (circleRadius - qrDiagonalRadius));
+  const tAxis = clamp01((maxAxisDistance - qrRadius) / (circleRadius - qrRadius));
+  let t = clamp01(0.6 * tRadial + 0.4 * tAxis);
+  t = Math.pow(t, 1.5);
+  let p = lerp(0.60, 0.08, t);
+  const edgeDelta = maxAxisDistance - qrRadius;
+  let minEdgeP = 0;
+  if (edgeDelta <= 0.10) {
+    minEdgeP = 0.85;
+  } else if (edgeDelta <= 0.25) {
+    const u = (edgeDelta - 0.10) / 0.15;
+    minEdgeP = lerp(0.85, 0.55, u);
+  }
+  p = Math.max(p, minEdgeP);
+  const coarse = hash2D((x / 3) | 0, (y / 3) | 0, 915488749);
+  const ringBin = Math.max(0, Math.min(9, Math.floor(tRadial * 10)));
+  const ringNoise = hash2D(ringBin, 99991, 424242);
+  const theta = Math.atan2(dy, dx);
+  const angleBin = Math.floor(((theta + Math.PI) / (2 * Math.PI)) * 8) | 0;
+  const angleNoise = hash2D(angleBin, ringBin, 777);
+  let s = 1;
+  s *= 1 + (coarse - 0.5) * 0.6;
+  s *= 1 + (ringNoise - 0.5) * 0.3;
+  s *= 1 + (angleNoise - 0.5) * 0.25;
+  p *= s;
+  p *= 0.60;
+  p = Math.max(p, minEdgeP);
+  const fine = hash2D(x, y, 1337);
+  p = clamp01(p);
+  return fine < p;
+}
+
+
 // Helper function to create a neighbor checker for a specific module position
+export function getBorderDotSizeAt(
+  x: number,
+  y: number,
+  params: ReturnType<typeof getCircularBorderParams>,
+): number {
+  const { center, gridOffset, qrRadius, qrDiagonalRadius, circleRadius, dotSize } = params;
+  const dx = x + 0.5 - center - gridOffset;
+  const dy = y + 0.5 - center - gridOffset;
+  const r = Math.hypot(dx, dy);
+  const maxAxisDistance = Math.max(Math.abs(dx), Math.abs(dy));
+
+  // Same blend as probability, but use a gentler curve for size
+  const tRadial = clamp01((r - qrDiagonalRadius) / (circleRadius - qrDiagonalRadius));
+  const tAxis = clamp01((maxAxisDistance - qrRadius) / (circleRadius - qrRadius));
+  let t = clamp01(0.6 * tRadial + 0.4 * tAxis);
+  t = Math.pow(t, 0.8);
+
+  // Slightly larger near inner edge to eliminate thin gaps
+  const maxSize = 1.04; // up to 4% larger than a cell near edge
+  const minSize = dotSize; // default far from core
+  const size = lerp(maxSize, minSize, t);
+  return Math.max(0.01, size);
+}
+
 export function createGetNeighbor(modules: Modules, x: number, y: number): GetNeighbor {
   return (dx: number, dy: number): boolean => {
     const newX = x + dx;
@@ -428,6 +682,114 @@ export function convertImageSettingsToPixels(
   return { imgWidth, imgHeight, imgLeft, imgTop };
 }
 
+/**
+ * Generate corner dots for circular QR codes
+ * Fills the area outside the square QR but inside the circular boundary
+ */
+function generateCornerDots(numCells: number, margin: number, dotType: DotType): JSX.Element[] {
+  const dots: JSX.Element[] = [];
+
+  const params = getCircularBorderParams(numCells, margin);
+
+  // Build occupancy grid for neighbor-aware shapes
+  const borderCells: boolean[][] = Array.from({ length: params.gridSize }, () => Array(params.gridSize).fill(false));
+  for (let y = 0; y < params.gridSize; y += 1) {
+    for (let x = 0; x < params.gridSize; x += 1) {
+      borderCells[y][x] = shouldPlaceCircularBorderDot(x, y, params);
+    }
+  }
+
+  // Generate dots in a grid pattern, only rendering those in corner areas
+  for (let y = 0; y < params.gridSize; y += 1) {
+    for (let x = 0; x < params.gridSize; x += 1) {
+      if (!borderCells[y][x]) continue;
+
+      // Adjust coordinates to account for grid offset
+      const cx = x + 0.5 - params.gridOffset;
+      const cy = y + 0.5 - params.gridOffset;
+      const dotX = x - params.gridOffset;
+      const dotY = y - params.gridOffset;
+
+      // Local size tweak to eliminate inner gap
+      const localSize = getBorderDotSizeAt(x, y, params);
+
+      // Neighbor lookup
+      const getNeighbor = (dx: number, dy: number) => {
+        const ny = y + dy;
+        const nx = x + dx;
+        if (ny < 0 || ny >= params.gridSize) return false;
+        if (nx < 0 || nx >= params.gridSize) return false;
+        return borderCells[ny][nx];
+      };
+      const left = getNeighbor(-1, 0);
+      const right = getNeighbor(1, 0);
+      const top = getNeighbor(0, -1);
+      const bottom = getNeighbor(0, 1);
+      const neighborCount = [left, right, top, bottom].filter(Boolean).length;
+      const hasOpposites = (left && right) || (top && bottom);
+
+      // Render dot based on dot type
+      let dotPath = "";
+      switch (dotType) {
+        case "dots": {
+          const r = localSize / 2;
+          dotPath = `M${cx - r},${cy} a${r},${r} 0 1 0 ${localSize},0 a${r},${r} 0 1 0 ${-localSize},0z`;
+          break;
+        }
+        case "rounded":
+        case "extra-rounded": {
+          if (neighborCount > 2 || hasOpposites) {
+            dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
+          } else if (neighborCount === 0) {
+            const r = localSize / 2;
+            dotPath = `M${cx - r},${cy} a${r},${r} 0 1 0 ${localSize},0 a${r},${r} 0 1 0 ${-localSize},0z`;
+          } else if (neighborCount === 1) {
+            const r = localSize / 2;
+            if (left) {
+              dotPath = `M${dotX},${dotY} v${localSize} h${localSize / 2} a${r},${r} 0 0 0 0,${-localSize} z`;
+            } else if (right) {
+              dotPath = `M${dotX + localSize},${dotY} v${localSize} h${-localSize / 2} a${r},${r} 0 0 1 0,${-localSize} z`;
+            } else if (top) {
+              dotPath = `M${dotX},${dotY} h${localSize} v${localSize / 2} a${r},${r} 0 0 1 ${-localSize},0 z`;
+            } else {
+              dotPath = `M${dotX},${dotY + localSize} h${localSize} v${-localSize / 2} a${r},${r} 0 0 0 ${-localSize},0 z`;
+            }
+          } else {
+            dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
+          }
+          break;
+        }
+        case "classy": {
+          const r = localSize / 2;
+          if (neighborCount === 0) {
+            dotPath = `M${dotX},${dotY} v${r} a${r},${r} 0 0 0 ${r},${r} h${r} v${-r} a${r},${r} 0 0 0 ${-r},${-r} z`;
+          } else if (!left && !top) {
+            dotPath = `M${dotX},${dotY + r} a${r},${r} 0 0 1 ${r},${-r} h${localSize - r} v${localSize} h${-localSize} z`;
+          } else if (!right && !bottom) {
+            dotPath = `M${dotX},${dotY} h${localSize} v${r} a${r},${r} 0 0 1 ${-r},${r} h${-localSize + r} z`;
+          } else {
+            dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
+          }
+          break;
+        }
+        default:
+          // Square dots
+          dotPath = `M${dotX},${dotY} h${localSize}v${localSize}H${dotX}z`;
+      }
+
+      dots.push(
+        <path
+          key={`corner-dot-${x}-${y}`}
+          d={dotPath}
+          fill="currentColor"
+        />
+      );
+    }
+  }
+
+  return dots;
+}
+
 export function QRCodeSVG(props: QRPropsSVG) {
   const {
     value,
@@ -436,6 +798,7 @@ export function QRCodeSVG(props: QRPropsSVG) {
     bgColor = DEFAULT_BGCOLOR,
     fgColor = DEFAULT_FGCOLOR,
     margin = DEFAULT_MARGIN,
+    qrShape = "square",
     isOGContext = false,
     imageSettings,
     dotsOptions,
@@ -544,69 +907,67 @@ export function QRCodeSVG(props: QRPropsSVG) {
 
   // Calculate frame padding and total output size
   const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
-  const framePadding = getFramePadding(size, frameType);
-  const outputSize = framePadding > 0 ? size + framePadding * 2 : size;
+
+  // Corner dots (in QR cell units)
+  const cornerDots = qrShape === "circle" ? generateCornerDots(numCells, margin, dotType) : null;
+
+  // Compute shape padding so the QR core remains the same pixel size
+  const params = getCircularBorderParams(numCells, margin);
+  const scalePxPerCell = size / numCells;
+  const shapePaddingPx = qrShape === "circle" ? params.gridOffset * scalePxPerCell : 0;
+
+  // Frame padding computed on the full visual size (core + border)
+  const framePaddingForFrame = getFramePadding(size + shapePaddingPx * 2, frameType);
+  const outputSize = size + shapePaddingPx * 2 + framePaddingForFrame * 2;
 
   // Generate frame SVG if needed
   const frameSVG = frameOptions && frameOptions.type && frameOptions.type !== "none"
     ? renderSVGFrame({
         frameOptions,
-        qrSize: size,
+        qrSize: size + shapePaddingPx * 2, // frame surrounds full visual content
         margin: 0,
       })
     : null;
 
-  // Render QR content with frame support
-  if (framePadding > 0 && frameSVG) {
-    // When there's a frame, wrap QR in a nested SVG at the correct position
-    return (
-      <svg
-        height={outputSize}
-        width={outputSize}
-        viewBox={`0 0 ${outputSize} ${outputSize}`}
-        {...otherProps}
-      >
-        {/* Background across entire output including frame padding */}
-        <rect fill={bgColor} x={0} y={0} width={outputSize} height={outputSize} />
-        {/* QR code content, positioned with padding for the frame */}
-        <svg
-          x={framePadding}
-          y={framePadding}
-          width={size}
-          height={size}
-          viewBox={`0 0 ${numCells} ${numCells}`}
-        >
-          <path
-            fill={bgColor}
-            d={`M0,0 h${numCells}v${numCells}H0z`}
-            shapeRendering="crispEdges"
-          />
-          <path fill={dotsColor} d={fgPath} shapeRendering="crispEdges" />
-          {eyePaths}
-          {image}
-        </svg>
-        {/* Frame elements rendered at the outer level */}
-        <g dangerouslySetInnerHTML={{ __html: frameSVG }} />
-      </svg>
-    );
-  }
-
-  // No frame - render normally
+  // Always render an outer SVG that can be larger than the core size when circular
   return (
     <svg
-      height={size}
-      width={size}
-      viewBox={`0 0 ${numCells} ${numCells}`}
+      height={outputSize}
+      width={outputSize}
+      viewBox={`0 0 ${outputSize} ${outputSize}`}
       {...otherProps}
     >
-      <path
-        fill={bgColor}
-        d={`M0,0 h${numCells}v${numCells}H0z`}
-        shapeRendering="crispEdges"
-      />
-      <path fill={dotsColor} d={fgPath} shapeRendering="crispEdges" />
-      {eyePaths}
-      {image}
+      {/* Background across entire output including any frame + shape padding */}
+      <rect fill={bgColor} x={0} y={0} width={outputSize} height={outputSize} />
+
+      {/* Corner dots for circular QR (drawn in outer space, scaled from cell units) */}
+      {qrShape === "circle" && cornerDots && (
+        <g
+          fill={dotsColor}
+          transform={`translate(${framePaddingForFrame + shapePaddingPx}, ${framePaddingForFrame + shapePaddingPx}) scale(${scalePxPerCell})`}
+        >
+          {cornerDots}
+        </g>
+      )}
+
+      {/* Nested SVG for the QR core at exact size, preserving core dimensions */}
+      <svg
+        x={framePaddingForFrame + shapePaddingPx}
+        y={framePaddingForFrame + shapePaddingPx}
+        width={size}
+        height={size}
+        viewBox={`0 0 ${numCells} ${numCells}`}
+      >
+        {qrShape !== "circle" && (
+          <path fill={bgColor} d={`M0,0 h${numCells}v${numCells}H0z`} shapeRendering="crispEdges" />
+        )}
+        <path fill={dotsColor} d={fgPath} shapeRendering="crispEdges" />
+        {eyePaths}
+        {image}
+      </svg>
+
+      {/* Frame elements rendered at the outer level */}
+      {frameSVG && <g dangerouslySetInnerHTML={{ __html: frameSVG }} />}
     </svg>
   );
 }

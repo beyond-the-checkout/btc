@@ -42,38 +42,24 @@ export type NavItemChildren = (
 export const FEATURES_LIST = [
   {
     id: "links",
-    title: "Dynamic QR Campaigns",
-    description: "Create and manage QR codes at scale",
+    title: "Static QR codes",
+    description: "Simple, permanent QR codes for packaging",
     icon: DubLinksIcon,
-    href: "/campaigns",
-  },
-  {
-    id: "partners",
-    title: "Bitcoin Rewards",
-    description: "Instant incentives via Lightning Network",
-    icon: DubPartnersIcon,
-    href: "/rewards",
+    href: "/qr-codes/static",
   },
   {
     id: "analytics",
-    title: "Analytics Dashboard",
-    description: "Real-time engagement and conversion metrics",
+    title: "Dynamic QR codes",
+    description: "Updateable QR codes with tracking and analytics",
     icon: DubAnalyticsIcon,
-    href: "/analytics",
+    href: "/qr-codes/dynamic",
   },
   {
-    id: "api",
-    title: "Developer API",
-    description: "Integrate with your packaging workflow",
-    icon: DubApiIcon,
-    href: "/docs/api-reference/introduction",
-  },
-  {
-    id: "integrations",
-    title: "Integrations",
-    description: "Connect with your packaging and printing partners",
-    icon: Toggle2Fill,
-    href: "/integrations",
+    id: "partners",
+    title: "Incentive QR codes",
+    description: "Reward customers with Bitcoin via Lightning Network",
+    icon: DubPartnersIcon,
+    href: "/qr-codes/incentive",
   },
 ];
 
@@ -125,12 +111,6 @@ export const SOLUTIONS: NavItemChildren = [
     title: "Content Creators",
     description: "Intelligent audience insights and link tracking",
     href: "/solutions/creators",
-  },
-  {
-    icon: UsersFill,
-    title: "Affiliate Management",
-    description: "Manage affiliates and automate payouts",
-    href: "/partners",
   },
   {
     label: "SDKs",
@@ -190,10 +170,9 @@ export const RESOURCES = [
 ];
 
 export const COMPARE_PAGES = [
-  { name: "Bitly", slug: "bitly" },
-  { name: "Rebrandly", slug: "rebrandly" },
-  { name: "Short.io", slug: "short" },
-  { name: "Bl.ink", slug: "blink" },
+  { name: "Flow Code", slug: "flowcode" },
+  { name: "QR Tiger", slug: "qr-tiger" },
+  { name: "QRStuff", slug: "qrstuff" },
 ];
 
 export const LEGAL_PAGES = [

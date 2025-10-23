@@ -279,61 +279,15 @@ function FramePreview({ type, color }: { type: FrameType; color: string }) {
   );
 }
 
-// Compact inline color picker component
-function InlineColorPicker({
-  value,
-  onChange,
-  isDefault = false,
-}: {
-  value: string;
-  onChange: (color: string) => void;
-  isDefault?: boolean;
-}) {
-  const debouncedOnChange = useDebouncedCallback(onChange, 500);
-
-  return (
-    <div
-      className={cn(
-        "relative flex h-12 w-full shrink-0 rounded-md shadow-sm transition-opacity sm:w-32 sm:ml-auto",
-        isDefault && "opacity-40 grayscale hover:opacity-100 hover:grayscale-0",
-      )}
-    >
-      <Tooltip
-        content={
-          <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
-            <HexColorPicker color={value} onChange={debouncedOnChange} />
-          </div>
-        }
-      >
-        <div
-          className="h-full w-10 rounded-l-md border"
-          style={{
-            backgroundColor: value,
-            borderColor: value,
-          }}
-        />
-      </Tooltip>
-      <HexColorInput
-        color={value}
-        onChange={debouncedOnChange}
-        prefixed
-        style={{ borderColor: value }}
-        className="block w-full rounded-r-md border-2 border-l-0 px-2 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black"
-      />
-    </div>
-  );
-}
-
 export type QRCodeDesign = {
   fgColor: string;
   hideLogo: boolean;
   dotType: DotType;
   cornerSquareType: CornerSquareType;
   cornerDotType: CornerDotType;
-  frameType: FrameType;
-  dotsColor?: string;
-  eyeOuterColor?: string;
-  eyeInnerColor?: string;
+  qrShape: "square" | "circle";
+  hasFrame: boolean;
+  frameStyle?: "square" | "rounded" | "solid-circle" | "dotted-circle";
   frameColor?: string;
 };
 
@@ -382,7 +336,7 @@ function LinkQRModalInner({
       : undefined;
   }, [props.key, props.domain]);
 
-  const [dataPersisted, setDataPersisted] = useLocalStorage<QRCodeDesign>(
+  const [dataPersisted, setDataPersisted] = useLocalStorage<any>(
     `qr-code-design-${workspaceId}`,
     {
       fgColor: "#000000",
@@ -390,29 +344,54 @@ function LinkQRModalInner({
       dotType: "square",
       cornerSquareType: "square",
       cornerDotType: "square",
-      frameType: "none",
-      dotsColor: undefined,
-      eyeOuterColor: undefined,
-      eyeInnerColor: undefined,
+      qrShape: "square",
+      frameStyle: undefined, // undefined = no frame
       frameColor: undefined,
     },
   );
 
-  const [data, setData] = useState<QRCodeDesign>(() => ({
-    ...dataPersisted,
-    frameType: dataPersisted.frameType ?? "none",
+  // Migrate old frameType data to new structure
+  const [data, setData] = useState<QRCodeDesign>(() => {
+    const persisted = dataPersisted;
+
+    // Migration: convert old frameType to new qrShape + frameStyle
+    if ('frameType' in persisted && !('qrShape' in persisted)) {
+      const oldFrameType = persisted.frameType;
+      const migrated: QRCodeDesign = {
+        ...persisted,
+        qrShape: (oldFrameType === "circle" || oldFrameType === "dots-circle") ? "circle" : "square",
+        frameStyle: oldFrameType === "none" ? undefined :
+                   oldFrameType === "square" ? "square" :
+                   oldFrameType === "rounded-square" ? "rounded" :
+                   oldFrameType === "circle" ? "solid-circle" :
+                   oldFrameType === "dots-circle" ? "dotted-circle" : undefined,
+      };
+      delete (migrated as any).frameType;
+      delete (migrated as any).hasFrame; // Remove old hasFrame if exists
+      return migrated;
+    }
+
+    // Remove hasFrame from persisted data if it exists (legacy cleanup)
+    const cleanedData = { ...persisted };
+    delete (cleanedData as any).hasFrame;
+
+    return {
+      ...cleanedData,
+      qrShape: persisted.qrShape ?? "square",
+      frameStyle: persisted.frameStyle ?? undefined, // undefined = no frame by default
+    };
   }));
 
-  const frameType = data.frameType ?? "none";
   const frameOptions = useMemo(
     () =>
-      frameType !== "none"
+      data.frameStyle
         ? {
-            type: frameType,
+            type: data.frameStyle,
+            shape: data.qrShape,
             color: data.frameColor || data.fgColor,
           }
         : undefined,
-    [frameType, data.frameColor, data.fgColor],
+    [data.frameStyle, data.qrShape, data.frameColor, data.fgColor],
   );
 
   const hideLogo = data.hideLogo && plan !== "free";
@@ -427,18 +406,19 @@ function LinkQRModalInner({
             fgColor: data.fgColor,
             hideLogo,
             logo,
+            qrShape: data.qrShape,
             dotsOptions: {
               type: data.dotType,
-              color: data.dotsColor,
+              color: data.fgColor,
             },
             eyeOptions: {
               cornerSquare: {
                 type: data.cornerSquareType,
-                color: data.eyeOuterColor || data.fgColor,
+                color: data.fgColor,
               },
               cornerDot: {
                 type: data.cornerDotType,
-                color: data.eyeInnerColor || data.fgColor,
+                color: data.fgColor,
               },
             },
             frameOptions,
@@ -447,12 +427,10 @@ function LinkQRModalInner({
     [
       url,
       data.fgColor,
+      data.qrShape,
       data.dotType,
-      data.dotsColor,
       data.cornerSquareType,
-      data.eyeOuterColor,
       data.cornerDotType,
-      data.eyeInnerColor,
       hideLogo,
       logo,
       frameOptions,
@@ -466,6 +444,11 @@ function LinkQRModalInner({
 
   const onColorChange = useDebouncedCallback(
     (color: string) => setData((d) => ({ ...d, fgColor: color })),
+    500,
+  );
+
+  const onFrameColorChange = useDebouncedCallback(
+    (color: string) => setData((d) => ({ ...d, frameColor: color })),
     500,
   );
 
@@ -566,12 +549,11 @@ function LinkQRModalInner({
                   data.fgColor +
                   data.hideLogo +
                   data.dotType +
-                  data.dotsColor +
                   data.cornerSquareType +
-                  data.eyeOuterColor +
                   data.cornerDotType +
-                  data.eyeInnerColor +
-                  frameType +
+                  data.qrShape +
+                  data.hasFrame +
+                  data.frameStyle +
                   data.frameColor
                 }
                 initial={{ filter: "blur(2px)", opacity: 0.4 }}
@@ -586,18 +568,19 @@ function LinkQRModalInner({
                   hideLogo={data.hideLogo}
                   logo={logo}
                   scale={1}
+                  qrShape={data.qrShape}
                   dotsOptions={{
                     type: data.dotType,
-                    color: data.dotsColor,
+                    color: data.fgColor,
                   }}
                   eyeOptions={{
                     cornerSquare: {
                       type: data.cornerSquareType,
-                      color: data.eyeOuterColor || data.fgColor,
+                      color: data.fgColor,
                     },
                     cornerDot: {
                       type: data.cornerDotType,
-                      color: data.eyeInnerColor || data.fgColor,
+                      color: data.fgColor,
                     },
                   }}
                   frameOptions={frameOptions}
@@ -685,17 +668,12 @@ function LinkQRModalInner({
                 >
                   <PatternPreview
                     pattern={pattern}
-                    color={data.dotsColor || data.fgColor}
+                    color={data.fgColor}
                   />
                 </button>
               </Tooltip>
             );
           })}
-          <InlineColorPicker
-            value={data.dotsColor || data.fgColor}
-            onChange={(color) => setData((d) => ({ ...d, dotsColor: color }))}
-            isDefault={!data.dotsColor}
-          />
         </div>
       </div>
 
@@ -739,19 +717,12 @@ function LinkQRModalInner({
                     >
                       <CornerSquarePreview
                         type={type}
-                        color={data.eyeOuterColor || data.fgColor}
+                        color={data.fgColor}
                       />
                     </button>
                   </Tooltip>
                 );
               })}
-              <InlineColorPicker
-                value={data.eyeOuterColor || data.fgColor}
-                onChange={(color) =>
-                  setData((d) => ({ ...d, eyeOuterColor: color }))
-                }
-                isDefault={!data.eyeOuterColor}
-              />
             </div>
           </div>
 
@@ -787,78 +758,233 @@ function LinkQRModalInner({
                     >
                       <CornerDotPreview
                         type={type}
-                        color={data.eyeInnerColor || data.fgColor}
+                        color={data.fgColor}
                       />
                     </button>
                   </Tooltip>
                 );
               })}
-              <InlineColorPicker
-                value={data.eyeInnerColor || data.fgColor}
-                onChange={(color) =>
-                  setData((d) => ({ ...d, eyeInnerColor: color }))
-                }
-                isDefault={!data.eyeInnerColor}
-              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Frame selector */}
+      {/* QR Shape selector */}
       <div>
         <span className="mb-2 block text-sm font-medium text-neutral-700">
-          Frame
+          QR Code Shape
         </span>
-        <div className="flex flex-wrap items-center gap-3">
-          {FRAME_TYPES.map((type) => {
-            const isSelected = frameType === type;
-            const frameLabels: Record<FrameType, string> = {
-              none: "None",
-              square: "Square",
-              "rounded-square": "Rounded",
-              circle: "Circle",
-              "dots-circle": "Dots",
-            };
-            return (
-              <Tooltip
-                key={type}
-                content={frameLabels[type]}
+        <div className="flex items-center gap-3">
+          <Tooltip content="Square">
+            <button
+              type="button"
+              aria-pressed={data.qrShape === "square"}
+              aria-label="Select square shape"
+              onClick={() => setData((d) => {
+                // Auto-convert circle frames to square frames when switching shape
+                const newFrameStyle = d.frameStyle
+                  ? (d.frameStyle === "solid-circle" || d.frameStyle === "dotted-circle")
+                    ? "square" // Convert circle frame to default square frame
+                    : d.frameStyle // Keep existing square frame (square/rounded)
+                  : undefined; // Keep no frame
+                return { ...d, qrShape: "square", frameStyle: newFrameStyle };
+              })}
+              className={cn(
+                "flex size-12 items-center justify-center rounded-md border transition-all",
+                data.qrShape === "square"
+                  ? "border-black bg-neutral-50 ring-1 ring-black"
+                  : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+              )}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="6" y="6" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+            </button>
+          </Tooltip>
+          <Tooltip content="Circle">
+            <button
+              type="button"
+              aria-pressed={data.qrShape === "circle"}
+              aria-label="Select circle shape"
+              onClick={() => setData((d) => {
+                // Auto-convert square frames to circle frames when switching shape
+                const newFrameStyle = d.frameStyle
+                  ? (d.frameStyle === "square" || d.frameStyle === "rounded")
+                    ? "solid-circle" // Convert square frame to default circle frame
+                    : d.frameStyle // Keep existing circle frame (solid-circle/dotted-circle)
+                  : undefined; // Keep no frame
+                return { ...d, qrShape: "circle", frameStyle: newFrameStyle };
+              })}
+              className={cn(
+                "flex size-12 items-center justify-center rounded-md border transition-all",
+                data.qrShape === "circle"
+                  ? "border-black bg-neutral-50 ring-1 ring-black"
+                  : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+              )}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+            </button>
+          </Tooltip>
+        </div>
+      </div>
+
+      {/* Frame style selector - Always visible with "No Frame" option */}
+      <div>
+          <span className="mb-2 block text-sm font-medium text-neutral-700">
+            Frame Style
+          </span>
+          <div className="flex items-center gap-3">
+            {/* No Frame option - always available */}
+            <Tooltip content="No Frame">
+              <button
+                type="button"
+                aria-pressed={data.frameStyle === undefined}
+                aria-label="No frame"
+                onClick={() => setData((d) => ({ ...d, frameStyle: undefined }))}
+                className={cn(
+                  "flex size-12 items-center justify-center rounded-md border transition-all",
+                  data.frameStyle === undefined
+                    ? "border-black bg-neutral-50 ring-1 ring-black"
+                    : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                )}
               >
-                <button
-                  type="button"
-                  aria-pressed={isSelected}
-                  aria-label={`Select ${frameLabels[type]} frame`}
-                  onClick={() => setData((d) => ({ ...d, frameType: type }))}
-                  className={cn(
-                    "flex size-12 items-center justify-center rounded-md border transition-all",
-                    isSelected
-                      ? "border-black bg-neutral-50 ring-1 ring-black"
-                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
-                  )}
-                >
-                  <FramePreview
-                    type={type}
-                    color={data.frameColor || data.fgColor}
-                  />
-                </button>
-              </Tooltip>
-            );
-          })}
-          {frameType !== "none" && (
-            <InlineColorPicker
-              value={data.frameColor || data.fgColor}
-              onChange={(color) => setData((d) => ({ ...d, frameColor: color }))}
-              isDefault={!data.frameColor}
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                </svg>
+              </button>
+            </Tooltip>
+            {data.qrShape === "square" ? (
+              <>
+                <Tooltip content="Square">
+                  <button
+                    type="button"
+                    aria-pressed={data.frameStyle === "square"}
+                    aria-label="Select square frame"
+                    onClick={() => setData((d) => ({ ...d, frameStyle: "square" }))}
+                    className={cn(
+                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      data.frameStyle === "square"
+                        ? "border-black bg-neutral-50 ring-1 ring-black"
+                        : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                    )}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <rect x="6" y="6" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" />
+                    </svg>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Rounded">
+                  <button
+                    type="button"
+                    aria-pressed={data.frameStyle === "rounded"}
+                    aria-label="Select rounded frame"
+                    onClick={() => setData((d) => ({ ...d, frameStyle: "rounded" }))}
+                    className={cn(
+                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      data.frameStyle === "rounded"
+                        ? "border-black bg-neutral-50 ring-1 ring-black"
+                        : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                    )}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                    </svg>
+                  </button>
+                </Tooltip>
+              </>
+            ) : (
+              <>
+                <Tooltip content="Solid Circle">
+                  <button
+                    type="button"
+                    aria-pressed={data.frameStyle === "solid-circle"}
+                    aria-label="Select solid circle frame"
+                    onClick={() => setData((d) => ({ ...d, frameStyle: "solid-circle" }))}
+                    className={cn(
+                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      data.frameStyle === "solid-circle"
+                        ? "border-black bg-neutral-50 ring-1 ring-black"
+                        : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                    )}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+                    </svg>
+                  </button>
+                </Tooltip>
+                <Tooltip content="Dotted Circle">
+                  <button
+                    type="button"
+                    aria-pressed={data.frameStyle === "dotted-circle"}
+                    aria-label="Select dotted circle frame"
+                    onClick={() => setData((d) => ({ ...d, frameStyle: "dotted-circle" }))}
+                    className={cn(
+                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      data.frameStyle === "dotted-circle"
+                        ? "border-black bg-neutral-50 ring-1 ring-black"
+                        : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                    )}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" strokeDasharray="2 2" fill="none" />
+                    </svg>
+                  </button>
+                </Tooltip>
+              </>
+            )}
+          </div>
+        </div>
+
+      {/* Frame Color selector - Always visible, disabled when no frame selected */}
+      <div className={cn("transition-opacity", !data.frameStyle && "opacity-40")}>
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
+          Frame Color
+        </span>
+        <div className="flex gap-6">
+          <div className={cn(
+            "relative flex h-9 w-32 shrink-0 rounded-md shadow-sm",
+            !data.frameStyle && "pointer-events-none cursor-not-allowed"
+          )}>
+            <Tooltip
+              content={
+                data.frameStyle ? (
+                  <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
+                    <HexColorPicker
+                      color={data.frameColor || data.fgColor}
+                      onChange={onFrameColorChange}
+                    />
+                  </div>
+                ) : (
+                  "Select a frame style to customize color"
+                )
+              }
+            >
+              <div
+                className="h-full w-12 rounded-l-md border"
+                style={{
+                  backgroundColor: data.frameColor || data.fgColor,
+                  borderColor: data.frameColor || data.fgColor,
+                }}
+              />
+            </Tooltip>
+            <HexColorInput
+              color={data.frameColor || data.fgColor}
+              onChange={onFrameColorChange}
+              prefixed
+              disabled={!data.frameStyle}
+              style={{ borderColor: data.frameColor || data.fgColor }}
+              className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm disabled:cursor-not-allowed disabled:bg-neutral-50"
             />
-          )}
+          </div>
         </div>
       </div>
 
       {/* Color selector */}
       <div>
         <span className="block text-sm font-medium text-neutral-700">
-          QR Code Color
+          Dots Color
         </span>
         <div className="mt-2 flex gap-6">
           <div className="relative flex h-9 w-32 shrink-0 rounded-md shadow-sm">

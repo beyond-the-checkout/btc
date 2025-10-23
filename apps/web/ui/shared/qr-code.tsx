@@ -10,6 +10,7 @@ export const QRCode = memo(
     logo,
     scale = 1,
     margin = DEFAULT_MARGIN,
+    qrShape,
     dotsOptions,
     eyeOptions,
     frameOptions,
@@ -20,13 +21,14 @@ export const QRCode = memo(
     logo?: string;
     scale?: number;
     margin?: number;
+    qrShape?: "square" | "circle";
     dotsOptions?: DotsOptions;
     eyeOptions?: EyeOptions;
     frameOptions?: FrameOptions;
   }) => {
     const qrData = useMemo(
-      () => getQRData({ url, fgColor, hideLogo, logo, margin, dotsOptions, eyeOptions, frameOptions }),
-      [url, fgColor, hideLogo, logo, margin, dotsOptions, eyeOptions, frameOptions],
+      () => getQRData({ url, fgColor, hideLogo, logo, margin, qrShape, dotsOptions, eyeOptions, frameOptions }),
+      [url, fgColor, hideLogo, logo, margin, qrShape, dotsOptions, eyeOptions, frameOptions],
     );
 
     return (
@@ -37,6 +39,7 @@ export const QRCode = memo(
         fgColor={qrData.fgColor}
         level={qrData.level}
         margin={qrData.margin}
+        qrShape={qrData.qrShape}
         dotsOptions={qrData.dotsOptions}
         eyeOptions={qrData.eyeOptions}
         frameOptions={qrData.frameOptions}

@@ -60,6 +60,7 @@ export type QRProps = {
   bgColor?: string;
   fgColor?: string;
   margin?: number;
+  qrShape?: "square" | "circle";
   style?: CSSProperties;
   imageSettings?: ImageSettings;
   dotsOptions?: DotsOptions;
