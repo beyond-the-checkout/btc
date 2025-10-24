@@ -11,18 +11,16 @@ export const APP_HOSTNAMES = new Set([
 ]);
 
 export const APP_DOMAIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
     ? `https://app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : "http://localhost:8888";
+    : "http://localhost:8888";
 
 export const APP_DOMAIN_WITH_NGROK =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
     ? `https://app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : process.env.NEXT_PUBLIC_NGROK_URL || "http://localhost:8888";
+    : process.env.NEXT_PUBLIC_NGROK_URL || "http://localhost:8888";
 
 export const API_HOSTNAMES = new Set([
   `api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,

@@ -29,7 +29,7 @@ import {
 } from "@dub/utils";
 import { formatPeriod } from "@dub/utils/src/functions/datetime";
 import { fetcher } from "@dub/utils/src/functions/fetcher";
-import { PayoutDetailsSheet } from "app/app.dub.co/(dashboard)/[slug]/(ee)/program/payouts/payout-details-sheet";
+import { PayoutDetailsSheet } from "app/app.chko.sh/(dashboard)/[slug]/(ee)/program/payouts/payout-details-sheet";
 import { useParams } from "next/navigation";
 import { memo, useEffect, useState } from "react";
 import useSWR from "swr";

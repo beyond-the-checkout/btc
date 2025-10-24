@@ -1,4 +1,4 @@
-import AdminLinksClient from "app/app.dub.co/(dashboard)/[slug]/links/page-client";
+import AdminLinksClient from "app/app.chko.sh/(dashboard)/[slug]/links/page-client";
 import { Suspense } from "react";
 
 export default function AdminLinks() {

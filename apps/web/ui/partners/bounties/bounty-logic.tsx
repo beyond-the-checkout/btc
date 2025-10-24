@@ -11,7 +11,7 @@ import {
 } from "@/ui/shared/inline-badge-popover";
 import { Trophy } from "@dub/ui/icons";
 import { cn, currencyFormatter } from "@dub/utils";
-import { useAddEditBountyForm } from "app/app.dub.co/(dashboard)/[slug]/(ee)/program/bounties/add-edit-bounty-sheet";
+import { useAddEditBountyForm } from "app/app.chko.sh/(dashboard)/[slug]/(ee)/program/bounties/add-edit-bounty-sheet";
 import { useContext } from "react";
 import { Controller } from "react-hook-form";
 

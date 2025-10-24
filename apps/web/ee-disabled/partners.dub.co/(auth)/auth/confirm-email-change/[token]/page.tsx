@@ -1,1 +1,1 @@
-export { default } from "app/app.dub.co/(auth)/auth/confirm-email-change/[token]/page";
+export { default } from "app/app.chko.sh/(auth)/auth/confirm-email-change/[token]/page";

@@ -110,6 +110,6 @@ export default async function AppMiddleware(req: NextRequest) {
     }
   }
 
-  // otherwise, rewrite the path to /app
-  return NextResponse.rewrite(new URL(`/app.dub.co${fullPath}`, req.url));
+  // otherwise, rewrite the path to /app.chko.sh
+  return NextResponse.rewrite(new URL(`/app.chko.sh${fullPath}`, req.url));
 }

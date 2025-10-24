@@ -1,7 +1,7 @@
 import Toolbar from "@/ui/layout/toolbar/toolbar";
 import { Grid, Wordmark } from "@dub/ui";
 import { cn } from "@dub/utils";
-import { SignedInHint } from "app/app.dub.co/(onboarding)/signed-in-hint";
+import { SignedInHint } from "app/app.chko.sh/(onboarding)/signed-in-hint";
 import Link from "next/link";
 
 export default function PartnerOnboardingLayout({

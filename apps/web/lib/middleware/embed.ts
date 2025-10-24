@@ -5,7 +5,7 @@ export default function EmbedMiddleware(req: NextRequest) {
   const { searchParamsObj, fullPath } = parse(req);
 
   if (searchParamsObj.token) {
-    return NextResponse.rewrite(new URL(`/app.dub.co${fullPath}`, req.url));
+    return NextResponse.rewrite(new URL(`/app.chko.sh${fullPath}`, req.url));
   }
 
   // TODO: Show token expiry page

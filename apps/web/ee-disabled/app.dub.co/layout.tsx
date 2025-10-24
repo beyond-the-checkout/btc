@@ -1,1 +1,1 @@
-export { default } from "../../app.dub.co/layout";
+export { default } from "../../app.chko.sh/layout";
