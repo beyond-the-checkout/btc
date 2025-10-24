@@ -5,7 +5,7 @@ import { CTA } from "@/ui/placeholders/cta";
 import { FeaturesSection } from "@/ui/placeholders/features-section";
 import { Hero } from "@/ui/placeholders/hero";
 import { Logo } from "@dub/ui";
-import { cn, createHref } from "@dub/utils";
+import { APP_DOMAIN, cn, createHref } from "@dub/utils";
 import { useParams } from "next/navigation";
 import { BubbleIcon } from "../../ui/placeholders/bubble-icon";
 import { BrowserGraphic } from "./browser-graphic";
@@ -52,7 +52,7 @@ export default function PlaceholderContent() {
             "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
           )}
         >
-          <ButtonLink variant="primary" href="https://app.dub.co/register">
+          <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
             Get a Live Demo
           </ButtonLink>
           <ButtonLink

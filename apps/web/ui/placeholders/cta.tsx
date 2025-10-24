@@ -1,5 +1,5 @@
 import { Grid } from "@dub/ui";
-import { cn, createHref, UTMTags } from "@dub/utils";
+import { APP_DOMAIN, cn, createHref, UTMTags } from "@dub/utils";
 import { Star, StarHalf } from "lucide-react";
 import { ReactNode } from "react";
 import { ButtonLink } from "./button-link";
@@ -100,7 +100,7 @@ export function CTA({
       </div>
 
       <div className="relative mx-auto mt-10 flex max-w-fit space-x-4">
-        <ButtonLink variant="primary" href="https://app.dub.co/register">
+        <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
           Get a Live Demo
         </ButtonLink>
         <ButtonLink

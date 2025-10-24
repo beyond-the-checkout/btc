@@ -4,7 +4,7 @@ import { CTA } from "@/ui/placeholders/cta";
 import { FeaturesSection } from "@/ui/placeholders/features-section";
 import { Hero } from "@/ui/placeholders/hero";
 import { GlobeSearch } from "@dub/ui";
-import { cn, constructMetadata, createHref } from "@dub/utils";
+import { APP_DOMAIN, cn, constructMetadata, createHref } from "@dub/utils";
 
 export const revalidate = false; // cache indefinitely
 
@@ -58,7 +58,7 @@ export default async function NotFoundLinkPage(
             "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
           )}
         >
-          <ButtonLink variant="primary" href="https://app.dub.co/register">
+          <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
             Try Dub today
           </ButtonLink>
           <ButtonLink
