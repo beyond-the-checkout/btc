@@ -154,8 +154,9 @@ export async function processLink<T extends Record<string, any>>({
     : [];
 
   // if domain is not defined, set it to the workspace's primary domain
+  // fall back to the configured SHORT_DOMAIN instead of a hardcoded value
   if (!domain) {
-    domain = domains?.find((d) => d.primary)?.slug || "dub.sh";
+    domain = domains?.find((d) => d.primary)?.slug || SHORT_DOMAIN;
   }
 
   // checks for default short domain (configured) and dub.link
@@ -196,9 +197,12 @@ export async function processLink<T extends Record<string, any>>({
     const { allowedHostnames } = DUB_DOMAINS.find((d) => d.slug === domain)!;
     const urlDomain = getDomainWithoutWWW(url) || "";
     const apexDomain = getApexDomain(url);
+    // Apply hostname restrictions only if this branded domain has a non-empty allowlist.
+    // Default short domain entries have an empty allowlist (accept any destination).
     if (
       key !== "_root" &&
-      allowedHostnames &&
+      Array.isArray(allowedHostnames) &&
+      allowedHostnames.length > 0 &&
       !allowedHostnames.includes(urlDomain) &&
       !allowedHostnames.includes(apexDomain)
     ) {
