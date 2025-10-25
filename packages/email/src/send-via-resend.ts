@@ -17,11 +17,13 @@ const resendEmailForOptions = (opts: ResendEmailOptions) => {
     tags,
   } = opts;
 
+  const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN || "example.com";
+
   return {
     to,
     from: from || VARIANT_TO_FROM_MAP[variant],
     bcc: bcc,
-    replyTo: replyTo || "support@dub.co",
+    replyTo: replyTo || `support@${APP_DOMAIN}`,
     subject,
     text,
     react,
