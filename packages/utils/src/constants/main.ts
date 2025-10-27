@@ -1,7 +1,6 @@
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || "Dub";
+export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME;
 
-export const SHORT_DOMAIN =
-  process.env.NEXT_PUBLIC_APP_SHORT_DOMAIN || "dub.sh";
+export const SHORT_DOMAIN = process.env.NEXT_PUBLIC_APP_SHORT_DOMAIN!;
 
 export const APP_HOSTNAMES = new Set([
   `app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
@@ -70,7 +69,10 @@ export const DUB_QR_LOGO = "https://assets.dub.co/logo.png";
 export const DUB_WORDMARK = "https://assets.dub.co/wordmark.png";
 export const DUB_THUMBNAIL = "https://assets.dub.co/thumbnail.jpg";
 
-export const DUB_WORKSPACE_ID = "cl7pj5kq4006835rbjlt2ofka";
+// The platform workspace ID. Override per environment using BEYONDTC_WORKSPACE_ID.
+// We keep DUB_WORKSPACE_ID for backward compatibility across imports.
+export const DUB_WORKSPACE_ID = process.env.BEYONDTC_WORKSPACE_ID;
+export const BEYONDTC_WORKSPACE_ID = process.env.BEYONDTC_WORKSPACE_ID;
 export const ACME_WORKSPACE_ID = "clrei1gld0002vs9mzn93p8ik";
 export const ACME_PROGRAM_ID = "prog_CYCu7IMAapjkRpTnr8F1azjN";
 export const LEGAL_WORKSPACE_ID = "clrflia0j0000vs7sqfhz9c7q";
