@@ -1,6 +1,7 @@
 { lib
 , buildGoModule
 , fetchFromGitHub
+, git
 }:
 
 # Beads CLI (bd) - Lightweight memory system for coding agents
@@ -10,18 +11,27 @@
 
 buildGoModule rec {
   pname = "bd";
-  version = "0.9.6";
+  version = "0.17.7";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-    hash = "sha256-QpEezKjhQHjfgBRfHrSSlmqjoeLPWjtfHDOMPEt55fs=";
+# hash = lib.fakeHash; # use when upgrading
+    hash = "sha256-eX1dmJmQKdSwvWGJBA1S0cOi5p9cR2Z9d+DQhysAryk=";
   };
 
   # Use proxyVendor because the vendor directory in the repo is out of sync
   proxyVendor = true;
-  vendorHash = "sha256-dQLzUjt0CBGzTfwjWIWI4KQ34NV8KJGK4s9oPgeTO2s=";
+  vendorHash = "sha256-kmyg/ZCndqsDPKsg64jWx9T1r8Oymdg8gQX8Fvyl/3E=";
+
+  # Add git to build environment for tests
+  nativeBuildInputs = [ git ];
+
+  # Some tests still fail due to sandbox restrictions, skip those
+  checkFlags = [
+    "-skip=TestGitPullSyncIntegration"
+  ];
 
   subPackages = [ "cmd/bd" ];
 
