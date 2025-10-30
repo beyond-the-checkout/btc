@@ -34,7 +34,7 @@ export default function PlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            Turn every scan into a reward
+            Dynamic QR codes that never expire
           </h1>
           <p
             className={cn(
@@ -42,7 +42,7 @@ export default function PlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            Beyond The Checkout makes your packaging playable. Customers scan a dynamic QR and win real Bitcoin—while you capture rich post-purchase data.
+            Checkout delivers guaranteed longevity for your QR codes with transparent pricing and no hidden fees. Your scan data belongs to you—update anytime without reprinting.
           </p>
         </div>
 
@@ -53,17 +53,17 @@ export default function PlaceholderContent() {
           )}
         >
           <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
-            Get a Live Demo
+            Get Started
           </ButtonLink>
           <ButtonLink
             variant="secondary"
-            href={createHref("/links", domain, {
+            href={createHref("/tools/qr-code", domain, {
               ...UTM_PARAMS,
               utm_campaign: domain,
-              utm_content: "Try Free QR Demo",
+              utm_content: "Try Free QR Generator",
             })}
           >
-            Try Free QR Demo
+            Try Free QR Generator
           </ButtonLink>
         </div>
       </Hero>

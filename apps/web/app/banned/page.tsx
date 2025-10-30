@@ -9,14 +9,14 @@ import { cn, constructMetadata, createHref } from "@dub/utils";
 export const revalidate = false; // cache indefinitely
 
 export const metadata = constructMetadata({
-  title: "Banned Link",
-  description: "This link has been banned for violating our terms of service.",
+  title: "Banned QR Code",
+  description: "This QR code has been banned for violating our terms of service.",
   noIndex: true,
 });
 
 const UTM_PARAMS = {
-  utm_source: "Expired Link",
-  utm_medium: "Expired Link Page",
+  utm_source: "Banned QR Code",
+  utm_medium: "Banned Page",
 };
 
 export default async function BannedPage(props: {
@@ -39,7 +39,7 @@ export default async function BannedPage(props: {
                 "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
               )}
             >
-              Banned link
+              Banned QR code
             </h1>
             <p
               className={cn(
@@ -47,7 +47,7 @@ export default async function BannedPage(props: {
                 "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
               )}
             >
-              This link has been banned for violating our terms of service.
+              This QR code has been banned for violating our terms of service.
             </p>
           </div>
 
@@ -57,8 +57,8 @@ export default async function BannedPage(props: {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            <ButtonLink variant="primary" href="https://app.dub.co/register">
-              Try Dub today
+            <ButtonLink variant="primary" href="https://app.chko.sh/register">
+              Get started with CHKO.SH
             </ButtonLink>
             <ButtonLink
               variant="secondary"

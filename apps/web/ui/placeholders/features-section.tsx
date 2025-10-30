@@ -23,36 +23,38 @@ export function FeaturesSection({
           Platform Features
         </div>
         <h2 className="font-display mt-2 text-balance text-3xl font-medium text-neutral-900">
-          Everything you need to turn packages into performance media
+          Everything you need for reliable, dynamic QR codes
         </h2>
         <p className="mt-3 text-pretty text-lg text-neutral-500">
-          Beyond The Checkout combines dynamic QR codes, instant Bitcoin rewards, and real-time analytics to transform your packaging into an engagement channel.
+          Checkout delivers guaranteed longevity, complete data ownership, and transparent pricing for QR codes at scale. Update anytime, manage thousands, and track every scan.
         </p>
       </div>
       <div className="mx-auto mt-14 grid w-full max-w-screen-lg grid-cols-1 px-4 sm:grid-cols-2">
         <div className="contents divide-neutral-200 max-sm:divide-y sm:divide-x">
           <FeatureCard
-            title="Dynamic QR at scale"
-            description="Create, version, and update codes per SKU, lot, or region—no reprint required. Manage thousands of unique QR codes with variable data printing support."
+            title="Guaranteed Longevity"
+            description="Your QR codes never expire. We guarantee long-term reliability with no arbitrary expiration dates or surprise shutdowns."
             linkText="Learn more"
-            href={createHref("/help/article/dynamic-qr-codes", domain, {
+            href={createHref("/help/article/qr-never-expire", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
             })}
           >
+            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Domains />
           </FeatureCard>
           <FeatureCard
-            title="Instant Bitcoin rewards"
-            description="Automated micropayments in sats via Lightning Network. We handle all crypto operations—no wallets or technical setup needed on your end."
-            linkText="Try the demo"
+            title="Easy QR Code Generation"
+            description="Create QR codes in seconds with our intuitive interface. No technical knowledge required—just enter your URL and generate. Bulk creation and API access available."
+            linkText="Try it now"
             href={createHref("/tools/qr-code", domain, {
               utm_campaign: domain,
-              utm_content: "Learn more",
+              utm_content: "Try it now",
               ...utmParams,
             })}
           >
+            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <QR />
           </FeatureCard>
         </div>
@@ -61,19 +63,20 @@ export function FeaturesSection({
           className="border-y border-neutral-200 pt-12 sm:col-span-2"
           graphicClassName="sm:h-96"
           title="Real-time analytics"
-          description="Track scans, plays, claims, cohorts, and SKU performance. Monitor repeat purchase signals and measure campaign ROI down to the product level."
+          description="Track every scan in real time with detailed analytics on QR code performance, geographic data, and device types. Monitor trends and optimize campaigns instantly."
           linkText="Explore analytics"
-          href={createHref("/help/article/dub-analytics", domain, {
+          href={createHref("/help/article/scan-analytics", domain, {
             utm_campaign: domain,
             utm_content: "Learn more",
             ...utmParams,
           })}
         >
           <a
-            href="https://d.to/stats/try"
+            href="https://chko.sh/stats/demo"
             target="_blank"
             className="group block size-full"
           >
+            {/* TODO: Update demo analytics link when available */}
             <div className="size-full transition-[filter,opacity] duration-300 group-hover:opacity-70 group-hover:blur-[3px]">
               <Analytics />
             </div>
@@ -88,40 +91,43 @@ export function FeaturesSection({
         <div className="grid grid-cols-1 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3 border-t border-neutral-200">
           <FeatureCard
             className="border-r-0 sm:border-r lg:border-r border-neutral-200"
-            title="10-second micro-games"
-            description="Tap-to-win games built for mobile attention spans. Customize themes and mechanics to match your brand identity and campaign goals."
+            title="Transparent Pricing"
+            description="No hidden fees or surprise charges. Clear, upfront pricing with no arbitrary limits. You know exactly what you're paying for."
             linkText="Learn more"
-            href={createHref("/help/article/micro-games", domain, {
+            href={createHref("/help/article/pricing-plans", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
             })}
           >
+            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Personalization />
           </FeatureCard>
           <FeatureCard
             className="border-r-0 lg:border-r border-neutral-200"
-            title="Compliance-ready"
-            description="Built-in consent flows, reward limits, and regional toggles. Designed to support regulations including EU Digital Product Passport requirements."
+            title="Dynamic QR at scale"
+            description="Update anytime, manage thousands. Create, version, and update codes per SKU or campaign—no reprint required. Variable data printing support included."
             linkText="Learn more"
-            href={createHref("/help/article/compliance", domain, {
+            href={createHref("/help/article/dynamic-qr-codes", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
             })}
           >
+            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Collaboration />
           </FeatureCard>
           <FeatureCard
-            title="Packaging workflow friendly"
-            description="Export vector assets, variable data printing support, and printer partner integrations. Fits seamlessly into your existing packaging production process."
+            title="Complete Data Ownership"
+            description="Your scan data belongs to you. Export anytime, full data portability, and complete control over your customer information."
             linkText="Learn more"
-            href={createHref("/help/article/packaging-workflow", domain, {
+            href={createHref("/help/article/data-ownership", domain, {
               utm_campaign: domain,
               utm_content: "Learn more",
               ...utmParams,
             })}
           >
+            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Domains />
           </FeatureCard>
         </div>

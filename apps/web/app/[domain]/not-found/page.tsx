@@ -9,16 +9,16 @@ import { APP_DOMAIN, cn, constructMetadata, createHref } from "@dub/utils";
 export const revalidate = false; // cache indefinitely
 
 export const metadata = constructMetadata({
-  title: "Link Not Found",
+  title: "QR Code Not Found",
   description:
-    "This link does not exist on Dub. Please check the URL and try again.",
-  image: "https://assets.dub.co/misc/notfoundlink.jpg",
+    "This QR code does not exist on Checkout. Please check the URL and try again.",
+  image: "https://assets.chko.sh/misc/notfoundlink.jpg",
   noIndex: true,
 });
 
 const UTM_PARAMS = {
-  utm_source: "Link Not Found",
-  utm_medium: "Link Not Found Page",
+  utm_source: "QR Code Not Found",
+  utm_medium: "Not Found Page",
 };
 
 export default async function NotFoundLinkPage(
@@ -40,7 +40,7 @@ export default async function NotFoundLinkPage(
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            Link not found
+            QR code not found
           </h1>
           <p
             className={cn(
@@ -48,7 +48,7 @@ export default async function NotFoundLinkPage(
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            This link does not exist on Dub. Please check the URL and try again.
+            This QR code does not exist on Checkout. Please check the URL and try again.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export default async function NotFoundLinkPage(
           )}
         >
           <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
-            Try Dub today
+            Get started with CHKO.SH
           </ButtonLink>
           <ButtonLink
             variant="secondary"

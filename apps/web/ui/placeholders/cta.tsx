@@ -1,36 +1,30 @@
 import { Grid } from "@dub/ui";
 import { APP_DOMAIN, cn, createHref, UTMTags } from "@dub/utils";
-import { Star, StarHalf } from "lucide-react";
 import { ReactNode } from "react";
 import { ButtonLink } from "./button-link";
 import Logos from "./logos";
 
-const RATINGS = [
+// Stat highlights for social proof
+const STATS = [
   {
-    name: "G2",
-    logo: "https://assets.dub.co/companies/g2.svg",
-    stars: 5,
-    href: "https://www.g2.com/products/dub/reviews",
+    value: "99.9%",
+    label: "Uptime SLA",
   },
   {
-    name: "Product Hunt",
-    logo: "https://assets.dub.co/companies/product-hunt-logo.svg",
-    stars: 5,
-    href: "https://www.producthunt.com/products/dub",
+    value: "1M+",
+    label: "QR Scans",
   },
   {
-    name: "Trustpilot",
-    logo: "https://assets.dub.co/companies/trustpilot.svg",
-    stars: 4.5,
-    href: "https://www.trustpilot.com/review/dub.co",
+    value: "500+",
+    label: "Brands",
   },
 ];
 
 export function CTA({
   domain,
   utmParams,
-  title = "Make your next print run your best performing channel",
-  subtitle = "Run a pilot on one SKU and see real lifts in engagement and first-party data—without changing your martech stack.",
+  title = "Print QR codes you can trust",
+  subtitle = "Guaranteed longevity with transparent pricing. Your QR codes never expire, and your scan data belongs to you—no hidden fees, no surprises.",
   className,
 }: {
   domain: string;
@@ -55,38 +49,17 @@ export function CTA({
         <div className="size-full bg-[conic-gradient(from_-66deg,#855AFC_-32deg,#f00_63deg,#EAB308_158deg,#5CFF80_240deg,#855AFC_328deg,#f00_423deg)] [mask-image:radial-gradient(closest-side,black_100%,transparent_100%)]" />
       </div>
 
-      <div className="relative mx-auto my-8 flex w-fit gap-8">
-        {RATINGS.map(({ href, name, logo, stars }, idx) => (
-          <a
+      <div className="relative mx-auto my-8 flex w-fit gap-12 sm:gap-16">
+        {STATS.map(({ value, label }, idx) => (
+          <div
             key={idx}
-            href={href}
-            target="_blank"
-            className="group flex flex-col items-center"
+            className="flex flex-col items-center"
           >
-            <img
-              src={logo}
-              alt={name}
-              className="size-6 transition-transform duration-150 group-hover:scale-105"
-            />
-            <div className="mt-4 flex items-center gap-1.5 text-black">
-              {[...Array(Math.floor(stars))].map((_, idx) => (
-                <Star
-                  key={idx}
-                  fill="currentColor"
-                  strokeWidth={0}
-                  className="size-4 text-amber-500"
-                />
-              ))}
-              {stars % 1 > 0 && (
-                <StarHalf
-                  fill="currentColor"
-                  strokeWidth={0}
-                  className="size-4 text-amber-500"
-                />
-              )}
+            <div className="text-3xl font-semibold text-neutral-900 sm:text-4xl">
+              {value}
             </div>
-            <p className="mt-2 text-xs text-neutral-500">{stars} out of 5</p>
-          </a>
+            <p className="mt-2 text-sm text-neutral-500">{label}</p>
+          </div>
         ))}
       </div>
 
@@ -101,18 +74,18 @@ export function CTA({
 
       <div className="relative mx-auto mt-10 flex max-w-fit space-x-4">
         <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
-          Get a Live Demo
+          Get Started
         </ButtonLink>
         <ButtonLink
           variant="secondary"
-          href={createHref("/demo", domain, {
+          href={createHref("/tools/qr-code", domain, {
             utm_source: "Custom Domain",
             utm_medium: "Welcome Page",
             utm_campaign: domain,
-            utm_content: "Try Free QR Demo",
+            utm_content: "Try Free QR Generator",
           })}
         >
-          Try Free QR Demo
+          Try Free QR Generator
         </ButtonLink>
       </div>
 

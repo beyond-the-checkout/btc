@@ -11,15 +11,15 @@ import { redirect } from "next/navigation";
 export const revalidate = false; // cache indefinitely
 
 export const metadata = constructMetadata({
-  title: "Expired Link",
+  title: "Expired QR Code",
   description:
-    "This link has expired. Please contact the owner of this link to get a new one.",
+    "This QR code has expired. Please contact the owner of this QR code to get a new one.",
   noIndex: true,
 });
 
 const UTM_PARAMS = {
-  utm_source: "Expired Link",
-  utm_medium: "Expired Link Page",
+  utm_source: "Expired QR Code",
+  utm_medium: "Expired Page",
 };
 
 export default async function ExpiredLinkPage(props: {
@@ -52,7 +52,7 @@ export default async function ExpiredLinkPage(props: {
                 "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
               )}
             >
-              Expired link
+              Expired QR code
             </h1>
             <p
               className={cn(
@@ -60,7 +60,7 @@ export default async function ExpiredLinkPage(props: {
                 "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
               )}
             >
-              This link has expired. Please contact the owner of this link to
+              This QR code has expired. Please contact the owner of this QR code to
               get a new one.
             </p>
           </div>
@@ -71,8 +71,8 @@ export default async function ExpiredLinkPage(props: {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            <ButtonLink variant="primary" href="https://app.dub.co/register">
-              Try Dub today
+            <ButtonLink variant="primary" href="https://app.chko.sh/register">
+              Get started with CHKO.SH
             </ButtonLink>
             <ButtonLink
               variant="secondary"
