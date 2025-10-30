@@ -27,33 +27,34 @@ export default function UpgradeEmail({
   return (
     <Html>
       <Head />
-      <Preview>Thank you for upgrading to Dub {plan}!</Preview>
+      <Preview>Thank you for upgrading to Checkout {plan}!</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={DUB_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
-              Thank you for upgrading to Dub {plan}!
+              Thank you for upgrading to Checkout {plan}!
             </Heading>
             <Section className="my-8">
               <Img
-                src="https://assets.dub.co/misc/thank-you-thumbnail.jpg"
+                src="https://assets.chko.sh/misc/thank-you-thumbnail.jpg"
                 alt="Thank you"
                 className="max-w-[500px]"
               />
+              {/* TODO: Update thank-you image when btc.git-89 (brand assets) is complete */}
             </Section>
             <Text className="text-sm leading-6 text-black">
               Hey{name && ` ${name}`}!
             </Text>
             <Text className="text-sm leading-6 text-black">
-              My name is Steven, and I'm the founder of Dub.
+              My name is Steven, and I'm the founder of Checkout.
             </Text>
             <Text className="text-sm leading-6 text-black">
               I wanted to personally reach out to thank you for upgrading to{" "}
-              <strong>Dub {plan}</strong>! Your support means the world to us
-              and helps us continue to build and improve Dub.
+              <strong>Checkout {plan}</strong>! Your support means the world to us
+              and helps us continue to build and improve Checkout.
             </Text>
             <Text className="text-sm leading-6 text-black">
               On the {plan} plan, you now have access to:
@@ -69,11 +70,11 @@ export default function UpgradeEmail({
               </Text>
             ))}
             <Text className="text-sm leading-6 text-black">
-              If you have any questions or feedback about Dub, please don't
+              If you have any questions or feedback about Checkout, please don't
               hesitate to reach out – I'm always happy to help!
             </Text>
             <Text className="text-sm font-light leading-6 text-neutral-400">
-              Steven from Dub
+              Steven from Checkout
             </Text>
             <Footer email={email} marketing />
           </Container>
