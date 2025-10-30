@@ -187,20 +187,15 @@ export const LEGAL_PAGES = [
 ];
 
 export const SOCIAL_LINKS = [
-  { name: "X (Twitter)", icon: Twitter, href: "https://x.com/dubdotco" },
+  { name: "X (Twitter)", icon: Twitter, href: "https://x.com/BTCheckoutTech" },
   {
     name: "LinkedIn",
     icon: LinkedIn,
-    href: "https://www.linkedin.com/company/dubinc",
+    href: "https://www.linkedin.com/company/beyond-the-checkout",
   },
   {
     name: "GitHub",
     icon: Github,
-    href: "https://github.com/dubinc/dub",
-  },
-  {
-    name: "YouTube",
-    icon: YouTube,
-    href: "https://www.youtube.com/@dubdotco",
+    href: "https://github.com/beyond-the-checkout",
   },
 ];

@@ -15,7 +15,6 @@ import {
   LinkedIn,
   ReferredVia,
   Twitter,
-  YouTube,
 } from "./icons";
 import { MaxWidthWrapper } from "./max-width-wrapper";
 import { menuItemVariants } from "./menu-item";
