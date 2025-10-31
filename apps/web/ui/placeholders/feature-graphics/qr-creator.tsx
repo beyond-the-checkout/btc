@@ -97,6 +97,7 @@ export function QRCreator() {
             value={url}
             onChange={handleUrlChange}
             placeholder="https://chko.sh"
+            title=""
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900 placeholder-neutral-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
           />
         </div>
@@ -126,6 +127,17 @@ export function QRCreator() {
           </div>
         </div>
 
+        {/* Logo Toggle */}
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-neutral-700">Show Logo</span>
+          <Switch
+            checked={!hideLogo}
+            fn={(checked) => {
+              setHideLogo(!checked);
+            }}
+          />
+        </div>
+
         {/* QR Shape Toggle */}
         <QRShapeToggle
           value={qrShape}
@@ -144,17 +156,6 @@ export function QRCreator() {
 
         {/* Color Picker */}
         <ColorPicker value={fgColor} onChange={setFgColor} label="Color" />
-
-        {/* Logo Toggle */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-neutral-700">Show Logo</span>
-          <Switch
-            checked={!hideLogo}
-            fn={(checked) => {
-              setHideLogo(!checked);
-            }}
-          />
-        </div>
       </div>
     </div>
   );
