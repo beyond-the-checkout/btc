@@ -1,4 +1,5 @@
-import { Tooltip, cn } from "@dub/ui";
+import { Tooltip } from "@dub/ui";
+import { cn } from "@dub/utils";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 
 interface ColorPickerProps {

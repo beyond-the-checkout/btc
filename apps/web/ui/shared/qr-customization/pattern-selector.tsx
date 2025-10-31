@@ -1,7 +1,8 @@
 import { DotType } from "@/lib/qr/types";
 import { DOT_TYPES } from "@/lib/qr/constants";
 import { generatePath } from "@/lib/qr/utils";
-import { Tooltip, cn } from "@dub/ui";
+import { Tooltip } from "@dub/ui";
+import { cn } from "@dub/utils";
 
 // Pattern preview using actual QR rendering functions
 function PatternPreview({ pattern, color }: { pattern: DotType; color: string }) {

@@ -1,7 +1,8 @@
 import { CornerSquareType, CornerDotType } from "@/lib/qr/constants";
 import { CORNER_SQUARE_TYPES, CORNER_DOT_TYPES } from "@/lib/qr/constants";
 import { generateCornerSquarePath, generateCornerDotPath } from "@/lib/qr/eye-patterns";
-import { Tooltip, cn } from "@dub/ui";
+import { Tooltip } from "@dub/ui";
+import { cn } from "@dub/utils";
 
 // Corner Square preview (7x7 outer frame)
 function CornerSquarePreview({ type, color }: { type: CornerSquareType; color: string }) {
