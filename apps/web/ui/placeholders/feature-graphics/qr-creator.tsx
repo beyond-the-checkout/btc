@@ -1,7 +1,7 @@
 "use client";
 
 import { ClientOnly, Switch } from "@dub/ui";
-import { DUB_QR_LOGO, cn } from "@dub/utils";
+import { DUB_QR_LOGO, CHECKOUT_BASE_URL, cn } from "@dub/utils";
 import { useState, useCallback, useMemo } from "react";
 import { QRCode } from "@/ui/shared/qr-code";
 import {
@@ -55,11 +55,11 @@ export function QRCreator() {
 
   const eyeOptions = useMemo(
     () => ({
-      cornerSquareOptions: {
+      cornerSquare: {
         type: "square" as const,
         color: debouncedFgColor,
       },
-      cornerDotOptions: {
+      cornerDot: {
         type: "square" as const,
         color: debouncedFgColor,
       },
@@ -100,7 +100,7 @@ export function QRCreator() {
             type="text"
             value={url}
             onChange={handleUrlChange}
-            placeholder="https://chko.sh"
+            placeholder={CHECKOUT_BASE_URL}
             title=""
             className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm text-neutral-900 placeholder-neutral-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
           />
@@ -115,7 +115,7 @@ export function QRCreator() {
             <ClientOnly>
               <div className="relative flex size-full items-center justify-center">
                 <QRCode
-                  url={url || "https://chko.sh"}
+                  url={url || CHECKOUT_BASE_URL}
                   fgColor={debouncedFgColor}
                   hideLogo={hideLogo}
                   logo={DUB_QR_LOGO}
