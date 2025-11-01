@@ -14,6 +14,10 @@ import { DotType } from "@/lib/qr/types";
 import { DEFAULT_MARGIN } from "@/lib/qr/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 
+// QR Creator Constants
+const QR_PREVIEW_SCALE = 1.3; // Optimal size for landing page preview
+const COLOR_DEBOUNCE_MS = 300; // Balance between responsiveness and performance
+
 export function QRCreator() {
   // URL state
   const [url, setUrl] = useState("");
@@ -34,8 +38,8 @@ export function QRCreator() {
   // Color state (non-debounced for immediate updates in color picker)
   const [fgColor, setFgColor] = useState("#000000");
 
-  // Debounced color value for QR rendering (300ms delay)
-  const debouncedFgColor = useDebounce(fgColor, 300);
+  // Debounced color value for QR rendering
+  const debouncedFgColor = useDebounce(fgColor, COLOR_DEBOUNCE_MS);
 
   // Logo state
   const [hideLogo, setHideLogo] = useState(false);
@@ -115,7 +119,7 @@ export function QRCreator() {
                   fgColor={debouncedFgColor}
                   hideLogo={hideLogo}
                   logo={DUB_QR_LOGO}
-                  scale={1.3}
+                  scale={QR_PREVIEW_SCALE}
                   margin={DEFAULT_MARGIN}
                   qrShape={qrShape}
                   dotsOptions={dotsOptions}
