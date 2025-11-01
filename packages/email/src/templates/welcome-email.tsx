@@ -1,4 +1,4 @@
-import { CHECKOUT_WORDMARK } from "@dub/utils";
+import { CHECKOUT_WORDMARK, CHECKOUT_HELP_BASE, CHECKOUT_DOCS_BASE, CHECKOUT_APP_URL } from "@dub/utils";
 import {
   Body,
   Container,
@@ -54,7 +54,7 @@ export default function WelcomeEmail({
               </strong>
               :{" "}
               <Link
-                href="https://chko.sh/help/article/how-to-create-qr-code"
+                href={`${CHECKOUT_HELP_BASE}/article/how-to-create-qr-code`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 Generate a QR code
@@ -68,7 +68,7 @@ export default function WelcomeEmail({
               </strong>
               :{" "}
               <Link
-                href="https://chko.sh/help/article/pricing-plans"
+                href={`${CHECKOUT_HELP_BASE}/article/pricing-plans`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 Review your plan details
@@ -82,7 +82,7 @@ export default function WelcomeEmail({
               </strong>
               : Monitor{" "}
               <Link
-                href="https://chko.sh/help/article/scan-analytics"
+                href={`${CHECKOUT_HELP_BASE}/article/scan-analytics`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 scan data
@@ -96,7 +96,7 @@ export default function WelcomeEmail({
               </strong>
               :{" "}
               <Link
-                href="https://chko.sh/docs/introduction"
+                href={`${CHECKOUT_DOCS_BASE}/introduction`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 Check out our docs
@@ -107,7 +107,7 @@ export default function WelcomeEmail({
             <Section className="mb-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href="https://app.chko.sh"
+                href={CHECKOUT_APP_URL}
               >
                 Go to your dashboard
               </Link>

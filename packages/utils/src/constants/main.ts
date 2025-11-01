@@ -72,6 +72,13 @@ export const DUB_THUMBNAIL = "https://assets.dub.co/thumbnail.jpg";
 // Checkout brand assets
 export const CHECKOUT_WORDMARK = "https://assets.chko.sh/wordmark.png";
 
+// Checkout domain constants
+export const CHECKOUT_DOMAIN = "chko.sh";
+export const CHECKOUT_BASE_URL = "https://chko.sh";
+export const CHECKOUT_APP_URL = "https://app.chko.sh";
+export const CHECKOUT_HELP_BASE = "https://chko.sh/help";
+export const CHECKOUT_DOCS_BASE = "https://chko.sh/docs";
+
 // The platform workspace ID. Override per environment using BEYONDTC_WORKSPACE_ID.
 // We keep DUB_WORKSPACE_ID for backward compatibility across imports.
 export const DUB_WORKSPACE_ID = process.env.BEYONDTC_WORKSPACE_ID;
