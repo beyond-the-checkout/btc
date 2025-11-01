@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -30,7 +30,7 @@ export default function WelcomeEmail({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-semibold text-black">
               Welcome {name || "to Checkout"}!
@@ -57,7 +57,6 @@ export default function WelcomeEmail({
                 href="https://chko.sh/help/article/how-to-create-qr-code"
                 className="font-semibold text-black underline underline-offset-4"
               >
-                {/* TODO: Update help link when btc.git-99 (help docs) is complete */}
                 Generate a QR code
               </Link>{" "}
               that you can update anytime without reprinting.
@@ -72,7 +71,6 @@ export default function WelcomeEmail({
                 href="https://chko.sh/help/article/pricing-plans"
                 className="font-semibold text-black underline underline-offset-4"
               >
-                {/* TODO: Update help link when btc.git-99 (help docs) is complete */}
                 Review your plan details
               </Link>{" "}
               with transparent pricing and no surprise charges.
@@ -87,7 +85,6 @@ export default function WelcomeEmail({
                 href="https://chko.sh/help/article/scan-analytics"
                 className="font-semibold text-black underline underline-offset-4"
               >
-                {/* TODO: Update help link when btc.git-99 (help docs) is complete */}
                 scan data
               </Link>{" "}
               in real time to see how your QR codes perform.
@@ -102,7 +99,6 @@ export default function WelcomeEmail({
                 href="https://chko.sh/docs/introduction"
                 className="font-semibold text-black underline underline-offset-4"
               >
-                {/* TODO: Update docs link when btc.git-99 (help docs) is complete */}
                 Check out our docs
               </Link>{" "}
               to integrate QR code generation into your production process.

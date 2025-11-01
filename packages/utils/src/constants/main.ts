@@ -69,6 +69,9 @@ export const DUB_QR_LOGO = "https://assets.chko.sh/assets/checkmark_black.png";
 export const DUB_WORDMARK = "https://assets.dub.co/wordmark.png";
 export const DUB_THUMBNAIL = "https://assets.dub.co/thumbnail.jpg";
 
+// Checkout brand assets
+export const CHECKOUT_WORDMARK = "https://assets.chko.sh/wordmark.png";
+
 // The platform workspace ID. Override per environment using BEYONDTC_WORKSPACE_ID.
 // We keep DUB_WORKSPACE_ID for backward compatibility across imports.
 export const DUB_WORKSPACE_ID = process.env.BEYONDTC_WORKSPACE_ID;

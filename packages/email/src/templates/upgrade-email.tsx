@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, getPlanDetails } from "@dub/utils";
+import { CHECKOUT_WORDMARK, getPlanDetails } from "@dub/utils";
 import {
   Body,
   Container,
@@ -32,7 +32,7 @@ export default function UpgradeEmail({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
               Thank you for upgrading to Checkout {plan}!
@@ -43,7 +43,6 @@ export default function UpgradeEmail({
                 alt="Thank you"
                 className="max-w-[500px]"
               />
-              {/* TODO: Update thank-you image when btc.git-89 (brand assets) is complete */}
             </Section>
             <Text className="text-sm leading-6 text-black">
               Hey{name && ` ${name}`}!
