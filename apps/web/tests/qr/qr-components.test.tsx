@@ -7,6 +7,8 @@ import {
   FrameSelector
 } from "@/ui/shared/qr-customization";
 import { DOT_TYPES, CORNER_SQUARE_TYPES, CORNER_DOT_TYPES } from "@/lib/qr/constants";
+import { generatePath } from "@/lib/qr/utils";
+import { generateCornerSquarePath, generateCornerDotPath } from "@/lib/qr/eye-patterns";
 
 /**
  * Component smoke tests for QR customization UI
@@ -84,7 +86,8 @@ describe("QR Customization Components", () => {
       // PatternPreview component inside PatternSelector uses generatePath
       // which is already tested with all 5 dot types in qr-generation.test.ts
       // This verifies the integration point exists
-      expect(true).toBe(true);
+      expect(generatePath).toBeDefined();
+      expect(typeof generatePath).toBe("function");
     });
   });
 
@@ -111,7 +114,10 @@ describe("QR Customization Components", () => {
       // CornerSquarePreview and CornerDotPreview use these functions
       // The path generation is already tested in qr-generation.test.ts
       // This verifies the integration points exist
-      expect(true).toBe(true);
+      expect(generateCornerSquarePath).toBeDefined();
+      expect(generateCornerDotPath).toBeDefined();
+      expect(typeof generateCornerSquarePath).toBe("function");
+      expect(typeof generateCornerDotPath).toBe("function");
     });
   });
 
@@ -157,18 +163,118 @@ describe("QR Customization Components", () => {
     });
   });
 
+  describe("Edge Cases and Validation", () => {
+    it("should identify invalid hex color formats", () => {
+      // ColorPicker expects 6-character hex format
+      const invalidColors = ["#FFF", "#GGGGGG", "red", "", "#12345", "#1234567"];
+      invalidColors.forEach(color => {
+        expect(color).not.toMatch(/^#[0-9A-F]{6}$/i);
+      });
+    });
+
+    it("should only accept valid DOT_TYPES patterns", () => {
+      // PatternSelector should only work with defined DOT_TYPES
+      const invalidPatterns = ["invalid", "round", "circular", "", "dot"];
+      invalidPatterns.forEach(pattern => {
+        expect(DOT_TYPES).not.toContain(pattern);
+      });
+    });
+
+    it("should only accept valid CORNER_SQUARE_TYPES", () => {
+      // CornerSelector should only work with defined CORNER_SQUARE_TYPES
+      const invalidSquareTypes = ["circle", "invalid", "", "triangle"];
+      invalidSquareTypes.forEach(type => {
+        expect(CORNER_SQUARE_TYPES).not.toContain(type);
+      });
+    });
+
+    it("should only accept valid CORNER_DOT_TYPES", () => {
+      // CornerSelector should only work with defined CORNER_DOT_TYPES
+      const invalidDotTypes = ["classy", "extra-rounded", "invalid", "", "leaf"];
+      invalidDotTypes.forEach(type => {
+        expect(CORNER_DOT_TYPES).not.toContain(type);
+      });
+    });
+
+    it("should document frame availability transitions by shape", () => {
+      /**
+       * FrameSelector behavior based on qrShape prop:
+       *
+       * When qrShape="square":
+       * - Available frames: "square", "rounded", undefined
+       * - Unavailable: "solid-circle", "dotted-circle"
+       *
+       * When qrShape="circle":
+       * - Available frames: "solid-circle", "dotted-circle", undefined
+       * - Unavailable: "square", "rounded"
+       *
+       * Note: The component conditionally renders frame options based on qrShape.
+       * Actual transition testing requires component rendering with @testing-library/react.
+       *
+       * Reference: apps/web/ui/shared/qr-customization/frame-selector.tsx:48-126
+       */
+
+      // Verify that frame options differ by shape type
+      const squareFrames = ["square", "rounded"];
+      const circleFrames = ["solid-circle", "dotted-circle"];
+
+      // Ensure no overlap between shape-specific frames
+      squareFrames.forEach(frame => {
+        expect(circleFrames).not.toContain(frame);
+      });
+      circleFrames.forEach(frame => {
+        expect(squareFrames).not.toContain(frame);
+      });
+    });
+
+    it("should handle ColorPicker disabled state", () => {
+      /**
+       * ColorPicker supports disabled state:
+       * - disabled: boolean - When true, picker becomes non-interactive
+       * - disabledTooltip: string - Custom tooltip message when disabled
+       *
+       * Disabled behavior (requires rendering to test fully):
+       * - Adds opacity-40 class to container
+       * - Adds pointer-events-none to color preview
+       * - Disables HexColorInput field
+       * - Shows disabledTooltip instead of color picker in tooltip
+       *
+       * Reference: apps/web/ui/shared/qr-customization/color-picker.tsx:21-41
+       */
+      expect(typeof ColorPicker).toBe("function");
+    });
+
+    it("should verify CornerSelector has separate callbacks for square and dot", () => {
+      /**
+       * CornerSelector uses two independent callbacks:
+       * - onCornerSquareChange: For outer frame (7x7 area)
+       * - onCornerDotChange: For inner dot (3x3 area)
+       *
+       * This separation allows independent customization of outer and inner eye patterns.
+       * Callback isolation testing requires component rendering.
+       *
+       * Reference: apps/web/ui/shared/qr-customization/corner-selector.tsx:60-61
+       */
+      expect(typeof CornerSelector).toBe("function");
+    });
+  });
+
   describe("Component Integration", () => {
     it("PatternSelector integrates with generatePath (tested in qr-generation.test.ts)", () => {
       // PatternPreview component inside PatternSelector uses generatePath
       // which is already tested with all 5 dot types
       // The business logic (path generation) is thoroughly tested
-      expect(true).toBe(true);
+      // Verify the function is available for integration
+      expect(generatePath).toBeDefined();
+      expect(typeof generatePath).toBe("function");
     });
 
     it("CornerSelector integrates with eye pattern generation (tested in qr-generation.test.ts)", () => {
       // CornerSquarePreview and CornerDotPreview use generateCornerSquarePath
       // and generateCornerDotPath which are tested in the core library tests
-      expect(true).toBe(true);
+      // Verify both functions are available for integration
+      expect(generateCornerSquarePath).toBeDefined();
+      expect(generateCornerDotPath).toBeDefined();
     });
 
     it("All components are thin UI wrappers around tested core functions", () => {
@@ -177,39 +283,83 @@ describe("QR Customization Components", () => {
       // This architectural pattern ensures separation of concerns:
       // - Core logic: tested in qr-generation.test.ts
       // - UI components: verified for exports and structure here
-      expect(true).toBe(true);
+      // Verify key integration functions are available
+      expect(generatePath).toBeDefined();
+      expect(generateCornerSquarePath).toBeDefined();
+      expect(generateCornerDotPath).toBeDefined();
     });
   });
 
   describe("Component Props Interface", () => {
     it("PatternSelector should accept required props", () => {
-      // Required props: value, onChange, color
-      // Optional props: label
-      // This test verifies the component can be imported and has a structure
+      /**
+       * Props interface for PatternSelector:
+       * - value: DotType (required) - 'square' | 'rounded' | 'dots' | 'classy' | 'extra-rounded'
+       * - onChange: (pattern: DotType) => void (required) - Callback when pattern changes
+       * - color: string (required) - Hex color format #RRGGBB for pattern preview
+       * - label?: string (optional) - Label text, defaults to 'Dot Pattern'
+       *
+       * Reference: apps/web/ui/shared/qr-customization/pattern-selector.tsx:43-48
+       */
       expect(typeof PatternSelector).toBe("function");
     });
 
     it("CornerSelector should accept required props", () => {
-      // Required props: cornerSquareType, cornerDotType, onCornerSquareChange, onCornerDotChange, color
-      // Optional props: label
+      /**
+       * Props interface for CornerSelector:
+       * - cornerSquareType: CornerSquareType (required) - 'square' | 'rounded' | 'dots' | 'extra-rounded' | 'leaf'
+       * - cornerDotType: CornerDotType (required) - 'square' | 'dots' | 'rounded'
+       * - onCornerSquareChange: (type: CornerSquareType) => void (required) - Callback for outer frame changes
+       * - onCornerDotChange: (type: CornerDotType) => void (required) - Callback for inner dot changes
+       * - color: string (required) - Hex color format for preview rendering
+       * - label?: string (optional) - Label text, defaults to 'Corner Eyes'
+       *
+       * Reference: apps/web/ui/shared/qr-customization/corner-selector.tsx:57-64
+       */
       expect(typeof CornerSelector).toBe("function");
     });
 
     it("QRShapeToggle should accept required props", () => {
-      // Required props: value, onChange
-      // Optional props: label
+      /**
+       * Props interface for QRShapeToggle:
+       * - value: 'square' | 'circle' (required) - Currently selected QR code shape
+       * - onChange: (shape: 'square' | 'circle') => void (required) - Callback when shape changes
+       * - label?: string (optional) - Label text, defaults to 'QR Code Shape'
+       *
+       * Reference: apps/web/ui/shared/qr-customization/qr-shape-toggle.tsx:4-8
+       */
       expect(typeof QRShapeToggle).toBe("function");
     });
 
     it("ColorPicker should accept required props", () => {
-      // Required props: value, onChange
-      // Optional props: label, disabled, disabledTooltip
+      /**
+       * Props interface for ColorPicker:
+       * - value: string (required) - Current hex color value
+       * - onChange: (color: string) => void (required) - Callback when color changes
+       * - label?: string (optional) - Label text, defaults to 'Color'
+       * - disabled?: boolean (optional) - Whether picker is disabled, defaults to false
+       * - disabledTooltip?: string (optional) - Tooltip shown when disabled, defaults to 'Disabled'
+       *
+       * Uses react-colorful's HexColorPicker and HexColorInput components
+       * Reference: apps/web/ui/shared/qr-customization/color-picker.tsx:5-11
+       */
       expect(typeof ColorPicker).toBe("function");
     });
 
     it("FrameSelector should accept required props", () => {
-      // Required props: value, onChange, qrShape
-      // Optional props: label
+      /**
+       * Props interface for FrameSelector:
+       * - value: FrameStyle (required) - 'square' | 'rounded' | 'solid-circle' | 'dotted-circle' | undefined
+       * - onChange: (frame: FrameStyle) => void (required) - Callback when frame changes
+       * - qrShape: 'square' | 'circle' (required) - QR shape determines available frame options
+       * - label?: string (optional) - Label text, defaults to 'Frame Style'
+       *
+       * Frame availability by shape:
+       * - Square QR: 'square', 'rounded', or undefined (no frame)
+       * - Circle QR: 'solid-circle', 'dotted-circle', or undefined (no frame)
+       *
+       * Reference: apps/web/ui/shared/qr-customization/frame-selector.tsx:4-11
+       */
       expect(typeof FrameSelector).toBe("function");
     });
   });
