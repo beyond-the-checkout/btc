@@ -99,7 +99,7 @@ export function Nav({
   const scrolled = useScroll(40);
   const pathname = usePathname();
   const { data: session, isLoading } = useSWR(
-    domain.endsWith("dub.co") && "/api/auth/session",
+    (domain.endsWith("chko.sh") || domain.endsWith("chko.dev")) && "/api/auth/session",
     fetcher,
     {
       dedupingInterval: 60000,

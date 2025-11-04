@@ -7,7 +7,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { COMPARE_PAGES, FEATURES_LIST, LEGAL_PAGES } from "./content";
-import { DubStatusBadge } from "./dub-status-badge";
 import {
   DubProduct,
   DubProductIcon,
@@ -287,9 +286,8 @@ export function Footer({
           </div>
         </div>
 
-        {/* Bottom row (status, SOC2, copyright) */}
-        <div className="mt-12 grid grid-cols-1 items-center gap-8 sm:grid-cols-3">
-          <DubStatusBadge />
+        {/* Bottom row (SOC2, copyright) */}
+        <div className="mt-12 grid grid-cols-1 items-center gap-8 sm:grid-cols-2">
           <Link
             href={createHref("/blog/soc2", domain, {
               utm_source: "Custom Domain",
@@ -297,10 +295,10 @@ export function Footer({
               utm_campaign: domain,
               utm_content: "SOC2",
             })}
-            className="flex sm:justify-center"
+            className="flex sm:justify-start"
           >
             <Image
-              src="https://assets.dub.co/misc/soc2.svg"
+              src="https://assets.chko.sh/misc/soc2.svg"
               alt="AICPA SOC 2 Type II Certified"
               width={63}
               height={32}
@@ -308,7 +306,7 @@ export function Footer({
             />
           </Link>
           <p className="text-xs text-neutral-500 sm:text-right">
-            © {new Date().getFullYear()} Dub Technologies, Inc.
+            © {new Date().getFullYear()} Beyond The Checkout, Inc.
           </p>
         </div>
       </footer>
