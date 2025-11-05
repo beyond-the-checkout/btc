@@ -5,10 +5,8 @@ import { CTA } from "@/ui/placeholders/cta";
 import { FeaturesSection } from "@/ui/placeholders/features-section";
 import { QRCreator } from "@/ui/placeholders/feature-graphics/qr-creator";
 import { Hero } from "@/ui/placeholders/hero";
-import { Logo } from "@dub/ui";
 import { APP_DOMAIN, cn } from "@dub/utils";
 import { useParams } from "next/navigation";
-import { BubbleIcon } from "../../ui/placeholders/bubble-icon";
 import { BrowserGraphic } from "./browser-graphic";
 
 const UTM_PARAMS = {
@@ -23,9 +21,6 @@ export default function PlaceholderContent() {
     <div>
       <Hero>
         <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center">
-          <BubbleIcon>
-            <Logo className="size-10" />
-          </BubbleIcon>
           <h1
             className={cn(
               "font-display mt-8 text-center text-4xl font-medium text-neutral-900 sm:text-5xl sm:leading-[1.15]",
