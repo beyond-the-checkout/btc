@@ -2,48 +2,45 @@ import { ExpandingArrow } from "@dub/ui";
 import { cn, createHref, UTMTags } from "@dub/utils";
 import Link from "next/link";
 
-// TODO: Move these logo images from the checkout.tech CDN to a dedicated assets CDN
-// Currently loading from: https://checkout.tech/_next/image/...
-// Should move to: https://assets.checkout.tech/partners/ or similar
 const logos = [
   {
     name: "fmk",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FFMK%2FFMK_Logo.webp&w=384&q=75",
+    url: "https://assets.chko.sh/partners/FMK_Logo.webp",
     href: "https://www.freemarketkids.com/",
   },
   {
     name: "foundation",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2Ffoundation_brand.png&w=384&q=75",
+    url: "https://assets.chko.sh/partners/foundation_brand.png",
     href: "https://foundation.xyz/",
   },
   {
     name: "btc-tc",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FBTC-TC%2FBTC-TC_Gold-Black.jpg&w=384&q=75",
+    url: "https://assets.chko.sh/partners/BTC-TC_Gold-Black.jpg",
     href: "https://btc-tc.com/",
   },
   {
     name: "shamory",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FShamory%2FShamoryLogo.jpg&w=384&q=75",
+    url: "https://assets.chko.sh/partners/ShamoryLogo.jpg",
     href: "https://shamory.com/",
   },
   {
     name: "panties4bitcoin",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2FP4B_RoundLogo.png&w=384&q=75",
+    url: "https://assets.chko.sh/partners/P4B_RoundLogo.png",
     href: "https://www.pantiesforbitcoin.com/",
   },
   {
     name: "nihowdy",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2F241120_NiHowdy_Logo.png&w=384&q=75",
+    url: "https://assets.chko.sh/partners/241120_NiHowdy_Logo.png",
     href: "https://nihowdy.com/",
   },
   {
     name: "proofofpod",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2FProofOfPod_Logo.png&w=384&q=75",
+    url: "https://assets.chko.sh/partners/ProofOfPod_Logo.png",
     href: "https://www.youtube.com/@ProofofPod",
   },
   {
     name: "jippi",
-    url: "https://checkout.tech/_next/image?url=%2Fimages%2FPartners%2FJippi_Logo.png&w=384&q=75",
+    url: "https://assets.chko.sh/partners/Jippi_Logo.png",
     href: "https://jippi.app/",
   },
 ];
