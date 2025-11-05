@@ -97,7 +97,7 @@ export function ProgramHelpAndSupportContent({
               <input
                 type="email"
                 className="block w-full rounded-md border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
-                placeholder="support@dub.co"
+                placeholder="support@checkout.tech"
                 {...register("supportEmail", {
                   required: true,
                 })}
@@ -108,7 +108,7 @@ export function ProgramHelpAndSupportContent({
 
         <SettingsRow
           heading="Messaging center"
-          description="Communicate with your partners directly inside Dub"
+          description="Communicate with your partners directly inside Checkout"
         >
           <div className="flex items-center justify-end">
             <div className="w-full max-w-md">
@@ -160,7 +160,7 @@ export function ProgramHelpAndSupportContent({
                 type="url"
                 className="block w-full rounded-md border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
                 {...register("helpUrl")}
-                placeholder="https://dub.co/help"
+                placeholder="https://checkout.tech/help"
               />
             </div>
           </div>
@@ -176,7 +176,7 @@ export function ProgramHelpAndSupportContent({
                 type="url"
                 className="block w-full rounded-md border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
                 {...register("termsUrl")}
-                placeholder="https://dub.co/legal/affiliates"
+                placeholder="https://checkout.tech/tos"
               />
             </div>
           </div>

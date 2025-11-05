@@ -49,6 +49,11 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
     return NextResponse.rewrite(new URL(`/${domain}${path}`, req.url));
   }
 
+  // for legal pages (TOS and Privacy Policy)
+  if (path === "/tos" || path === "/privacy-policy") {
+    return NextResponse.next();
+  }
+
   // for .well-known routes
   if (path.startsWith("/.well-known/")) {
     const file = path.split("/.well-known/").pop();

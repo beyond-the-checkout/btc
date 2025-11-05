@@ -67,7 +67,7 @@ export function Form() {
           <Input
             type="email"
             {...register("supportEmail", { required: true })}
-            placeholder="support@dub.co"
+            placeholder="support@checkout.tech"
             autoFocus={!isMobile}
             className="mt-2 w-full max-w-none"
           />
@@ -80,7 +80,7 @@ export function Form() {
           <Input
             type="url"
             {...register("helpUrl")}
-            placeholder="https://dub.co/help"
+            placeholder="https://checkout.tech/help"
             className="mt-2 w-full max-w-none"
           />
         </div>
@@ -92,7 +92,7 @@ export function Form() {
           <Input
             type="url"
             {...register("termsUrl")}
-            placeholder="https://dub.co/legal/affiliates"
+            placeholder="https://checkout.tech/tos"
             className="mt-2 w-full max-w-none"
           />
         </div>

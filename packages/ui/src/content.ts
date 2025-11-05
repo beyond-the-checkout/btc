@@ -176,14 +176,8 @@ export const COMPARE_PAGES = [
 ];
 
 export const LEGAL_PAGES = [
-  { name: "Affiliate Program Terms", slug: "affiliates" },
-  { name: "DPA", slug: "dpa" },
-  { name: "Partner Terms", slug: "partners" },
-  { name: "Privacy Policy", slug: "privacy" },
-  { name: "Report Abuse", slug: "abuse" },
-  { name: "SLA", slug: "sla" },
-  { name: "Subprocessors", slug: "subprocessors" },
-  { name: "Terms of Service", slug: "terms" },
+  { name: "Terms of Service", slug: "tos" },
+  { name: "Privacy Policy", slug: "privacy-policy" },
 ];
 
 export const SOCIAL_LINKS = [

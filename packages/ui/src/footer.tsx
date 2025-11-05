@@ -58,12 +58,8 @@ const navigation = {
   ],
   company: [
     { name: "About", href: "/about" },
-    { name: "Blog", href: "/blog" },
-    { name: "Changelog", href: "/changelog" },
     { name: "Customers", href: "/customers" },
-    { name: "Brand", href: "/brand" },
     { name: "Contact", href: "/contact" },
-    { name: "Privacy", href: "/privacy" },
   ],
   compare: COMPARE_PAGES.map(({ name, slug }) => ({
     name,
@@ -103,12 +99,7 @@ export function Footer({
           <div className="flex flex-col gap-6">
             <div className="grow">
               <Link
-                href={createHref("/", domain, {
-                  utm_source: "Custom Domain",
-                  utm_medium: "Footer",
-                  utm_campaign: domain,
-                  utm_content: "Logo",
-                })}
+                href={createHref("/", domain)}
                 className="block max-w-fit"
               >
                 <span className="sr-only">
@@ -141,12 +132,7 @@ export function Footer({
                     {navigation.product.map((item) => (
                       <li key={item.name}>
                         <Link
-                          href={createHref(item.href, domain, {
-                            utm_source: "Custom Domain",
-                            utm_medium: "Footer",
-                            utm_campaign: domain,
-                            utm_content: item.name,
-                          })}
+                          href={createHref(item.href, domain)}
                           className={linkListItemClassName}
                         >
                           {item.id && (
@@ -164,12 +150,7 @@ export function Footer({
                     {navigation.solutions.map((item) => (
                       <li key={item.name}>
                         <Link
-                          href={createHref(item.href, domain, {
-                            utm_source: "Custom Domain",
-                            utm_medium: "Footer",
-                            utm_campaign: domain,
-                            utm_content: item.name,
-                          })}
+                          href={createHref(item.href, domain)}
                           className={linkListItemClassName}
                         >
                           {item.name}
@@ -185,12 +166,7 @@ export function Footer({
                   {navigation.resources.map((item) => (
                     <li key={item.name}>
                       <Link
-                        href={createHref(item.href, domain, {
-                          utm_source: "Custom Domain",
-                          utm_medium: "Footer",
-                          utm_campaign: domain,
-                          utm_content: item.name,
-                        })}
+                        href={createHref(item.href, domain)}
                         className={linkListItemClassName}
                       >
                         {item.name}
@@ -208,12 +184,7 @@ export function Footer({
                     {navigation.company.map((item) => (
                       <li key={item.name}>
                         <Link
-                          href={createHref(item.href, domain, {
-                            utm_source: "Custom Domain",
-                            utm_medium: "Footer",
-                            utm_campaign: domain,
-                            utm_content: item.name,
-                          })}
+                          href={createHref(item.href, domain)}
                           className={cn(linkListItemClassName, "gap-1")}
                         >
                           {item.name}
@@ -227,16 +198,7 @@ export function Footer({
                             {LEGAL_PAGES.map((page) => (
                               <Link
                                 key={page.name}
-                                href={createHref(
-                                  `/legal/${page.slug}`,
-                                  domain,
-                                  {
-                                    utm_source: "Custom Domain",
-                                    utm_medium: "Footer",
-                                    utm_campaign: domain,
-                                    utm_content: page.name,
-                                  },
-                                )}
+                                href={createHref(`/${page.slug}`, domain)}
                                 className={cn(
                                   menuItemVariants({ variant: "default" }),
                                   linkListItemClassName,
@@ -267,12 +229,7 @@ export function Footer({
                   {navigation.compare.map((item) => (
                     <li key={item.name}>
                       <Link
-                        href={createHref(item.href, domain, {
-                          utm_source: "Custom Domain",
-                          utm_medium: "Footer",
-                          utm_campaign: domain,
-                          utm_content: item.name,
-                        })}
+                        href={createHref(item.href, domain)}
                         className={linkListItemClassName}
                       >
                         <DubProductIcon product={item.product as DubProduct} />
@@ -289,12 +246,7 @@ export function Footer({
         {/* Bottom row (SOC2, copyright) */}
         <div className="mt-12 grid grid-cols-1 items-center gap-8 sm:grid-cols-2">
           <Link
-            href={createHref("/blog/soc2", domain, {
-              utm_source: "Custom Domain",
-              utm_medium: "Footer",
-              utm_campaign: domain,
-              utm_content: "SOC2",
-            })}
+            href={createHref("/blog/soc2", domain)}
             className="flex sm:justify-start"
           >
             <Image
