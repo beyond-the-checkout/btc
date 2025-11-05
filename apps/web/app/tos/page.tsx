@@ -7,16 +7,15 @@ export const metadata = constructMetadata({
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-default">
-      <main className="flex-1 container mx-auto px-4 py-12">
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-center text-content-emphasis mb-6">
-          Terms of Service
-        </h1>
-        <p className="font-default text-center text-sm text-content-subtle mb-12">
-          Effective Date: May 19, 2025
-        </p>
+    <main className="container mx-auto px-4 py-12">
+      <h1 className="font-display text-4xl md:text-5xl font-bold text-center text-content-emphasis mb-6">
+        Terms of Service
+      </h1>
+      <p className="font-default text-center text-sm text-content-subtle mb-12">
+        Effective Date: May 19, 2025
+      </p>
 
-        <div className="max-w-3xl mx-auto space-y-8 font-default text-content-default">
+      <div className="max-w-3xl mx-auto space-y-8 font-default text-content-default">
           <p>
             <strong className="text-content-emphasis">Company:</strong> Beyond The Checkout, Inc.<br />
             <strong className="text-content-emphasis">Incorporated in:</strong> Delaware, United States
@@ -165,8 +164,7 @@ export default function TermsOfServicePage() {
               </a>
             </p>
           </section>
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
