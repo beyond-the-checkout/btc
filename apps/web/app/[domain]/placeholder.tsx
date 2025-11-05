@@ -46,17 +46,6 @@ export default function PlaceholderContent() {
             <QRCreator />
           </div>
         </div>
-
-        <div
-          className={cn(
-            "relative mx-auto mt-8 flex max-w-fit items-center",
-            "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:400ms] [animation-duration:1s] [animation-fill-mode:both]",
-          )}
-        >
-          <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
-            Sign Up to Download
-          </ButtonLink>
-        </div>
       </Hero>
       <div className="mt-20">
         <FeaturesSection domain={domain} utmParams={UTM_PARAMS} />

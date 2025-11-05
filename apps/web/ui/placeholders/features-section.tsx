@@ -34,12 +34,6 @@ export function FeaturesSection({
           <FeatureCard
             title="Guaranteed Longevity"
             description="Your QR codes never expire. We guarantee long-term reliability with no arbitrary expiration dates or surprise shutdowns."
-            linkText="Learn more"
-            href={createHref("/help/article/qr-never-expire", domain, {
-              utm_campaign: domain,
-              utm_content: "Learn more",
-              ...utmParams,
-            })}
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Domains />
@@ -47,12 +41,6 @@ export function FeaturesSection({
           <FeatureCard
             title="Easy QR Code Generation"
             description="Create QR codes in seconds with our intuitive interface. No technical knowledge required—just enter your URL and generate. Bulk creation and API access available."
-            linkText="Try it now"
-            href={createHref("/tools/qr-code", domain, {
-              utm_campaign: domain,
-              utm_content: "Try it now",
-              ...utmParams,
-            })}
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <QR />
@@ -64,12 +52,6 @@ export function FeaturesSection({
           graphicClassName="sm:h-96"
           title="Real-time analytics"
           description="Track every scan in real time with detailed analytics on QR code performance, geographic data, and device types. Monitor trends and optimize campaigns instantly."
-          linkText="Explore analytics"
-          href={createHref("/help/article/scan-analytics", domain, {
-            utm_campaign: domain,
-            utm_content: "Learn more",
-            ...utmParams,
-          })}
         >
           <a
             href="https://chko.sh/stats/demo"
@@ -93,12 +75,6 @@ export function FeaturesSection({
             className="border-r-0 sm:border-r lg:border-r border-neutral-200"
             title="Transparent Pricing"
             description="No hidden fees or surprise charges. Clear, upfront pricing with no arbitrary limits. You know exactly what you're paying for."
-            linkText="Learn more"
-            href={createHref("/help/article/pricing-plans", domain, {
-              utm_campaign: domain,
-              utm_content: "Learn more",
-              ...utmParams,
-            })}
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Personalization />
@@ -107,12 +83,6 @@ export function FeaturesSection({
             className="border-r-0 lg:border-r border-neutral-200"
             title="Dynamic QR at scale"
             description="Update anytime, manage thousands. Create, version, and update codes per SKU or campaign—no reprint required. Variable data printing support included."
-            linkText="Learn more"
-            href={createHref("/help/article/dynamic-qr-codes", domain, {
-              utm_campaign: domain,
-              utm_content: "Learn more",
-              ...utmParams,
-            })}
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Collaboration />
@@ -120,12 +90,6 @@ export function FeaturesSection({
           <FeatureCard
             title="Complete Data Ownership"
             description="Your scan data belongs to you. Export anytime, full data portability, and complete control over your customer information."
-            linkText="Learn more"
-            href={createHref("/help/article/data-ownership", domain, {
-              utm_campaign: domain,
-              utm_content: "Learn more",
-              ...utmParams,
-            })}
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Domains />
@@ -147,8 +111,8 @@ function FeatureCard({
 }: PropsWithChildren<{
   title: string;
   description: string;
-  linkText: string;
-  href: string;
+  linkText?: string;
+  href?: string;
   className?: string;
   graphicClassName?: string;
 }>) {
@@ -193,15 +157,17 @@ function FeatureCard({
         >
           {description}
         </Markdown>
-        <Link
-          href={href}
-          className={cn(
-            "mt-6 w-fit whitespace-nowrap rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium leading-none text-neutral-900 transition-colors duration-75",
-            "outline-none hover:bg-neutral-50 focus-visible:border-neutral-900 focus-visible:ring-1 focus-visible:ring-neutral-900 active:bg-neutral-100",
-          )}
-        >
-          {linkText}
-        </Link>
+        {href && linkText && (
+          <Link
+            href={href}
+            className={cn(
+              "mt-6 w-fit whitespace-nowrap rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm font-medium leading-none text-neutral-900 transition-colors duration-75",
+              "outline-none hover:bg-neutral-50 focus-visible:border-neutral-900 focus-visible:ring-1 focus-visible:ring-neutral-900 active:bg-neutral-100",
+            )}
+          >
+            {linkText}
+          </Link>
+        )}
       </div>
     </div>
   );
