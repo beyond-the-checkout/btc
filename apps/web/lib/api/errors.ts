@@ -231,8 +231,8 @@ export const exceededLimitError = ({
   plan: PlanProps;
   limit: number;
   type:
-    | "clicks"
-    | "links"
+    | "scans"
+    | "codes"
     | "AI"
     | "domains"
     | "tags"
@@ -242,7 +242,7 @@ export const exceededLimitError = ({
     | "groups";
 }) => {
   return `You've reached your ${
-    ["links", "AI", "payouts"].includes(type) ? "monthly" : ""
+    ["codes", "AI", "payouts"].includes(type) ? "monthly" : ""
   } limit of ${
     type === "payouts"
       ? currencyFormatter(limit / 100)

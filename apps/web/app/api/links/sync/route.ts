@@ -42,7 +42,7 @@ export const POST = withWorkspace(
         exceededLimitError({
           plan: workspace.plan,
           limit: workspace.linksLimit,
-          type: "links",
+          type: "codes",
         }),
         { status: 403 },
       );

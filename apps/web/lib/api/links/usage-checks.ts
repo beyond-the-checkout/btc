@@ -1,7 +1,7 @@
 import { WorkspaceWithUsers } from "@/lib/types";
 import { DubApiError, exceededLimitError } from "../errors";
 
-// Workspace clicks usage overage checks
+// Workspace scans usage overage checks
 export const throwIfClicksUsageExceeded = (workspace: WorkspaceWithUsers) => {
   if (workspace.usage > workspace.usageLimit) {
     throw new DubApiError({
@@ -9,13 +9,13 @@ export const throwIfClicksUsageExceeded = (workspace: WorkspaceWithUsers) => {
       message: exceededLimitError({
         plan: workspace.plan,
         limit: workspace.usageLimit,
-        type: "clicks",
+        type: "scans",
       }),
     });
   }
 };
 
-// Workspace links usage overage checks
+// Workspace codes usage overage checks
 export const throwIfLinksUsageExceeded = (workspace: WorkspaceWithUsers) => {
   if (
     workspace.linksUsage >= workspace.linksLimit &&
@@ -26,7 +26,7 @@ export const throwIfLinksUsageExceeded = (workspace: WorkspaceWithUsers) => {
       message: exceededLimitError({
         plan: workspace.plan,
         limit: workspace.linksLimit,
-        type: "links",
+        type: "codes",
       }),
     });
   }

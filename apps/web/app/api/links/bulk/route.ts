@@ -50,7 +50,7 @@ export const POST = withWorkspace(
         message: exceededLimitError({
           plan: workspace.plan,
           limit: workspace.linksLimit,
-          type: "links",
+          type: "codes",
         }),
       });
     }
