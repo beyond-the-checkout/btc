@@ -18,7 +18,7 @@ import {
   pluralize,
 } from "@dub/utils";
 import { combineTagIds } from "../tags/combine-tag-ids";
-import { businessFeaturesCheck, proFeaturesCheck } from "./plan-features-check";
+import { baseFeaturesCheck, businessFeaturesCheck } from "./plan-features-check";
 import { keyChecks, processKey } from "./utils";
 
 export async function processLink<T extends Record<string, any>>({
@@ -113,13 +113,13 @@ export async function processLink<T extends Record<string, any>>({
       return {
         link: payload,
         error:
-          "You can only set a redirect for a root domain link on a Pro plan and above. Upgrade to Pro to use this feature.",
+          "You can only set a redirect for a root domain link on a Base plan and above. Upgrade to Base to use this feature.",
         code: "forbidden",
       };
     }
     try {
       businessFeaturesCheck(payload);
-      proFeaturesCheck(payload);
+      baseFeaturesCheck(payload);
     } catch (error) {
       return {
         link: payload,
@@ -127,7 +127,7 @@ export async function processLink<T extends Record<string, any>>({
         code: "forbidden",
       };
     }
-  } else if (workspace.plan === "pro") {
+  } else if (workspace.plan === "base" || workspace.plan === "pro") {
     try {
       businessFeaturesCheck(payload);
     } catch (error) {
@@ -161,12 +161,12 @@ export async function processLink<T extends Record<string, any>>({
 
   // checks for default short domain (configured) and dub.link
   if (domain === SHORT_DOMAIN || domain === "dub.link") {
-    // for dub.link: check if workspace plan is pro+
+    // for dub.link: check if workspace plan is base+
     if (domain === "dub.link" && (!workspace || workspace.plan === "free")) {
       return {
         link: payload,
         error:
-          "You can only use dub.link on a Pro plan and above. Upgrade to Pro to use this domain.",
+          "You can only use dub.link on a Base plan and above. Upgrade to Base to use this domain.",
         code: "forbidden",
       };
     }
@@ -238,9 +238,9 @@ export async function processLink<T extends Record<string, any>>({
       code: "forbidden",
     };
 
-    // else, check if the domain is a free .link and whether the workspace is pro+
+    // else, check if the domain is a free .link and whether the workspace is base+
   } else if (domain.endsWith(".link") && workspace?.plan === "free") {
-    // Dub provisioned .link domains can only be used on a Pro plan and above
+    // Dub provisioned .link domains can only be used on a Base plan and above
     const domainId = domains?.find((d) => d.slug === domain)?.id;
     const registeredDomain = await prisma.registeredDomain.findUnique({
       where: {
@@ -251,7 +251,7 @@ export async function processLink<T extends Record<string, any>>({
       return {
         link: payload,
         error:
-          "You can only use your free .link domain on a Pro plan and above. Upgrade to Pro to use this domain.",
+          "You can only use your free .link domain on a Base plan and above. Upgrade to Base to use this domain.",
         code: "forbidden",
       };
     }

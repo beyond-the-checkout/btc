@@ -21,7 +21,7 @@ export async function keyChecks({
   if ((key.length === 0 || key === "_root") && workspace?.plan === "free") {
     return {
       error:
-        "You can only set a redirect for your root domain on a Pro plan and above. Upgrade to Pro to unlock this feature.",
+        "You can only set a redirect for your root domain on a Base plan and above. Upgrade to Base to unlock this feature.",
       code: "forbidden",
     };
   }
@@ -58,14 +58,14 @@ export async function keyChecks({
     }
     if (key.length <= 3 && (!workspace || workspace.plan === "free")) {
       return {
-        error: `You can only use keys that are 3 characters or less on a Pro plan and above. Upgrade to Pro to register a ${key.length}-character key.`,
+        error: `You can only use keys that are 3 characters or less on a Base plan and above. Upgrade to Base to register a ${key.length}-character key.`,
         code: "forbidden",
       };
     }
     if (
       domain === "dub.link" &&
       key.length <= 5 &&
-      (!workspace || workspace.plan === "free" || workspace.plan === "pro")
+      (!workspace || workspace.plan === "free" || workspace.plan === "base" || workspace.plan === "pro")
     ) {
       return {
         error: `You can only use dub.link with keys that are 5 characters or less on a Business plan and above. Upgrade to Business to register a ${key.length}-character dub.link key.`,
@@ -78,7 +78,7 @@ export async function keyChecks({
     ) {
       return {
         error:
-          "This is a premium key. You can only use this key on a Pro plan and above. Upgrade to Pro to register this key.",
+          "This is a premium key. You can only use this key on a Base plan and above. Upgrade to Base to register this key.",
         code: "forbidden",
       };
     }
