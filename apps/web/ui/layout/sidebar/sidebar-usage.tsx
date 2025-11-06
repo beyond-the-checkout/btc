@@ -148,7 +148,7 @@ function UsageInner() {
                 setHovered(false);
               }}
             >
-              {plan === "free" ? "Get Dub Pro" : "Upgrade plan"}
+              {plan === "free" ? "Get Base plan" : "Upgrade plan"}
             </Link>
           ) : null}
         </div>

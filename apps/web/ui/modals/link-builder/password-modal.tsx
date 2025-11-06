@@ -1,6 +1,6 @@
 import { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
 import { useLinkBuilderKeyboardShortcut } from "@/ui/links/link-builder/use-link-builder-keyboard-shortcut";
-import { ProBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
 import {
   Button,
   ButtonTooltip,
@@ -93,7 +93,7 @@ function PasswordModalInner({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-medium">Link Password</h3>
-          <ProBadgeTooltip
+          <BaseBadgeTooltip
             content={
               <SimpleTooltipContent
                 title="Restrict access to your short links by encrypting it with a password."

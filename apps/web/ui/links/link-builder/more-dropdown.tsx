@@ -5,7 +5,7 @@ import { useExpirationModal } from "@/ui/modals/link-builder/expiration-modal";
 import { usePartnersModal } from "@/ui/modals/link-builder/partners-modal";
 import { usePasswordModal } from "@/ui/modals/link-builder/password-modal";
 import { useTargetingModal } from "@/ui/modals/link-builder/targeting-modal";
-import { ProBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
 import { Button, Popover, SimpleTooltipContent, useMediaQuery } from "@dub/ui";
 import { Dots } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
@@ -141,7 +141,7 @@ export function MoreDropdown({
                           </>
                         )}
                         {option.description && (
-                          <ProBadgeTooltip
+                          <BaseBadgeTooltip
                             content={
                               <SimpleTooltipContent
                                 title={option.description}

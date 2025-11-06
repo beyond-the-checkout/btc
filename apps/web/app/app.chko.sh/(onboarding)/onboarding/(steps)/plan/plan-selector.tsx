@@ -3,13 +3,18 @@
 import { PlanFeatures } from "@/ui/workspaces/plan-features";
 import { UpgradePlanButton } from "@/ui/workspaces/upgrade-plan-button";
 import { Badge, ToggleGroup } from "@dub/ui";
-import { ADVANCED_PLAN, BUSINESS_PLAN, cn, PRO_PLAN } from "@dub/utils";
+import {
+  ADVANCED_PLAN,
+  BASE_PLAN,
+  BUSINESS_PLAN,
+  cn,
+} from "@dub/utils";
 import NumberFlow from "@number-flow/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { CSSProperties, useState } from "react";
 
-export const PLAN_SELECTOR_PLANS = [PRO_PLAN, BUSINESS_PLAN, ADVANCED_PLAN];
+export const PLAN_SELECTOR_PLANS = [BASE_PLAN, BUSINESS_PLAN, ADVANCED_PLAN];
 
 export function PlanSelector() {
   const [period, setPeriod] = useState<"monthly" | "yearly">("monthly");
@@ -83,7 +88,8 @@ export function PlanSelector() {
                   format={{
                     style: "currency",
                     currency: "USD",
-                    maximumFractionDigits: 0,
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
                   }}
                   continuous
                 />

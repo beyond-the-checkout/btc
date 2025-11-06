@@ -1,6 +1,6 @@
 import { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
 import { useLinkBuilderKeyboardShortcut } from "@/ui/links/link-builder/use-link-builder-keyboard-shortcut";
-import { ProBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
 import {
   Button,
   InfoTooltip,
@@ -92,7 +92,7 @@ function ExpirationModal({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-medium">Link Expiration</h3>
-            <ProBadgeTooltip
+            <BaseBadgeTooltip
               content={
                 <SimpleTooltipContent
                   title="Set an expiration date for your links – after which it won't be accessible."

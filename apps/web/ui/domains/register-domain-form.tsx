@@ -16,7 +16,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useDebounce } from "use-debounce";
 import { AlertCircleFill, CheckCircleFill } from "../shared/icons";
-import { ProBadgeTooltip } from "../shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";
 
 interface DomainSearchResult {
   domain: string;
@@ -153,7 +153,7 @@ export function RegisterDomainForm({
             </p>
 
             {workspace.plan === "free" && variant === "modal" && (
-              <ProBadgeTooltip
+              <BaseBadgeTooltip
                 content={
                   <SimpleTooltipContent
                     title="Search for a free .link domain to use for your short links."

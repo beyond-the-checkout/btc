@@ -33,7 +33,7 @@ const COMPARE_FEATURE_ICONS: Record<
   API: Plug2,
 };
 
-const plans = ["Base", "Business", "Advanced", "Enterprise"].map(
+const plans = ["Base", "Business", "Advanced"].map(
   (p) => PLANS.find(({ name }) => name === p)!,
 );
 
@@ -65,7 +65,7 @@ export function WorkspaceBillingUpgradePageClient() {
             { label: "Yearly (2 months free)", value: "yearly" },
           ]}
           selected={period}
-          selectAction={(option) => setPeriod(option as "monthly" | "monthly")}
+          selectAction={(option) => setPeriod(option as "monthly" | "yearly")}
           className="rounded-lg border-neutral-300 bg-neutral-100 p-0.5"
           optionClassName="text-xs text-neutral-800 data-[selected=true]:text-neutral-800 px-3 sm:px-5 py-2 leading-none"
           indicatorClassName="bg-white border-neutral-200 rounded-md"
@@ -135,7 +135,8 @@ export function WorkspaceBillingUpgradePageClient() {
                               format={{
                                 style: "currency",
                                 currency: "USD",
-                                minimumFractionDigits: 0,
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
                               }}
                               continuous
                             />

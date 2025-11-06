@@ -47,7 +47,7 @@ import {
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
-import { ProBadgeTooltip } from "../shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";
 
 const DEFAULT_COLORS = [
   "#000000",
@@ -539,7 +539,7 @@ function LinkQRModalInner({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-medium">QR Code</h3>
-          <ProBadgeTooltip
+          <BaseBadgeTooltip
             content={
               <SimpleTooltipContent
                 title="Set a custom QR code design to improve click-through rates."

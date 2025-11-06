@@ -4,7 +4,7 @@ import {
   useLinkBuilderContext,
 } from "@/ui/links/link-builder/link-builder-provider";
 import { Link } from "@/ui/shared/icons";
-import { ProBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
 import { UpgradeRequiredToast } from "@/ui/shared/upgrade-required-toast";
 import {
   Button,
@@ -222,7 +222,7 @@ function OGModalInner({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-medium">Link Preview</h3>
-              <ProBadgeTooltip
+              <BaseBadgeTooltip
                 content={
                   <SimpleTooltipContent
                     title="Customize how your links look when shared on social media to improve click-through rates. When enabled, the preview settings below will be shown publicly (instead of the URL's original metatags)."

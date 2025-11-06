@@ -1,6 +1,6 @@
 import { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
 import { useLinkBuilderKeyboardShortcut } from "@/ui/links/link-builder/use-link-builder-keyboard-shortcut";
-import { ProBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "@/ui/shared/pro-badge-tooltip";
 import {
   Button,
   Combobox,
@@ -145,7 +145,7 @@ function TargetingModal({
                 <span className="block text-sm font-medium text-neutral-700">
                   Geo Targeting
                 </span>
-                <ProBadgeTooltip
+                <BaseBadgeTooltip
                   content={
                     <SimpleTooltipContent
                       title="Redirect your users to different links based on their location."
@@ -291,7 +291,7 @@ function TargetingModal({
                 >
                   iOS Targeting
                 </label>
-                <ProBadgeTooltip
+                <BaseBadgeTooltip
                   content={
                     <SimpleTooltipContent
                       title="Redirect your iOS users to a different link."
@@ -331,7 +331,7 @@ function TargetingModal({
                 >
                   Android Targeting
                 </label>
-                <ProBadgeTooltip
+                <BaseBadgeTooltip
                   content={
                     <SimpleTooltipContent
                       title="Redirect your Android users to a different link."

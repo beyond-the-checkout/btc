@@ -11,7 +11,7 @@ import { getParamsFromURL, getUrlFromString } from "@dub/utils";
 import { forwardRef, HTMLProps, ReactNode, useId } from "react";
 import { useFormContext } from "react-hook-form";
 import { AlertCircleFill } from "../shared/icons";
-import { ProBadgeTooltip } from "../shared/pro-badge-tooltip";
+import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";
 import { LinkFormData } from "./link-builder/link-builder-provider";
 
 type DestinationUrlInputProps = {
@@ -53,7 +53,7 @@ export const DestinationUrlInput = forwardRef<
               Destination URL
             </label>
             {key === "_root" ? (
-              <ProBadgeTooltip
+              <BaseBadgeTooltip
                 content={
                   <SimpleTooltipContent
                     title="The URL your users will get redirected to when they visit your root domain link."
