@@ -1,7 +1,7 @@
 import { NewLinkProps } from "@/lib/types";
 import { combineWords } from "@dub/utils";
 
-export const proFeaturesCheck = (payload: NewLinkProps) => {
+export const baseFeaturesCheck = (payload: NewLinkProps) => {
   const {
     proxy,
     password,
@@ -27,7 +27,7 @@ export const proFeaturesCheck = (payload: NewLinkProps) => {
     trackConversion ||
     doIndex
   ) {
-    const proFeaturesString = combineWords(
+    const baseFeaturesString = combineWords(
       [
         proxy && "custom link previews",
         password && "password protection",
@@ -41,10 +41,13 @@ export const proFeaturesCheck = (payload: NewLinkProps) => {
     );
 
     throw new Error(
-      `You can only use ${proFeaturesString} on a Pro plan and above. Upgrade to Pro to use these features.`,
+      `You can only use ${baseFeaturesString} on a Base plan and above. Upgrade to Base to use these features.`,
     );
   }
 };
+
+// Keep proFeaturesCheck as an alias for backward compatibility
+export const proFeaturesCheck = baseFeaturesCheck;
 
 export const businessFeaturesCheck = (payload: NewLinkProps) => {
   const { testVariants, trackConversion } = payload;

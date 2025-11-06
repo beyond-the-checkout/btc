@@ -6,11 +6,11 @@ export const getPlanCapabilities = (
 ) => {
   return {
     canAddFolder: !!plan && !["free"].includes(plan),
-    canManageFolderPermissions: !!plan && !["free", "pro"].includes(plan), // default access level is write
-    canManageCustomers: !!plan && !["free", "pro"].includes(plan),
-    canCreateWebhooks: !!plan && !["free", "pro"].includes(plan),
-    canManageProgram: !!plan && !["free", "pro"].includes(plan),
-    canTrackConversions: !!plan && !["free", "pro"].includes(plan),
+    canManageFolderPermissions: !!plan && !["free", "base", "pro"].includes(plan), // default access level is write
+    canManageCustomers: !!plan && !["free", "base", "pro"].includes(plan),
+    canCreateWebhooks: !!plan && !["free", "base", "pro"].includes(plan),
+    canManageProgram: !!plan && !["free", "base", "pro"].includes(plan),
+    canTrackConversions: !!plan && !["free", "base", "pro"].includes(plan),
     canExportAuditLogs: !!plan && ["enterprise"].includes(plan),
     canUseAdvancedRewardLogic:
       !!plan && ["enterprise", "advanced"].includes(plan),

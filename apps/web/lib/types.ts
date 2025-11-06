@@ -319,6 +319,7 @@ export type ProcessedLinkProps = Omit<NewLinkProps, ProcessedLinkOverrides> &
 
 export const plans = [
   "free",
+  "base",
   "pro",
   "business",
   "business plus",
