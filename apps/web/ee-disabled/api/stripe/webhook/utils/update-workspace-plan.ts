@@ -33,7 +33,7 @@ export async function updateWorkspacePlan({
   }
 
   const newPlanName = plan.name.toLowerCase();
-  const shouldDisableWebhooks = newPlanName === "free" || newPlanName === "pro";
+  const shouldDisableWebhooks = newPlanName === "free" || newPlanName === "pro" || newPlanName === "base";
   const shouldDeleteFolders =
     newPlanName === "free" && workspace.foldersUsage > 0;
 

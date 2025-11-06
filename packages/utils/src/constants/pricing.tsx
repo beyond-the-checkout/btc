@@ -19,12 +19,12 @@ const LEGACY_PRO_PRICE_IDS = [
   "price_1OYJeBAlJJEpqkPVnPGEZeb0", // new yearly (prod)
 ];
 
-// 2025 pricing
-const NEW_PRO_PRICE_IDS = [
-  "price_1R8XtyAlJJEpqkPV5WZ4c0jF", //  yearly
-  "price_1R8XtEAlJJEpqkPV4opVvVPq", // monthly
-  "price_1R8XxZAlJJEpqkPVqGi0wOqD", // yearly (test),
-  "price_1R7oeBAlJJEpqkPVh6q5q3h8", // monthly (test),
+// 2025 pricing - Base Plan (formerly Pro)
+export const NEW_BASE_PRICE_IDS = [
+  "price_1SQFhAKANfnWIX8CHoDxGlYC", // monthly (prod) - $9.99/month
+  "price_1SQFi6KANfnWIX8C4bf0abdo", // yearly (prod) - $99.96/year
+  "price_1SQFXCK3nEI4m99k924xskA0", // monthly (test) - $9.99/month
+  "price_1SQFYGK3nEI4m99kv84dSSRQ", // yearly (test) - $99.96/year
 ];
 
 const LEGACY_BUSINESS_PRICE_IDS = [
@@ -37,12 +37,12 @@ const LEGACY_BUSINESS_PRICE_IDS = [
   "price_1OzOXMAlJJEpqkPV9ERrjjbw", // new yearly (prod)
 ];
 
-// 2025 pricing
+// 2025 pricing - Business Plan
 export const NEW_BUSINESS_PRICE_IDS = [
-  "price_1R3j01AlJJEpqkPVXuG1eNzm", //  yearly
-  "price_1R6JedAlJJEpqkPVMUkfjch4", // monthly
-  "price_1R8XypAlJJEpqkPVdjzOcYUC", // yearly (test),
-  "price_1R7ofLAlJJEpqkPV3MlgDpyx", // monthly (test),
+  "price_1SQFilKANfnWIX8CRDmOVDdZ", // monthly (prod) - $39.99/month
+  "price_1SQFjSKANfnWIX8CcKXxYdF5", // yearly (prod) - $399.96/year
+  "price_1SQFZ0K3nEI4m99kAAZLuFvG", // monthly (test) - $39.99/month
+  "price_1SQFZsK3nEI4m99kuMIkue6D", // yearly (test) - $399.96/year
 ];
 
 export const PLANS = [
@@ -53,8 +53,10 @@ export const PLANS = [
       yearly: 0,
     },
     limits: {
-      links: 25,
-      clicks: 1_000,
+      codes: 2,
+      scans: 100,
+      links: 25, // deprecated - use codes
+      clicks: 1_000, // deprecated - use scans
       payouts: 0,
       domains: 3,
       tags: 5,
@@ -68,16 +70,18 @@ export const PLANS = [
     },
   },
   {
-    name: "Pro",
-    link: "https://dub.co/help/article/pro-plan",
+    name: "Base",
+    link: "https://chko.dev/help/article/base-plan",
     price: {
-      monthly: 30,
-      yearly: 25,
-      ids: [...LEGACY_PRO_PRICE_IDS, ...NEW_PRO_PRICE_IDS],
+      monthly: 9.99,
+      yearly: 8.33,
+      ids: [...LEGACY_PRO_PRICE_IDS, ...NEW_BASE_PRICE_IDS],
     },
     limits: {
-      links: 1_000,
-      clicks: 50_000,
+      codes: 10,
+      scans: 10_000,
+      links: 1_000, // deprecated - use codes
+      clicks: 50_000, // deprecated - use scans
       payouts: 0,
       domains: 10,
       tags: 25,
@@ -91,14 +95,14 @@ export const PLANS = [
     },
     featureTitle: "Everything in Free, plus:",
     features: [
-      { id: "clicks", text: "50K tracked clicks/mo" },
-      { id: "links", text: "1K new links/mo" },
+      { id: "scans", text: "10K tracked scans/mo" },
+      { id: "codes", text: "10 new codes/mo" },
       { id: "retention", text: "1-year analytics retention" },
       { id: "domains", text: "10 domains" },
       { id: "users", text: "3 users" },
       {
         id: "advanced",
-        text: "Advanced link features",
+        text: "Advanced QR code features",
         tooltip: "ADVANCED_LINK_FEATURES",
       },
       {
@@ -123,12 +127,12 @@ export const PLANS = [
       },
       {
         id: "folders",
-        text: "Link folders",
+        text: "QR code folders",
         tooltip: {
           title:
-            "Organize and manage access to your links on Dub using folders.",
+            "Organize and manage access to your QR codes using folders.",
           cta: "Learn more.",
-          href: "https://dub.co/help/article/link-folders",
+          href: "https://chko.dev/help/article/qr-code-folders",
         },
       },
       {
@@ -138,7 +142,7 @@ export const PLANS = [
           title:
             "Redirect users to a specific page within your mobile application using deep links.",
           cta: "Learn more.",
-          href: "https://dub.co/docs/concepts/deep-links/quickstart",
+          href: "https://chko.dev/docs/concepts/deep-links/quickstart",
         },
       },
     ] as PlanFeature[],
@@ -146,13 +150,15 @@ export const PLANS = [
   {
     name: "Business",
     price: {
-      monthly: 90,
-      yearly: 75,
+      monthly: 39.99,
+      yearly: 33.33,
       ids: [...LEGACY_BUSINESS_PRICE_IDS, ...NEW_BUSINESS_PRICE_IDS],
     },
     limits: {
-      links: 10_000,
-      clicks: 250_000,
+      codes: 50,
+      scans: 100_000,
+      links: 10_000, // deprecated - use codes
+      clicks: 250_000, // deprecated - use scans
       payouts: 2_500_00,
       domains: 100,
       tags: INFINITY_NUMBER,
@@ -164,15 +170,15 @@ export const PLANS = [
       api: 1_200,
       retention: "3-year",
     },
-    featureTitle: "Everything in Pro, plus:",
+    featureTitle: "Everything in Base, plus:",
     features: [
       {
-        id: "clicks",
-        text: "250K tracked clicks/mo",
+        id: "scans",
+        text: "100K tracked scans/mo",
       },
       {
-        id: "links",
-        text: "10K new links/mo",
+        id: "codes",
+        text: "50 new codes/mo",
       },
       {
         id: "retention",
@@ -240,18 +246,20 @@ export const PLANS = [
   {
     name: "Advanced",
     price: {
-      monthly: 300,
-      yearly: 250,
+      monthly: 99.99,
+      yearly: 83.33,
       ids: [
-        "price_1R8Xw4AlJJEpqkPV6nwdink9", //  yearly
-        "price_1R3j0qAlJJEpqkPVkfGNXRwb", // monthly
-        "price_1R8XztAlJJEpqkPVnHmIU2tf", // yearly (test),
-        "price_1R7ofzAlJJEpqkPV0L2TwyJo", // monthly (test),
+        "price_1SQFk5KANfnWIX8Cn5PMKBSZ", // monthly (prod) - $99.99/month
+        "price_1SQFklKANfnWIX8CdfcD2M53", // yearly (prod) - $999.96/year
+        "price_1SQFanK3nEI4m99kwjSuAIsn", // monthly (test) - $99.99/month
+        "price_1SQFfSK3nEI4m99kmI7X2cFz", // yearly (test) - $999.96/year
       ],
     },
     limits: {
-      links: 50_000,
-      clicks: 1_000_000,
+      codes: 250,
+      scans: 500_000,
+      links: 50_000, // deprecated - use codes
+      clicks: 1_000_000, // deprecated - use scans
       payouts: 15_000_00,
       domains: 250,
       tags: INFINITY_NUMBER,
@@ -266,12 +274,12 @@ export const PLANS = [
     featureTitle: "Everything in Business, plus:",
     features: [
       {
-        id: "clicks",
-        text: "1M tracked clicks/mo",
+        id: "scans",
+        text: "500K tracked scans/mo",
       },
       {
-        id: "links",
-        text: "50K new links/mo",
+        id: "codes",
+        text: "250 new codes/mo",
       },
       {
         id: "retention",
@@ -359,13 +367,22 @@ export const PLANS = [
 ];
 
 export const FREE_PLAN = PLANS.find((plan) => plan.name === "Free")!;
-export const PRO_PLAN = PLANS.find((plan) => plan.name === "Pro")!;
+export const BASE_PLAN = PLANS.find((plan) => plan.name === "Base")!;
+export const PRO_PLAN = BASE_PLAN; // alias for backward compatibility
 export const BUSINESS_PLAN = PLANS.find((plan) => plan.name === "Business")!;
 export const ADVANCED_PLAN = PLANS.find((plan) => plan.name === "Advanced")!;
 
 export const SELF_SERVE_PAID_PLANS = PLANS.filter((p) =>
-  ["Pro", "Business", "Advanced"].includes(p.name),
+  ["Base", "Business", "Advanced"].includes(p.name),
 );
+
+/**
+ * Normalizes plan IDs for backward compatibility
+ * Maps "Pro" to "Base" to handle legacy references
+ */
+export const normalizePlanId = (plan: string): string => {
+  return plan.toLowerCase() === "pro" ? "base" : plan;
+};
 
 export const FREE_WORKSPACES_LIMIT = 2;
 
@@ -374,20 +391,22 @@ export const getPlanFromPriceId = (priceId: string) => {
 };
 
 export const getPlanDetails = (plan: string) => {
+  const normalizedPlan = normalizePlanId(plan);
   return SELF_SERVE_PAID_PLANS.find(
-    (p) => p.name.toLowerCase() === plan.toLowerCase(),
+    (p) => p.name.toLowerCase() === normalizedPlan.toLowerCase(),
   )!;
 };
 
 export const getCurrentPlan = (plan: string) => {
+  const normalizedPlan = normalizePlanId(plan);
   return (
-    PLANS.find((p) => p.name.toLowerCase() === plan.toLowerCase()) || FREE_PLAN
+    PLANS.find((p) => p.name.toLowerCase() === normalizedPlan.toLowerCase()) || FREE_PLAN
   );
 };
 
 export const getNextPlan = (plan?: string | null) => {
-  if (!plan) return PRO_PLAN;
-  const currentPlan = plan.toLowerCase().split(" ")[0]; // to account for old Business plans (e.g. "Business Plus")
+  if (!plan) return BASE_PLAN;
+  const currentPlan = normalizePlanId(plan.toLowerCase().split(" ")[0]); // to account for old Business plans (e.g. "Business Plus") and Pro->Base migration
   return PLANS[
     Math.min(
       // returns the next plan, or the last plan if the current plan is the last plan
@@ -398,11 +417,13 @@ export const getNextPlan = (plan?: string | null) => {
 };
 
 export const isDowngradePlan = (currentPlan: string, newPlan: string) => {
+  const normalizedCurrentPlan = normalizePlanId(currentPlan);
+  const normalizedNewPlan = normalizePlanId(newPlan);
   const currentPlanIndex = PLANS.findIndex(
-    (p) => p.name.toLowerCase() === currentPlan.toLowerCase(),
+    (p) => p.name.toLowerCase() === normalizedCurrentPlan.toLowerCase(),
   );
   const newPlanIndex = PLANS.findIndex(
-    (p) => p.name.toLowerCase() === newPlan.toLowerCase(),
+    (p) => p.name.toLowerCase() === normalizedNewPlan.toLowerCase(),
   );
   return currentPlanIndex > newPlanIndex;
 };
