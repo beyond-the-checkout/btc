@@ -27,6 +27,7 @@ in
   pkgs.jwt-cli
   pkgs.nodejs_20
   pkgs-unstable.claude-code
+  pkgs.mysql84
   pkgs.nodePackages.typescript
   pkgs.nodePackages.ts-node
   pkgs.nodePackages.yarn
