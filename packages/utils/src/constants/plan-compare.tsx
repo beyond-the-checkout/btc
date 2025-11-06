@@ -24,13 +24,13 @@ export const PLAN_COMPARE_FEATURES: {
   }[];
 }[] = [
   {
-    category: "Links",
+    category: "QR Codes",
     href: "https://dub.co/links",
     features: [
       {
         text: () => (
           <>
-            <strong>Unlimited</strong> clicks
+            <strong>Unlimited</strong> scans
           </>
         ),
       },
@@ -42,7 +42,7 @@ export const PLAN_COMPARE_FEATURES: {
                 ? "Unlimited"
                 : nFormatter(plan.limits.links)}
             </strong>{" "}
-            new links
+            new codes
             {plan.name === "Enterprise" ? "" : "/mo"}
           </>
         ),
@@ -152,197 +152,6 @@ export const PLAN_COMPARE_FEATURES: {
     ],
   },
   {
-    category: "Partners",
-    href: "https://dub.co/partners",
-    features: [
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Unlimited partners",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Automated global payouts",
-        href: "https://dub.co/help/article/partner-payouts",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: ({ id, plan }) =>
-          id === "free" || id === "pro" ? (
-            "No partner payouts"
-          ) : (
-            <>
-              <strong>
-                {plan.name === "Enterprise"
-                  ? "Unlimited"
-                  : `$${nFormatter(plan.limits.payouts / 100)}`}
-              </strong>{" "}
-              partner payouts
-              {plan.name === "Enterprise" ? "" : "/mo"}
-            </>
-          ),
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: ({ id }) =>
-          id === "free" || id === "pro" ? (
-            "No partner payouts"
-          ) : (
-            <>
-              <strong>
-                {
-                  {
-                    business: "5%",
-                    advanced: "5%",
-                    enterprise: "3%",
-                  }[id]
-                }
-              </strong>{" "}
-              payout fees
-            </>
-          ),
-        href: "https://dub.co/help/article/partner-payouts#payout-fees-and-timing",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Tax compliance",
-        href: "https://dub.co/help/article/partner-payouts#tax-compliance",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: ({ id, plan }) =>
-          id === "free" || id === "pro" ? (
-            "No partner rewards"
-          ) : (
-            <>
-              <strong>{plan.name === "Business" ? "Basic" : "Advanced"}</strong>{" "}
-              partner rewards
-            </>
-          ),
-        href: "https://dub.co/help/article/partner-rewards",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Dual-sided incentives",
-        href: "https://dub.co/help/article/dual-sided-incentives",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "AI landing page generator",
-        href: "https://dub.co/help/article/program-landing-page",
-      },
-      {
-        check: {
-          default: false,
-          business: true,
-          advanced: true,
-          enterprise: true,
-        },
-        text: ({ plan }) => (
-          <>
-            <strong>
-              {plan.limits.groups === 0
-                ? "No"
-                : plan.limits.groups === INFINITY_NUMBER
-                  ? "Unlimited"
-                  : nFormatter(plan.limits.groups)}
-            </strong>{" "}
-            partner groups
-          </>
-        ),
-        href: "https://dub.co/help/article/partner-groups",
-      },
-      {
-        check: {
-          default: false,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Embedded referral dashboard",
-        href: "https://dub.co/docs/partners/embedded-referrals",
-      },
-      {
-        check: {
-          default: false,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Partners API",
-        href: "https://dub.co/docs/api-reference/endpoint/create-a-partner",
-      },
-      {
-        check: {
-          default: false,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Messaging center",
-      },
-      {
-        check: {
-          default: false,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Email campaigns (beta)",
-      },
-      {
-        check: {
-          default: false,
-          advanced: true,
-          enterprise: true,
-        },
-        text: "Fraud & risk prevention",
-      },
-      {
-        check: {
-          default: false,
-          enterprise: true,
-        },
-        text: "Partner network access",
-      },
-    ],
-  },
-  {
     category: "Analytics",
     href: "https://dub.co/analytics",
     features: [
@@ -358,7 +167,7 @@ export const PLAN_COMPARE_FEATURES: {
                 ? "Unlimited"
                 : nFormatter(plan.limits.clicks)}
             </strong>{" "}
-            tracked clicks
+            tracked scans
             {plan.name === "Enterprise" ? "" : "/mo"}
           </>
         ),
@@ -537,6 +346,7 @@ export const PLAN_COMPARE_FEATURES: {
               {
                 {
                   free: "Basic support",
+                  base: "Elevated support",
                   pro: "Elevated support",
                   business: "Priority support",
                   advanced: "Priority via Slack",

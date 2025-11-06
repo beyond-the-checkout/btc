@@ -25,16 +25,15 @@ const COMPARE_FEATURE_ICONS: Record<
   (typeof PLAN_COMPARE_FEATURES)[number]["category"],
   Icon
 > = {
-  Links: Hyperlink,
+  "QR Codes": Hyperlink,
   Analytics: ChartLine,
-  Partners: ConnectedDots4,
   Domains: Globe,
   Workspace: Users2,
   Support: CircleQuestion,
   API: Plug2,
 };
 
-const plans = ["Pro", "Business", "Advanced", "Enterprise"].map(
+const plans = ["Base", "Business", "Advanced", "Enterprise"].map(
   (p) => PLANS.find(({ name }) => name === p)!,
 );
 
