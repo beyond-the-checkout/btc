@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
+import { APP_DOMAIN, CHECKOUT_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
 import {
   Body,
   Container,
@@ -38,23 +38,23 @@ export default function ClicksExceeded({
     <Html>
       <Head />
       <Preview>
-        Your Dub workspace, {name || ""} has exceeded the{" "}
-        {capitalize(plan) || ""} Plan limit of {nFormatter(usageLimit)} link
-        clicks/month.
+        Your Checkout workspace, {name || ""} has exceeded the{" "}
+        {capitalize(plan) || ""} Plan limit of {nFormatter(usageLimit)} QR code
+        scans/month.
       </Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
-              Clicks Limit Exceeded
+              Scans Limit Exceeded
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              Your Dub workspace,{" "}
+              Your Checkout workspace,{" "}
               <Link
-                href={`https://app.dub.co/${slug}`}
+                href={`${APP_DOMAIN}/${slug}`}
                 className="text-black underline"
               >
                 <strong>{name}</strong>
@@ -62,13 +62,13 @@ export default function ClicksExceeded({
               has exceeded the
               <strong> {capitalize(plan)} Plan </strong>
               limit of{" "}
-              <strong>{nFormatter(usageLimit)} link clicks/month</strong>. You
+              <strong>{nFormatter(usageLimit)} QR code scans/month</strong>. You
               have used{" "}
-              <strong>{nFormatter(usage, { digits: 2 })} link clicks</strong>{" "}
-              across all your links in your current billing cycle.
+              <strong>{nFormatter(usage, { digits: 2 })} QR code scans</strong>{" "}
+              across all your QR codes in your current billing cycle.
             </Text>
             <Text className="text-sm leading-6 text-black">
-              All your existing links will continue to work, and we are still
+              All your existing QR codes will continue to work, and we are still
               collecting data on them, but you'll need to upgrade to the{" "}
               <Link
                 href={nextPlan.link}
@@ -81,7 +81,7 @@ export default function ClicksExceeded({
             <Section className="my-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.dub.co/${slug}/upgrade`}
+                href={`${APP_DOMAIN}/${slug}/upgrade`}
               >
                 Upgrade my plan
               </Link>

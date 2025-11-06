@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
+import { APP_DOMAIN, CHECKOUT_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
 import {
   Body,
   Container,
@@ -43,53 +43,53 @@ export default function LinksLimitAlert({
     <Html>
       <Head />
       <Preview>
-        Your Dub workspace, {name} has used {percentage.toString()}% of its
-        links limit for the month.
+        Your Checkout workspace, {name} has used {percentage.toString()}% of its
+        QR codes limit for the month.
       </Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
-              Dub Links Limit Alert
+              QR Codes Limit Alert
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              Your Dub workspace,{" "}
+              Your Checkout workspace,{" "}
               <Link
-                href={`https://app.dub.co/${slug}`}
+                href={`${APP_DOMAIN}/${slug}`}
                 className="text-black underline"
               >
                 <strong>{name}</strong>
               </Link>{" "}
               has used <strong>{percentage.toString()}%</strong> of the monthly
-              links limit included in the {capitalize(plan)} plan. You have
+              QR codes limit included in the {capitalize(plan)} plan. You have
               created a total of{" "}
-              <strong>{nFormatter(linksUsage, { full: true })} links</strong>{" "}
+              <strong>{nFormatter(linksUsage, { full: true })} QR codes</strong>{" "}
               (out of a maximum of {nFormatter(linksLimit, { full: true })}{" "}
-              links) in your current billing cycle.
+              QR codes) in your current billing cycle.
             </Text>
 
             {plan === "enterprise" ? (
               <Text className="text-sm leading-6 text-black">
                 Since you're on the {capitalize(plan)} plan, you will still be
-                able to create links even after you hit your limit. We're
+                able to create QR codes even after you hit your limit. We're
                 planning to introduce on-demand billing for overages in the
-                future, but for now, you can continue to create links without
+                future, but for now, you can continue to create QR codes without
                 any interruption.
               </Text>
             ) : percentage === 100 ? (
               <Text className="text-sm leading-6 text-black">
-                All your existing links will continue to work, and we are still
-                collecting data on them, but you'll need to upgrade the{" "}
+                All your existing QR codes will continue to work, and we are still
+                collecting data on them, but you'll need to upgrade to the{" "}
                 <Link
                   href={nextPlan.link}
                   className="font-medium text-blue-600 no-underline"
                 >
                   {nextPlan.name} plan
                 </Link>{" "}
-                add more links.
+                to add more QR codes.
               </Text>
             ) : (
               <Text className="text-sm leading-6 text-black">
@@ -100,13 +100,13 @@ export default function LinksLimitAlert({
                 >
                   {nextPlan.name} plan
                 </Link>{" "}
-                to add more links.
+                to add more QR codes.
               </Text>
             )}
             <Section className="mb-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.dub.co/${slug}/upgrade`}
+                href={`${APP_DOMAIN}/${slug}/upgrade`}
               >
                 Upgrade my plan
               </Link>
