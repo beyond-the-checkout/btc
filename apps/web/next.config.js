@@ -66,12 +66,6 @@ module.exports = withAxiom({
 
     return config;
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       {
