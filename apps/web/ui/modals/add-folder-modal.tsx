@@ -54,8 +54,8 @@ function AddFolderButton({
       disabledTooltip={
         plan === "free" && (
           <TooltipContent
-            title="You can only use Link Folders on a Pro plan and above. Upgrade to Pro to continue."
-            cta="Upgrade to Pro"
+            title="You can only use Link Folders on a Base plan and above. Upgrade to Base to continue."
+            cta="Upgrade to Base"
             href={`/${slug}/upgrade`}
           />
         )

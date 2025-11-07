@@ -18,7 +18,7 @@ export default function CreateWorkspaceButton() {
           exceedingFreeWorkspaces ? (
             <TooltipContent
               title={`You can only create up to ${FREE_WORKSPACES_LIMIT} free workspaces. Additional workspaces require a paid plan.`}
-              cta="Upgrade to Pro"
+              cta="Upgrade to Base"
               href={
                 freeWorkspaces
                   ? `/${freeWorkspaces[0].slug}/upgrade`

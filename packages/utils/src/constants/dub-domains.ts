@@ -23,7 +23,7 @@ export const DUB_DOMAINS = [
           placeholder: "https://dub.co/help/article/what-is-dub",
           allowedHostnames: [],
           description:
-            "Premium short domain on Dub – only available on our Pro plan and above.",
+            "Premium short domain on Dub – only available on our Base plan and above.",
           projectId: DUB_WORKSPACE_ID,
         },
         {

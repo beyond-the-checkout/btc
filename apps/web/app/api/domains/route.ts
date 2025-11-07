@@ -122,7 +122,7 @@ export const POST = withWorkspace(
 
         throw new DubApiError({
           code: "forbidden",
-          message: `You can only set ${proFeaturesString} on a Pro plan and above. Upgrade to Pro to use these features.`,
+          message: `You can only set ${proFeaturesString} on a Base plan and above. Upgrade to Base to use these features.`,
         });
       }
     }

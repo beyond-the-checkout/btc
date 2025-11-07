@@ -64,7 +64,7 @@ export const PATCH = withWorkspace(
       throw new DubApiError({
         code: "forbidden",
         message:
-          "You can only use dub.link on a Pro plan and above. Upgrade to Pro to use this domain.",
+          "You can only use dub.link on a Base plan and above. Upgrade to Base to use this domain.",
       });
     }
 

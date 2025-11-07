@@ -367,10 +367,10 @@ function UpgradeTooltipContent() {
       title={
         <>
           You can only claim a free <span className="font-semibold">.link</span>{" "}
-          domain on a Pro plan and above.
+          domain on a Base plan and above.
         </>
       }
-      cta="Upgrade to Pro"
+      cta="Upgrade to Base"
       onClick={() => window.open(`/${slug}/upgrade`)}
     />
   );

@@ -691,8 +691,8 @@ function LinkQRModalInner({
           disabledTooltip={
             !plan || plan === "free" ? (
               <TooltipContent
-                title="You need to be on the Pro plan and above to customize your QR Code logo."
-                cta="Upgrade to Pro"
+                title="You need to be on the Base plan and above to customize your QR Code logo."
+                cta="Upgrade to Base"
                 href={slug ? `/${slug}/upgrade` : "https://dub.co/pricing"}
                 target="_blank"
               />

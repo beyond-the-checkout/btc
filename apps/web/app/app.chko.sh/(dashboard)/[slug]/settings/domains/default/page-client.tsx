@@ -95,8 +95,8 @@ export function DefaultDomains() {
                   permissionsError ||
                   (slug === "dub.link" && plan === "free" ? (
                     <TooltipContent
-                      title="You can only use dub.link on a Pro plan and above. Upgrade to Pro to use this domain."
-                      cta="Upgrade to Pro"
+                      title="You can only use dub.link on a Base plan and above. Upgrade to Base to use this domain."
+                      cta="Upgrade to Base"
                       href={`/${slug}/upgrade`}
                     />
                   ) : undefined)
