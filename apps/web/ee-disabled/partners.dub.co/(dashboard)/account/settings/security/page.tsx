@@ -1,1 +1,1 @@
-export { default } from "app/app.dub.co/(dashboard)/account/settings/security/page";
+export { default } from "../../../../../../app/app.chko.sh/(dashboard)/account/settings/security/page";

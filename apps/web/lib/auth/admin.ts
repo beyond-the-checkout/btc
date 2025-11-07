@@ -20,7 +20,7 @@ export const isDubAdmin = async (userId: string) => {
     where: {
       userId_projectId: {
         userId,
-        projectId: DUB_WORKSPACE_ID,
+        projectId: DUB_WORKSPACE_ID as string,
       },
     },
   });

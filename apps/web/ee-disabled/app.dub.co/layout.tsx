@@ -1,1 +1,1 @@
-export { default } from "../../app.chko.sh/layout";
+export { default } from "../../app/app.chko.sh/layout";

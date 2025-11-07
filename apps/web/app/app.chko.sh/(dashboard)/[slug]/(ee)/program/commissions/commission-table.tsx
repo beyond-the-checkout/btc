@@ -102,7 +102,7 @@ const CommissionTableInner = memo(
             row.original.customer ? (
               <CustomerRowItem
                 customer={row.original.customer}
-                href={`/${slug}/customers/${row.original.customer.id}`}
+                href={`/${slug ?? ""}/customers/${row.original.customer.id}`}
               />
             ) : (
               "-"

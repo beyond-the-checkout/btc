@@ -1,1 +1,1 @@
-export { default } from "../../../../app.chko.sh/(auth)/login/page";
+export { default } from "../../../../app/app.chko.sh/(auth)/login/page";

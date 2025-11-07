@@ -29,7 +29,7 @@ export default function useWorkspace({
 
   return {
     ...workspace,
-    slug,
+    slug: slug ?? undefined,
     nextPlan: workspace?.plan ? getNextPlan(workspace.plan) : PRO_PLAN,
     role: (workspace?.users && workspace.users[0].role) || "member",
     isOwner: workspace?.users && workspace.users[0].role === "owner",

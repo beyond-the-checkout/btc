@@ -16,7 +16,7 @@ export default async function AdminMiddleware(req: NextRequest) {
       where: {
         userId_projectId: {
           userId: user.id,
-          projectId: DUB_WORKSPACE_ID,
+          projectId: DUB_WORKSPACE_ID as string,
         },
       },
     });

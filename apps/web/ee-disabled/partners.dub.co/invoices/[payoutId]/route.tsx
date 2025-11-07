@@ -242,7 +242,7 @@ export const GET = withPartnerProfile(async ({ partner, params }) => {
     </Document>,
   );
 
-  return new Response(pdf, {
+  return new Response(pdf as any, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `inline; filename="payout-invoice-${payout.id}.pdf"`,

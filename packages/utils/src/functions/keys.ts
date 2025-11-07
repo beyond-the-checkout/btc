@@ -1,6 +1,6 @@
 // allow letters, numbers, '-', '_', '/', '.', and emojis
 export const validKeyRegex = new RegExp(
-  /^[0-9A-Za-z_\u0080-\uFFFF\/\-\p{Emoji}.]+$/u,
+"^[0-9A-Za-z_\\u0080-\\uFFFF\\/\\-\\p{Emoji}.]+$", "u" as any,
 );
 
 export const isUnsupportedKey = (key: string) => {
