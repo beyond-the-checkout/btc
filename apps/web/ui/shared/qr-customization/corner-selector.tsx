@@ -10,7 +10,7 @@ function CornerSquarePreview({ type, color }: { type: CornerSquareType; color: s
   const eyeSize = 7;
 
   // Mock eye position for preview - use the actual path generation function
-  const eye = { x: 0, y: 0, size: eyeSize };
+  const eye = { x: 0, y: 0, size: eyeSize, corner: "top-left" as const };
   const margin = 0;
 
   // Use the actual generateCornerSquarePath function
@@ -35,7 +35,7 @@ function CornerDotPreview({ type, color }: { type: CornerDotType; color: string 
   const eyeSize = 7;
 
   // Mock eye position for preview - use the actual path generation function
-  const eye = { x: 0, y: 0, size: eyeSize };
+  const eye = { x: 0, y: 0, size: eyeSize, corner: "top-left" as const };
   const margin = 0;
 
   // Use the actual generateCornerDotPath function
@@ -166,3 +166,5 @@ export function CornerSelector({
     </div>
   );
 }
+
+CornerSelector.displayName = "CornerSelector";

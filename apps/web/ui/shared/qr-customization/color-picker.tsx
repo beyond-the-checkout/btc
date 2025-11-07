@@ -62,3 +62,5 @@ export function ColorPicker({
     </div>
   );
 }
+
+ColorPicker.displayName = "ColorPicker";

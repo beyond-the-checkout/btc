@@ -10,7 +10,7 @@ import {
   ColorPicker,
   FrameSelector,
 } from "@/ui/shared/qr-customization";
-import { DotType } from "@/lib/qr/types";
+import { DotType, frameStyleToFrameType } from "@/lib/qr/types";
 import { DEFAULT_MARGIN } from "@/lib/qr/constants";
 import { useDebounce } from "@/lib/hooks/use-debounce";
 
@@ -126,16 +126,15 @@ export function QRCreator() {
     [debouncedFgColor],
   );
 
-  const frameOptions = useMemo(
-    () =>
-      frameStyle
-        ? {
-            type: frameStyle,
-            color: debouncedFgColor,
-          }
-        : undefined,
-    [frameStyle, debouncedFgColor],
-  );
+  const frameOptions = useMemo(() => {
+    const type = frameStyleToFrameType(frameStyle);
+    return type
+      ? {
+          type,
+          color: debouncedFgColor,
+        }
+      : undefined;
+  }, [frameStyle, debouncedFgColor]);
 
   // Handler for URL change
   const handleUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

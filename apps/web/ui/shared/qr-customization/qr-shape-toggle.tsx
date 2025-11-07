@@ -58,3 +58,5 @@ export function QRShapeToggle({
     </div>
   );
 }
+
+QRShapeToggle.displayName = "QRShapeToggle";

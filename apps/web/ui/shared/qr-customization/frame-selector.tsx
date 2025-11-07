@@ -1,13 +1,22 @@
 import { Tooltip } from "@dub/ui";
 import { cn } from "@dub/utils";
+import type { FrameType } from "@/lib/qr/constants";
 
-type FrameStyle = "square" | "rounded" | "solid-circle" | "dotted-circle" | undefined;
+type FrameStyle = FrameType | "rounded" | "solid-circle" | "dotted-circle" | undefined;
 
 interface FrameSelectorProps {
   value: FrameStyle;
-  onChange: (frame: FrameStyle) => void;
+  onChange: (frame: "square" | "rounded" | "solid-circle" | "dotted-circle" | undefined) => void;
   qrShape: "square" | "circle";
   label?: string;
+}
+
+function normalize(v: FrameStyle): FrameType | undefined {
+  if (!v) return undefined;
+  if (v === "rounded") return "rounded-square";
+  if (v === "solid-circle") return "circle";
+  if (v === "dotted-circle") return "dots-circle";
+  return v;
 }
 
 export function FrameSelector({
@@ -26,12 +35,12 @@ export function FrameSelector({
         <Tooltip content="No Frame">
           <button
             type="button"
-            aria-pressed={value === undefined}
+            aria-pressed={!value || normalize(value) === "none"}
             aria-label="No frame"
             onClick={() => onChange(undefined)}
             className={cn(
               "flex size-12 items-center justify-center rounded-md border transition-all",
-              value === undefined
+              !value || value === "none"
                 ? "border-black bg-neutral-50 ring-1 ring-black"
                 : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
             )}
@@ -50,7 +59,7 @@ export function FrameSelector({
             <Tooltip content="Square">
               <button
                 type="button"
-                aria-pressed={value === "square"}
+                aria-pressed={normalize(value) === "square"}
                 aria-label="Select square frame"
                 onClick={() => onChange("square")}
                 className={cn(
@@ -68,12 +77,12 @@ export function FrameSelector({
             <Tooltip content="Rounded">
               <button
                 type="button"
-                aria-pressed={value === "rounded"}
+                aria-pressed={normalize(value) === "rounded-square"}
                 aria-label="Select rounded frame"
                 onClick={() => onChange("rounded")}
                 className={cn(
                   "flex size-12 items-center justify-center rounded-md border transition-all",
-                  value === "rounded"
+                  normalize(value) === "rounded-square"
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                 )}
@@ -89,12 +98,12 @@ export function FrameSelector({
             <Tooltip content="Solid Circle">
               <button
                 type="button"
-                aria-pressed={value === "solid-circle"}
+                aria-pressed={normalize(value) === "circle"}
                 aria-label="Select solid circle frame"
                 onClick={() => onChange("solid-circle")}
                 className={cn(
                   "flex size-12 items-center justify-center rounded-md border transition-all",
-                  value === "solid-circle"
+                  normalize(value) === "circle"
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                 )}
@@ -107,12 +116,12 @@ export function FrameSelector({
             <Tooltip content="Dotted Circle">
               <button
                 type="button"
-                aria-pressed={value === "dotted-circle"}
+                aria-pressed={normalize(value) === "dots-circle"}
                 aria-label="Select dotted circle frame"
                 onClick={() => onChange("dotted-circle")}
                 className={cn(
                   "flex size-12 items-center justify-center rounded-md border transition-all",
-                  value === "dotted-circle"
+                  normalize(value) === "dots-circle"
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                 )}
@@ -128,3 +137,5 @@ export function FrameSelector({
     </div>
   );
 }
+
+FrameSelector.displayName = "FrameSelector";

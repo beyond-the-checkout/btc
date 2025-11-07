@@ -53,6 +53,42 @@ export type FrameOptions = {
   textSize?: number;
 };
 
+// UI-facing frame styles (what components/editors use)
+export type QRFrameStyle =
+  | "square"
+  | "rounded"
+  | "solid-circle"
+  | "dotted-circle"
+  | "dots-circle";
+
+// Normalize UI frame styles to a canonical value
+export const normalizeQRFrameStyle = (
+  style: string | undefined,
+): QRFrameStyle | undefined => {
+  if (!style) return undefined;
+  return style === "dotted-circle" ? "dots-circle" : (style as QRFrameStyle);
+};
+
+// Map normalized UI frame style to the renderer FrameType
+export const frameStyleToFrameType = (
+  style: string | undefined,
+): FrameType | undefined => {
+  if (!style) return undefined;
+  const s = normalizeQRFrameStyle(style);
+  switch (s) {
+    case "rounded":
+      return "rounded-square";
+    case "solid-circle":
+      return "circle";
+    case "dots-circle":
+      return "dots-circle";
+    case "square":
+      return "square";
+    default:
+      return undefined;
+  }
+};
+
 export type QRProps = {
   value: string;
   size?: number;

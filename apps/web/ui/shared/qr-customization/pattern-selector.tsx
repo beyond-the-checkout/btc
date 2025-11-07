@@ -98,3 +98,5 @@ export function PatternSelector({
     </div>
   );
 }
+
+PatternSelector.displayName = "PatternSelector";

@@ -139,8 +139,14 @@ export function QRCodePreview() {
   // Construct frame options from current data structure
   const frameOptions = data.qrFrameStyle
     ? {
-        type: data.qrFrameStyle,
-        shape: data.qrShape,
+        type:
+          (data.qrFrameStyle === "rounded"
+            ? "rounded-square"
+            : data.qrFrameStyle === "solid-circle"
+              ? "circle"
+              : data.qrFrameStyle === "dotted-circle"
+                ? "dots-circle"
+                : data.qrFrameStyle) as any,
         color: data.qrFrameColor || data.qrDotsColor || data.fgColor,
       }
     : undefined;

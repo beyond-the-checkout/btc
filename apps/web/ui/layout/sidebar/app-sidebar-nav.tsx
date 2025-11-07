@@ -134,7 +134,7 @@ const NAV_GROUPS: SidebarNavGroups<SidebarNavData> = ({
             : undefined,
         }
       : null,
-  ].filter((group): group is NavGroupType => Boolean(group));
+  ].filter(Boolean) as unknown as NavGroupType[];
 
 const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
   // Top-level

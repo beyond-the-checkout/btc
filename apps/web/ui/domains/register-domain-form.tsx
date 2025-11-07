@@ -42,14 +42,14 @@ export function RegisterDomainForm({
   const { isMobile } = useMediaQuery();
   const [isSearching, setIsSearching] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
-  const [slug, setSlug] = useState<string | undefined>(undefined);
+  const [slug, setSlug] = useState<string | null>(null);
   const [debouncedSlug] = useDebounce(slug, 500);
   const [searchedDomains, setSearchedDomains] = useState<DomainSearchResult[]>(
     [],
   );
 
   useEffect(() => {
-    setSlug(workspace.slug);
+    setSlug(workspace.slug ?? null);
   }, [workspace.slug]);
 
   // Search for domain availability
@@ -122,11 +122,11 @@ export function RegisterDomainForm({
   };
 
   const searchedDomain = searchedDomains.find(
-    (d) => d.domain === `${slug}.link`.toLowerCase(),
+    (d) => d.domain === `${slug ?? ""}.link`.toLowerCase(),
   );
 
   const availableDomains = searchedDomains.filter(
-    (d) => d.domain !== `${slug}.link`.toLowerCase() && d.available,
+    (d) => d.domain !== `${slug ?? ""}.link`.toLowerCase() && d.available,
   );
 
   return (
@@ -186,8 +186,8 @@ export function RegisterDomainForm({
                   className="block w-full rounded-md rounded-r-none border-0 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-0 sm:text-sm"
                   aria-invalid="true"
                   autoFocus={!isMobile}
-                  placeholder={workspace.slug}
-                  value={slug}
+                  placeholder={workspace.slug ?? ""}
+                  value={slug ?? ""}
                   onChange={(e) => {
                     setSlug(e.target.value);
                   }}
