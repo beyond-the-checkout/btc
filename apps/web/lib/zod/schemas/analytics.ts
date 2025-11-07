@@ -254,7 +254,7 @@ export const analyticsQuerySchema = z
   .merge(UTMTemplateSchema.omit({ id: true, name: true }));
 
 // Analytics filter params for Tinybird endpoints
-export const analyticsFilterTB = z
+export const analyticsFilterTB = (z
   .object({
     eventType: analyticsEvents,
     workspaceId: z
@@ -314,20 +314,17 @@ export const analyticsFilterTB = z
       partnerId: true,
       tenantId: true,
       folderId: true,
-      sortBy: true,
     }),
-  );
+  ));
 
 export const eventsFilterTB = analyticsFilterTB
-  .omit({ granularity: true, timezone: true, page: true, sortBy: true })
-  .and(
-    z.object({
-      offset: z.coerce.number().default(0),
-      limit: z.coerce.number().default(PAGINATION_LIMIT),
-      order: z.enum(["asc", "desc"]).default("desc"),
-      sortBy: z.enum(["timestamp"]).default("timestamp"),
-    }),
-  );
+  .omit({ granularity: true, timezone: true })
+  .extend({
+    offset: z.coerce.number().default(0),
+    limit: z.coerce.number().default(PAGINATION_LIMIT),
+    order: z.enum(["asc", "desc"]).default("desc"),
+    sortBy: z.enum(["timestamp"]).default("timestamp"),
+  });
 
 const sortOrder = z
   .enum(["asc", "desc"])
@@ -336,7 +333,7 @@ const sortOrder = z
   .describe("The sort order. The default is `desc`.");
 
 export const eventsQuerySchema = analyticsQuerySchema
-  .omit({ groupBy: true, sortBy: true })
+  .omit({ groupBy: true })
   .extend({
     event: z
       .enum(EVENT_TYPES)
@@ -351,7 +348,9 @@ export const eventsQuerySchema = analyticsQuerySchema
       .enum(["timestamp"])
       .optional()
       .default("timestamp")
-      .describe("The field to sort the events by. The default is `timestamp`."),
+      .describe(
+        "The field to sort the events by. The default is `timestamp`.",
+      ),
     order: sortOrder
       .describe("DEPRECATED. Use `sortOrder` instead.")
       .openapi({ deprecated: true }),

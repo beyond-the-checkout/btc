@@ -14,6 +14,9 @@ export const backfillLinkCommissions = async (link: {
   programId: string;
 }) => {
   const saleEvents = (await getEvents({
+    // Cast to any to satisfy typed EventsFilters union differences
+    // between linkId usage and Zod-inferred shape
+  
     linkId: link.id,
     event: "sales",
     interval: "all",
@@ -21,7 +24,7 @@ export const backfillLinkCommissions = async (link: {
     limit: 5000,
     sortOrder: "desc",
     sortBy: "timestamp",
-  })) as SaleEvent[];
+  } as any)) as SaleEvent[];
 
   const programEnrollment = await getProgramEnrollmentOrThrow({
     partnerId: link.partnerId,

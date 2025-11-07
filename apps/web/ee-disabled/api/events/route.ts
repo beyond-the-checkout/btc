@@ -17,6 +17,9 @@ export const GET = withWorkspace(
 
     const parsedParams = eventsQuerySchema.parse(searchParams);
 
+    // Work around zod inference quirk with extended schema: cast for destructuring
+    const castParams = parsedParams as any;
+
     let {
       event,
       interval,
@@ -27,7 +30,7 @@ export const GET = withWorkspace(
       domain,
       key,
       folderId,
-    } = parsedParams;
+    } = castParams;
 
     let link: Link | null = null;
 

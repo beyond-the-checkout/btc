@@ -42,6 +42,7 @@ export type AnalyticsFilters = z.infer<typeof analyticsQuerySchema> & {
   isDeprecatedClicksEndpoint?: boolean;
   linkIds?: string[]; // TODO: remove this once it's been added to the public API
   folderIds?: string[];
+  folderId?: string;
   isMegaFolder?: boolean;
 };
 
@@ -51,6 +52,7 @@ export type EventsFilters = z.infer<typeof eventsQuerySchema> & {
   isDemo?: boolean;
   customerId?: string;
   folderIds?: string[];
+  folderId?: string;
   isMegaFolder?: boolean;
 };
 
@@ -70,19 +72,14 @@ export type PartnerEarningsTimeseriesFilters = z.infer<
   typeof getPartnerEarningsTimeseriesSchema
 >;
 
-const partnerEventsSchema = eventsQuerySchema
-  .pick({
-    event: true,
-    interval: true,
-    start: true,
-    end: true,
-    groupBy: true,
-    page: true,
-    limit: true,
-    order: true,
-    sortOrder: true,
-    sortBy: true,
-  })
-  .partial();
+const partnerEventsSchema = eventsQuerySchema.omit({
+  externalId: true,
+  tenantId: true,
+  programId: true,
+  partnerId: true,
+  tagId: true,
+  tagIds: true,
+  folderId: true,
+});
 
 export type PartnerEventsFilters = z.infer<typeof partnerEventsSchema>;

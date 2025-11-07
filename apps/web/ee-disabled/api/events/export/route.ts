@@ -57,8 +57,9 @@ export const GET = withWorkspace(
       )
       .parse(searchParams);
 
+    // Cast to widen type for destructuring
     const { event, domain, interval, start, end, columns, key, folderId } =
-      parsedParams;
+      (parsedParams as any);
 
     if (domain) {
       await getDomainOrThrow({ workspace, domain });

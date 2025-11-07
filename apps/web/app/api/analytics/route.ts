@@ -1,4 +1,5 @@
 import { VALID_ANALYTICS_ENDPOINTS } from "@/lib/analytics/constants";
+import type { AnalyticsGroupByOptions } from "@/lib/analytics/types";
 import { getAnalytics } from "@/lib/analytics/get-analytics";
 import { getFolderIdsToFilter } from "@/lib/analytics/get-folder-ids-to-filter";
 import { validDateRangeForPlan } from "@/lib/analytics/utils";
@@ -26,7 +27,10 @@ export const GET = withWorkspace(
       analyticsPathParamsSchema.parse(params);
 
     // for backwards compatibility (we used to support /analytics/[endpoint] as well)
-    if (!oldType && oldEvent && VALID_ANALYTICS_ENDPOINTS.includes(oldEvent)) {
+    const validEndpointSet = new Set<string>(VALID_ANALYTICS_ENDPOINTS);
+    const isValidEndpoint = (v: unknown): v is AnalyticsGroupByOptions =>
+      typeof v === "string" && validEndpointSet.has(v);
+    if (!oldType && oldEvent && isValidEndpoint(oldEvent)) {
       oldType = oldEvent;
       oldEvent = undefined;
     }
@@ -49,8 +53,8 @@ export const GET = withWorkspace(
 
     let link: Link | null = null;
 
-    event = oldEvent || event;
-    groupBy = oldType || groupBy;
+    const resolvedEvent = (oldEvent ?? event) as typeof event;
+    const resolvedGroupBy = (oldType ?? groupBy) as typeof groupBy;
 
     if (programId) {
       const workspaceProgramId = getDefaultProgramIdOrThrow(workspace);
@@ -116,15 +120,15 @@ export const GET = withWorkspace(
 
     const response = await getAnalytics({
       ...parsedParams,
-      event,
-      groupBy,
+      event: resolvedEvent,
+      groupBy: resolvedGroupBy,
       ...(link && { linkId: link.id }),
       folderIds,
       workspaceId: workspace.id,
       isMegaFolder: workspace.totalLinks > 1_000_000,
       isDeprecatedClicksEndpoint,
       // dataAvailableFrom is only relevant for timeseries groupBy
-      ...(groupBy === "timeseries" && {
+      ...(resolvedGroupBy === "timeseries" && {
         dataAvailableFrom: workspace.createdAt,
       }),
     });

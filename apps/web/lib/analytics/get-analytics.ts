@@ -113,21 +113,48 @@ export const getAnalytics = async (params: AnalyticsFilters) => {
   }
 
   // Create a Tinybird pipe
+  // Define minimal Tinybird response shapes for cases we enrich client-side
+  const tbTopLinksRaw = z.object({
+    link: z.string(),
+    clicks: z.number().default(0),
+    leads: z.number().default(0),
+    sales: z.number().default(0),
+    saleAmount: z.number().default(0),
+  });
+  const tbTopPartnersRaw = z.object({
+    partnerId: z.string(),
+    clicks: z.number().default(0),
+    leads: z.number().default(0),
+    sales: z.number().default(0),
+    saleAmount: z.number().default(0),
+  });
+  const tbUtmRaw = z.object({
+    utm: z.string().nullable().default(null),
+    clicks: z.number().default(0),
+    leads: z.number().default(0),
+    sales: z.number().default(0),
+    saleAmount: z.number().default(0),
+  });
+
   const pipe = tb.buildPipe({
     pipe: UTM_TAGS_PLURAL_LIST.includes(groupBy) ? "v2_utms" : `v2_${groupBy}`,
     parameters: analyticsFilterTB,
     data:
-      groupBy === "top_links" ||
-      groupBy === "top_partners" ||
-      UTM_TAGS_PLURAL_LIST.includes(groupBy)
-        ? z.any()
-        : analyticsResponse[groupBy],
+      groupBy === "top_links"
+        ? tbTopLinksRaw
+        : groupBy === "top_partners"
+          ? tbTopPartnersRaw
+          : UTM_TAGS_PLURAL_LIST.includes(groupBy)
+            ? tbUtmRaw
+            : analyticsResponse[groupBy],
   });
 
   const filters = queryParser(query);
 
+  const { qr: _qr, ...restParams } = params;
+
   const response = await pipe({
-    ...params,
+    ...restParams,
     ...(UTM_TAGS_PLURAL_LIST.includes(groupBy)
       ? { groupByUtmTag: SINGULAR_ANALYTICS_ENDPOINTS[groupBy] }
       : {}),
@@ -153,9 +180,7 @@ export const getAnalytics = async (params: AnalyticsFilters) => {
       return response.data[0];
     }
   } else if (groupBy === "top_links") {
-    const topLinksData = response.data as {
-      link: string;
-    }[];
+    const topLinksData = response.data as Array<z.infer<typeof tbTopLinksRaw>>;
 
     const links = await prismaEdge.link.findMany({
       where: {
@@ -207,17 +232,18 @@ export const getAnalytics = async (params: AnalyticsFilters) => {
     // special case for utm tags
   } else if (UTM_TAGS_PLURAL_LIST.includes(groupBy)) {
     const schema = analyticsResponse[groupBy];
+    const utmData = response.data as Array<z.infer<typeof tbUtmRaw>>;
 
-    return response.data.map((item) =>
+    return utmData.map((item) =>
       schema.parse({
         ...item,
         [SINGULAR_ANALYTICS_ENDPOINTS[groupBy]]: item.utm,
       }),
     );
   } else if (groupBy === "top_partners") {
-    const topPartnersData = response.data as {
-      partnerId: string;
-    }[];
+    const topPartnersData = response.data as Array<
+      z.infer<typeof tbTopPartnersRaw>
+    >;
 
     const partners = await prismaEdge.partner.findMany({
       where: {

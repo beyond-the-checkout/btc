@@ -3,7 +3,7 @@ import {
   DUB_PARTNERS_ANALYTICS_INTERVAL,
 } from "@/lib/analytics/constants";
 import { CommissionType, ProgramEnrollmentStatus } from "@prisma/client";
-import { z } from "zod";
+import z from "@/lib/zod";
 import { analyticsQuerySchema, eventsQuerySchema } from "./analytics";
 import { BountySchema, BountySubmissionSchema } from "./bounties";
 import {

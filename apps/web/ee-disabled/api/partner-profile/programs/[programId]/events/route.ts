@@ -28,8 +28,8 @@ export const GET = withPartnerProfile(
       },
     });
 
-    let { linkId, domain, key, ...rest } =
-      partnerProfileEventsQuerySchema.parse(searchParams);
+    const parsed = partnerProfileEventsQuerySchema.parse(searchParams);
+    let { linkId, domain, key, ...rest } = parsed;
 
     if (!linkId && domain && key) {
       const link = await prisma.link.findUnique({
@@ -62,17 +62,20 @@ export const GET = withPartnerProfile(
       const { ip, click, ...eventRest } = event;
       const { ip: _, ...clickRest } = click;
 
-      return {
+      const base = {
         ...eventRest,
         click: clickRest,
         link: event?.link ? PartnerProfileLinkSchema.parse(event.link) : null,
-        // @ts-expect-error - customer is not always present
-        ...(event?.customer && {
-          customer: CustomerSchema
-            // @ts-expect-error - customer is not always present
-            .parse(event.customer),
-        }),
-      };
+      } as const;
+
+      if ("customer" in event && event.customer) {
+        return {
+          ...base,
+          customer: CustomerSchema.parse(event.customer),
+        };
+      }
+
+      return base;
     });
 
     return NextResponse.json(response);
