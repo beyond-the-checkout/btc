@@ -1,4 +1,5 @@
-import { z } from "zod";
+import z from "@/lib/zod";
+import { APP_DOMAIN } from "@dub/utils";
 
 /**
  * Billing & Upgrades (License-Free) - Normalized Types
@@ -31,12 +32,17 @@ export type BillingPeriodT = z.infer<typeof BillingPeriod>;
 /**
  * Request to upgrade a workspace to a specific plan/period
  */
-export const UpgradeRequest = z.object({
-  plan: PlanTier,
-  period: BillingPeriod,
-  baseUrl: z.string().url(), // must match APP_DOMAIN for security
-  onboarding: z.string().optional(), // tracking parameter
-});
+export const UpgradeRequest = z
+  .object({
+    plan: PlanTier,
+    period: BillingPeriod,
+    baseUrl: z.string().url(), // must match APP_DOMAIN for security
+    onboarding: z.string().optional(), // tracking parameter
+  })
+  .refine((data) => data.baseUrl.startsWith(APP_DOMAIN), {
+    message: "Invalid baseUrl",
+    path: ["baseUrl"],
+  });
 
 export type UpgradeRequestT = z.infer<typeof UpgradeRequest>;
 
