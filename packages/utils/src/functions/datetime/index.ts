@@ -7,4 +7,6 @@ export * from "./format-period";
 export * from "./get-datetime-local";
 export * from "./get-days-difference";
 export * from "./get-first-and-last-day";
+export * from "./get-end-of-day";
+export * from "./format-date-for-api";
 export * from "./parse-datetime";
