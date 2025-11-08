@@ -61,6 +61,11 @@ export function UpgradePlanButton({
           }),
         })
           .then(async (res) => {
+            if (!res.ok) {
+              const error = await res.json();
+              throw new Error(error.error?.message || "Failed to create checkout session");
+            }
+
             plausible("Opened Checkout");
             posthog.capture("checkout_opened", {
               currentPlan: capitalize(plan),
@@ -69,6 +74,9 @@ export function UpgradePlanButton({
             if (currentPlan === "free") {
               const data = await res.json();
               const { id: sessionId } = data;
+              if (!sessionId) {
+                throw new Error("No session ID returned from checkout");
+              }
               const stripe = await getStripe();
               stripe?.redirectToCheckout({ sessionId });
             } else {

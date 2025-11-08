@@ -23,8 +23,8 @@ const LEGACY_PRO_PRICE_IDS = [
 export const NEW_BASE_PRICE_IDS = [
   "price_1SQFhAKANfnWIX8CHoDxGlYC", // monthly (prod) - $9.99/month
   "price_1SQFi6KANfnWIX8C4bf0abdo", // yearly (prod) - $99.96/year
-  "price_1SQFXCK3nEI4m99k924xskA0", // monthly (test) - $9.99/month
-  "price_1SQFYGK3nEI4m99kv84dSSRQ", // yearly (test) - $99.96/year
+  "price_1SQwS7KANfnWIX8CberMoSuD", // monthly (test) - $9.99/month
+  "price_1SQwV3KANfnWIX8CgCpiMraG", // yearly (test) - $99.96/year
 ];
 
 const LEGACY_BUSINESS_PRICE_IDS = [
@@ -41,8 +41,8 @@ const LEGACY_BUSINESS_PRICE_IDS = [
 export const NEW_BUSINESS_PRICE_IDS = [
   "price_1SQFilKANfnWIX8CRDmOVDdZ", // monthly (prod) - $39.99/month
   "price_1SQFjSKANfnWIX8CcKXxYdF5", // yearly (prod) - $399.96/year
-  "price_1SQFZ0K3nEI4m99kAAZLuFvG", // monthly (test) - $39.99/month
-  "price_1SQFZsK3nEI4m99kuMIkue6D", // yearly (test) - $399.96/year
+  "price_1SQwXtKANfnWIX8CCu6Ycal7", // monthly (test) - $39.99/month
+  "price_1SQwY5KANfnWIX8CT2S3WrTC", // yearly (test) - $399.96/year
 ];
 
 export const PLANS = [
@@ -251,8 +251,8 @@ export const PLANS = [
       ids: [
         "price_1SQFk5KANfnWIX8Cn5PMKBSZ", // monthly (prod) - $99.99/month
         "price_1SQFklKANfnWIX8CdfcD2M53", // yearly (prod) - $999.96/year
-        "price_1SQFanK3nEI4m99kwjSuAIsn", // monthly (test) - $99.99/month
-        "price_1SQFfSK3nEI4m99kmI7X2cFz", // yearly (test) - $999.96/year
+        "price_1SQwdlKANfnWIX8Co0YKN7DU", // monthly (test) - $99.99/month
+        "price_1SQwdvKANfnWIX8CiJEjWZRc", // yearly (test) - $999.96/year
       ],
     },
     limits: {

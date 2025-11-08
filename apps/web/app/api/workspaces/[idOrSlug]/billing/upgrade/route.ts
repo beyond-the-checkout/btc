@@ -23,11 +23,16 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
     });
   }
 
-  plan = plan.replace(" ", "+");
+  plan = plan.replace(" ", "+").toLowerCase();
+
+  const lookupKey = `${plan}_${period}`;
+  console.log("🔍 Looking up Stripe price with key:", lookupKey);
 
   const prices = await stripe.prices.list({
-    lookup_keys: [`${plan}_${period}`],
+    lookup_keys: [lookupKey],
   });
+
+  console.log("✅ Found prices:", prices.data.length, prices.data.map(p => ({ id: p.id, lookup_key: p.lookup_key })));
 
   const activeSubscription = workspace.stripeId
     ? await stripe.subscriptions
@@ -69,7 +74,7 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
     });
     return NextResponse.json({ url });
   } else {
-    const customer = await getDubCustomer(session.user.id);
+    const customer = await getDubCustomer(session.user.id).catch(() => null);
 
     // For both new users and users with canceled subscriptions
     const stripeSession = await stripe.checkout.sessions.create({

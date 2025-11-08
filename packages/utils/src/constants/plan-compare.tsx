@@ -28,9 +28,15 @@ export const PLAN_COMPARE_FEATURES: {
     href: "https://dub.co/links",
     features: [
       {
-        text: () => (
+        text: ({ plan }) => (
           <>
-            <strong>Unlimited</strong> scans
+            <strong>
+              {plan.name === "Enterprise"
+                ? "Unlimited"
+                : nFormatter(plan.limits.scans)}
+            </strong>{" "}
+            scans
+            {plan.name === "Enterprise" ? "" : "/mo"}
           </>
         ),
       },
@@ -40,7 +46,7 @@ export const PLAN_COMPARE_FEATURES: {
             <strong>
               {plan.name === "Enterprise"
                 ? "Unlimited"
-                : nFormatter(plan.limits.links)}
+                : nFormatter(plan.limits.codes)}
             </strong>{" "}
             new codes
             {plan.name === "Enterprise" ? "" : "/mo"}

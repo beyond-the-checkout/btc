@@ -22,6 +22,14 @@ export const searchDomainsAvailability = async ({
 }: {
   domains: Record<string, string>;
 }) => {
+  // Check if API key is configured
+  if (!DYNADOT_API_KEY) {
+    throw new DubApiError({
+      code: "bad_request",
+      message: "DYNADOT_API_KEY environment variable is not configured",
+    });
+  }
+
   const searchParams = new URLSearchParams({
     ...domains,
     command: "search",
@@ -46,7 +54,19 @@ export const searchDomainsAvailability = async ({
     });
   }
 
-  const data = schema.parse(await response.json());
+  const responseJson = await response.json();
+
+  // Add better error handling for unexpected response format
+  const parseResult = schema.safeParse(responseJson);
+  if (!parseResult.success) {
+    console.error("Dynadot API returned unexpected format:", responseJson);
+    throw new DubApiError({
+      code: "bad_request",
+      message: `Dynadot API returned an unexpected response format. Response: ${JSON.stringify(responseJson)}`,
+    });
+  }
+
+  const data = parseResult.data;
 
   console.log(JSON.stringify(data, null, 2));
 
