@@ -19,9 +19,9 @@ model Project {
   totalClicks Int @default(0) // Total number of clicks in the workspace
 
   usage               Int   @default(0)
-  usageLimit          Int   @default(1000)
+  usageLimit          Int   @default(100)
   linksUsage          Int   @default(0)
-  linksLimit          Int   @default(25)
+  linksLimit          Int   @default(2)
   payoutsUsage        Int   @default(0)
   payoutsLimit        Int   @default(0)
   payoutFee           Float @default(0.05) // processing fee (in decimals) for partner payouts
