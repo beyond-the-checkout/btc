@@ -1,5 +1,5 @@
 import { UsagePointT } from "@/lib/billing-lf/types";
-import { fetcher, getFirstAndLastDay } from "@dub/utils";
+import { fetcher, getFirstAndLastDay, formatDateForAPI, getEndOfDay } from "@dub/utils";
 import useSWR from "swr";
 import useWorkspace from "../swr/use-workspace";
 
@@ -7,6 +7,9 @@ import useWorkspace from "../swr/use-workspace";
  * License-free hook for fetching billing usage data
  * Mirrors the pattern from useUsage() but hits the LF endpoint
  * and returns normalized UsagePointT[] instead of UsageResponse[]
+ *
+ * @param resource - Type of resource to fetch usage for ("links" | "events")
+ * @returns Usage data with loading state, mutate, and validation state
  */
 export default function useBillingUsage({
   resource,
@@ -20,16 +23,13 @@ export default function useBillingUsage({
     data: usage,
     error,
     isValidating,
+    mutate,
   } = useSWR<UsagePointT[]>(
     workspaceId &&
       `/api/workspaces/${workspaceId}/billing-lf/usage?${new URLSearchParams({
         resource,
-        start: firstDay.toISOString().replace("T", " ").replace("Z", ""),
-        // get end of the day (11:59:59 PM)
-        end: new Date(lastDay.getTime() + 86399999)
-          .toISOString()
-          .replace("T", " ")
-          .replace("Z", ""),
+        start: formatDateForAPI(firstDay),
+        end: formatDateForAPI(getEndOfDay(lastDay)),
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       }).toString()}`,
     fetcher,
@@ -42,5 +42,6 @@ export default function useBillingUsage({
     usage,
     loading: !usage && !error,
     isValidating,
+    mutate,
   };
 }
