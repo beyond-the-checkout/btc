@@ -11,7 +11,8 @@ type ToolbarProps = {
 export default function Toolbar(props: ToolbarProps) {
   return (
     <Suspense fallback={null}>
-      <div className="fixed bottom-0 right-0 z-40 m-5">
+      {/* suppressHydrationWarning because Radix Dialog sets aria-hidden when modals are open */}
+      <div className="fixed bottom-0 right-0 z-40 m-5" suppressHydrationWarning>
         <ToolbarRSC {...props} />
       </div>
     </Suspense>

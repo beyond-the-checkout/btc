@@ -38,6 +38,7 @@ in
   pkgs.snyk
   pkgs.bashInteractive
   pkgs.railway
+  pkgs.stripe-cli
   pkgs.starship
 
   # Custom packages
