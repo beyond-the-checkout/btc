@@ -433,7 +433,7 @@ export class StripeAdapter implements BillingProvider {
   /**
    * Normalize a Stripe payment method to PaymentMethodSummaryT
    */
-  private normalizePaymentMethod(
+  protected normalizePaymentMethod(
     method: Stripe.PaymentMethod,
   ): PaymentMethodSummaryT {
     const isDirectDebit = DIRECT_DEBIT_PAYMENT_METHOD_TYPES.includes(
@@ -485,7 +485,7 @@ export class StripeAdapter implements BillingProvider {
   /**
    * Map Stripe invoice status to provider-agnostic status
    */
-  private normalizeInvoiceStatus(
+  protected normalizeInvoiceStatus(
     status: Stripe.Invoice.Status | null,
   ): "paid" | "failed" | "pending" | undefined {
     if (!status) return undefined;
