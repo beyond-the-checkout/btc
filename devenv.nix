@@ -27,6 +27,7 @@ in
   pkgs.jwt-cli
   pkgs.nodejs_20
   pkgs-unstable.claude-code
+  pkgs-unstable.codex
   pkgs.mysql84
   pkgs.nodePackages.typescript
   pkgs.nodePackages.ts-node
@@ -44,7 +45,7 @@ in
   # Custom packages
   # customPkgs.tinybird  # TODO: Package not found on PyPI with version 3.0.0b50
   customPkgs.amp  # ✓ Working - npm package
-  customPkgs.droid  # ✓ Working - binary download
+# customPkgs.droid  # ✓ Working - binary download
   customPkgs.beads  # Beads (bd) CLI - memory system for coding agents
   customPkgs.linearis  # Linearis CLI - Linear.app with JSON output for LLM agents
   ];
@@ -101,7 +102,7 @@ in
     # echo "  tb: $(tb --version 2>/dev/null || echo 'not available')"
 
     # Set DEVENV_PROFILE for Starship
-    export DEVENV_PROFILE="rewards-ui"
+    export DEVENV_PROFILE="btc"
 
     # Start Zsh
     export SHELL=${pkgs.zsh}/bin/zsh
