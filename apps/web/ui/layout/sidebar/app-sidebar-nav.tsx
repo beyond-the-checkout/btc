@@ -423,14 +423,11 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
         name: "Developer",
         items: [
           {
-            name: "Analytics",
-            icon: LinesY,
-            href: `/${slug}/settings/analytics`,
-          },
-          {
-            name: "API Keys",
+            name: "Developer",
             icon: Key,
-            href: `/${slug}/settings/tokens`,
+            href: "#",
+            locked: true,
+            badge: "Coming Soon",
           },
         ],
       },
