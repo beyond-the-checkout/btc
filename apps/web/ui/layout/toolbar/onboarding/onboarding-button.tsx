@@ -50,12 +50,6 @@ function OnboardingButtonInner({
         recommended: true,
       },
       {
-        display: "Set up your custom domain",
-        cta: `/${slug}/settings/domains`,
-        checked: domainsCount && domainsCount > 0,
-        recommended: true,
-      },
-      {
         display: "Invite your teammates",
         cta: `/${slug}/settings/people`,
         checked: (users && users.length > 1) || (invites && invites.length > 0),

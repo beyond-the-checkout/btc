@@ -54,19 +54,9 @@ export function InstallStripeIntegrationButton() {
             <p className="text-content-default text-center text-xs font-medium">
               Required first step
             </p>
-            <Link
-              href={`/${workspaceSlug}/settings/integrations/stripe`}
-              target="_blank"
-              onMouseDown={(e) => {
-                if (e.button === 0 || e.button === 1) setIsClicked(true);
-              }}
-              className="text-content-inverted mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-medium transition-colors hover:bg-indigo-700"
-            >
-              {isClicked && (
-                <LoadingCircle className="size-4 opacity-60 mix-blend-screen" />
-              )}
-              Install Stripe integration
-            </Link>
+            <div className="text-content-inverted mt-2 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-neutral-300 px-4 text-sm font-medium cursor-not-allowed">
+              Install Stripe integration (not available)
+            </div>
           </>
         )}
       </div>

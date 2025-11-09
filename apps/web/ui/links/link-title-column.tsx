@@ -188,7 +188,6 @@ function UnverifiedTooltip({
             <TooltipContent
               title="Your branded links won't work until you verify your domain."
               cta="Verify your domain"
-              href={`/${slug}/settings/domains`}
             />
           }
         >

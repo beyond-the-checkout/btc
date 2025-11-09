@@ -46,6 +46,4 @@ export const updateHubSpotSettingsAction = authActionClient
         },
       },
     });
-
-    revalidatePath(`/${workspace.slug}/settings/integrations/hubspot`);
   });

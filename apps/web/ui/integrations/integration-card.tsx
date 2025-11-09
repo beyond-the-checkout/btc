@@ -65,15 +65,12 @@ function Wrapper({
     integration.comingSoon ? "cursor-default" : "hover:drop-shadow-card-hover",
   );
 
-  return integration.comingSoon ? (
+  return integration.comingSoon || !integration.guideUrl ? (
     <div className={className}>{children}</div>
   ) : (
     <Link
-      href={
-        integration.guideUrl ||
-        `/${slug}/settings/integrations/${integration.slug}`
-      }
-      target={integration.guideUrl ? "_blank" : undefined}
+      href={integration.guideUrl}
+      target="_blank"
       className={className}
     >
       {children}

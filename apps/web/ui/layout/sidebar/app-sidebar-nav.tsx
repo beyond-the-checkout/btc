@@ -413,24 +413,9 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
             href: `/${slug}/settings/billing`,
           },
           {
-            name: "Domains",
-            icon: Globe,
-            href: `/${slug}/settings/domains`,
-          },
-          {
             name: "People",
             icon: Users6,
             href: `/${slug}/settings/people`,
-          },
-          {
-            name: "Integrations",
-            icon: ConnectedDots,
-            href: `/${slug}/settings/integrations`,
-          },
-          {
-            name: "Security",
-            icon: ShieldCheck,
-            href: `/${slug}/settings/security`,
           },
         ],
       },
@@ -446,16 +431,6 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
             name: "API Keys",
             icon: Key,
             href: `/${slug}/settings/tokens`,
-          },
-          {
-            name: "OAuth Apps",
-            icon: CubeSettings,
-            href: `/${slug}/settings/oauth-apps`,
-          },
-          {
-            name: "Webhooks",
-            icon: Webhook,
-            href: `/${slug}/settings/webhooks`,
           },
         ],
       },

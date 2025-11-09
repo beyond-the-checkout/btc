@@ -200,30 +200,6 @@ function WorkspaceLinks() {
                           </div>
                         </div>
                       ),
-                      domain: (
-                        <div className="flex flex-col items-center gap-2 p-2 text-center text-sm">
-                          <div className="flex items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 p-3">
-                            <Globe className="size-6 text-neutral-700" />
-                          </div>
-                          <p className="mt-2 font-medium text-neutral-950">
-                            No domains found
-                          </p>
-                          <p className="mx-auto mt-1 w-full max-w-[180px] text-neutral-700">
-                            Add a custom domain to match your brand
-                          </p>
-                          <div>
-                            <Button
-                              className="mt-1 h-8"
-                              onClick={() =>
-                                router.push(
-                                  `/${workspace.slug}/settings/domains`,
-                                )
-                              }
-                              text="Add domain"
-                            />
-                          </div>
-                        </div>
-                      ),
                     }}
                   />
                 </div>

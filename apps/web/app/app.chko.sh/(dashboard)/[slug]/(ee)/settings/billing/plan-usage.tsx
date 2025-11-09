@@ -176,7 +176,6 @@ export default function PlanUsage() {
             icon={Globe}
             usage={domains?.length}
             usageLimit={domainsLimit}
-            href={`/${slug}/settings/domains`}
           />
           <UsageCategory
             title="Folders"

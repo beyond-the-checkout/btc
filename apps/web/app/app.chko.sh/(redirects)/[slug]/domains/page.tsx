@@ -8,5 +8,6 @@ export default async function OldWorkspaceDomains(
   }
 ) {
   const params = await props.params;
-  redirect(`/${params.slug}/settings/domains`);
+  // Domains page removed - redirect to settings home
+  redirect(`/${params.slug}/settings`);
 }

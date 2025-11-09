@@ -111,5 +111,5 @@ export const GET = async (req: Request) => {
     return handleAndReturnErrorResponse(e);
   }
 
-  redirect(`/${workspace.slug}/settings/integrations/hubspot`);
+  redirect(`/${workspace.slug}/settings`);
 };

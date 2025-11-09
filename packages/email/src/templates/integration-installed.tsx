@@ -52,14 +52,6 @@ export default function IntegrationInstalled({
               The <strong>{integration.name}</strong> integration has been added
               to your workspace {workspace.name} on Dub.
             </Text>
-            <Section className="mb-8 mt-8">
-              <Link
-                className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.dub.co/${workspace.slug}/settings/integrations/${integration.slug}`}
-              >
-                View installed integration
-              </Link>
-            </Section>
             <Footer email={email} />
           </Container>
         </Body>

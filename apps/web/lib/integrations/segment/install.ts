@@ -37,6 +37,4 @@ export const installSegmentAction = authActionClient
       secret: writeKey,
       installationId: installation.id,
     });
-
-    revalidatePath(`/${workspace.slug}/settings/integrations/segment`);
   });
