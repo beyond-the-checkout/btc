@@ -11,6 +11,9 @@ import { customerSubscriptionUpdated } from "./customer-subscription-updated";
 import { invoicePaymentFailed } from "./invoice-payment-failed";
 import { paymentIntentRequiresAction } from "./payment-intent-requires-action";
 
+// Disable body parsing to get raw body for Stripe signature verification
+export const runtime = "nodejs";
+
 const relevantEvents = new Set([
   "charge.succeeded",
   "charge.failed",
