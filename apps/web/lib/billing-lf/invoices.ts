@@ -1,6 +1,3 @@
-import { prisma } from "@dub/prisma";
-import { APP_DOMAIN } from "@dub/utils";
-import z from "@/lib/zod";
 import type { InvoiceItemT } from "./types";
 import { getProvider } from "./provider";
 
@@ -14,7 +11,7 @@ import { getProvider } from "./provider";
  * This service orchestrates both sources and returns normalized InvoiceItemT[].
  */
 
-export type InvoiceSource = "subscription" | "partnerPayout" | "domainRenewal";
+export type InvoiceSource = "subscription";
 
 /**
  * List invoices for a workspace by type
@@ -25,27 +22,26 @@ export type InvoiceSource = "subscription" | "partnerPayout" | "domainRenewal";
  */
 export async function listInvoices(
   workspaceId: string,
-  type: InvoiceSource,
+  _type: InvoiceSource,
   options?: { limit?: number; startingAfter?: string; cursor?: string },
 ): Promise<InvoiceItemT[]> {
-  switch (type) {
-    case "subscription":
-      return await listSubscriptionInvoices(workspaceId, {
-        limit: options?.limit,
-        startingAfter: options?.startingAfter,
-      });
-    case "partnerPayout":
-      return await listPartnerPayoutInvoices(workspaceId, {
-        limit: options?.limit,
-        cursor: options?.cursor,
-      });
-    case "domainRenewal":
-      return await listDomainRenewalInvoices(workspaceId, {
-        limit: options?.limit,
-        cursor: options?.cursor,
-      });
-    default:
-      return [];
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `[billing-lf/invoices] listInvoices called: workspaceId=${workspaceId}, type=subscription`,
+    );
+  }
+
+  try {
+    return await listSubscriptionInvoices(workspaceId, {
+      limit: options?.limit,
+      startingAfter: options?.startingAfter,
+    });
+  } catch (error) {
+    console.error(
+      `[billing-lf/invoices] Error in listInvoices for subscription:`,
+      error,
+    );
+    throw error;
   }
 }
 
@@ -56,99 +52,38 @@ async function listSubscriptionInvoices(
   workspaceId: string,
   options?: { limit?: number; startingAfter?: string },
 ): Promise<InvoiceItemT[]> {
-  const provider = getProvider();
-  const invoices = await provider.listSubscriptionInvoices({
-    workspaceId,
-    limit: options?.limit,
-    startingAfter: options?.startingAfter,
-  });
-
-  return invoices.map((invoice) => ({
-    id: invoice.id,
-    source: "subscription" as const,
-    total: invoice.total,
-    createdAt: invoice.createdAt.toISOString(),
-    status: invoice.status,
-    description: invoice.description,
-    paymentMethod: undefined, // could be enhanced to extract from provider
-    pdfUrl: invoice.pdfUrl,
-  }));
-}
-
-/**
- * Get partner payout invoices from database
- */
-async function listPartnerPayoutInvoices(
-  workspaceId: string,
-  options?: { limit?: number; cursor?: string },
-): Promise<InvoiceItemT[]> {
-  const invoices = await prisma.invoice.findMany({
-    where: {
+  if (process.env.NODE_ENV === "development") {
+    console.log(
+      `[billing-lf/invoices] listSubscriptionInvoices: workspaceId=${workspaceId}`,
+    );
+  }
+  
+  try {
+    const provider = getProvider();
+    const invoices = await provider.listSubscriptionInvoices({
       workspaceId,
-      type: "partnerPayout",
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: options?.limit ?? 50,
-    ...(options?.cursor ? { cursor: { id: options.cursor }, skip: 1 } : {}),
-  });
+      limit: options?.limit,
+      startingAfter: options?.startingAfter,
+    });
 
-  const statusSchema = z.enum(["paid", "failed", "pending"]);
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `[billing-lf/invoices] Stripe returned ${invoices.length} invoices`,
+      );
+    }
 
-  return invoices.map((invoice) => ({
-    id: invoice.id,
-    source: "partnerPayout" as const,
-    total: invoice.total,
-    createdAt: invoice.createdAt.toISOString(),
-    status: statusSchema.parse(
-      invoice.status === "completed"
-        ? "paid"
-        : invoice.status === "failed"
-          ? "failed"
-          : "pending",
-    ),
-    description: "Partner Payout",
-    paymentMethod: undefined,
-    pdfUrl: invoice.receiptUrl ?? undefined,
-  }));
-}
-
-/**
- * Get domain renewal invoices from database
- */
-async function listDomainRenewalInvoices(
-  workspaceId: string,
-  options?: { limit?: number; cursor?: string },
-): Promise<InvoiceItemT[]> {
-  const invoices = await prisma.invoice.findMany({
-    where: {
-      workspaceId,
-      type: "domainRenewal",
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: options?.limit ?? 50,
-    ...(options?.cursor ? { cursor: { id: options.cursor }, skip: 1 } : {}),
-  });
-
-  const statusSchema = z.enum(["paid", "failed", "pending"]);
-
-  return invoices.map((invoice) => ({
-    id: invoice.id,
-    source: "domainRenewal" as const,
-    total: invoice.total,
-    createdAt: invoice.createdAt.toISOString(),
-    status: statusSchema.parse(
-      invoice.status === "completed"
-        ? "paid"
-        : invoice.status === "failed"
-          ? "failed"
-          : "pending",
-    ),
-    description: "Domain Renewal",
-    paymentMethod: undefined,
-    pdfUrl: invoice.receiptUrl ?? undefined,
-  }));
+    return invoices.map((invoice) => ({
+      id: invoice.id,
+      source: "subscription" as const,
+      total: invoice.total,
+      createdAt: invoice.createdAt.toISOString(),
+      status: invoice.status,
+      description: invoice.description,
+      paymentMethod: undefined, // could be enhanced to extract from provider
+      pdfUrl: invoice.pdfUrl,
+    }));
+  } catch (error) {
+    console.error(`[billing-lf/invoices] Error in listSubscriptionInvoices:`, error);
+    throw error;
+  }
 }

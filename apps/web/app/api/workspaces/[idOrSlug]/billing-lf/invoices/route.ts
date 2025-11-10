@@ -8,47 +8,72 @@ import z from "@/lib/zod";
  * GET /api/workspaces/[idOrSlug]/billing-lf/invoices
  *
  * List invoices by type
- * - subscription: from payment provider
- * - partnerPayout: from database
- * - domainRenewal: from database
+ * - subscription: from payment provider (Stripe)
+ *
+ * Note: partnerPayout and domainRenewal types were removed from this API
+ * as the UI no longer uses them. If reintroducing them in the future, widen
+ * the `type` validation and re-add corresponding service handlers.
  */
 export const GET = withWorkspace(async ({ req, workspace }) => {
-  const { searchParams } = new URL(req.url);
+  try {
+    const { searchParams } = new URL(req.url);
 
-  const querySchema = z.object({
-    type: z.enum(["subscription", "partnerPayout", "domainRenewal"], {
-      errorMap: () => ({
+    const rawParams = {
+      type: searchParams.get("type"),
+      limit: searchParams.get("limit") ?? undefined,
+      startingAfter: searchParams.get("startingAfter") ?? undefined,
+      cursor: searchParams.get("cursor") ?? undefined,
+    };
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("[billing-lf/invoices] Raw query params:", rawParams);
+      console.log("[billing-lf/invoices] URL:", req.url);
+    }
+
+    const querySchema = z.object({
+      type: z.enum(["subscription"], {
+        errorMap: () => ({
+          message:
+            "Invalid query parameters. 'type' must be 'subscription'.",
+        }),
+      }),
+      limit: z.coerce.number().optional(),
+      startingAfter: z.string().optional(),
+      cursor: z.string().optional(),
+    });
+
+    const parsed = querySchema.safeParse(rawParams);
+
+    if (!parsed.success) {
+      console.error("[billing-lf/invoices] Query validation failed:", parsed.error);
+      throw new DubApiError({
+        code: "unprocessable_entity",
         message:
           "Invalid query parameters. 'type' must be one of: subscription, partnerPayout, domainRenewal.",
-      }),
-    }),
-    limit: z.coerce.number().optional(),
-    startingAfter: z.string().optional(),
-    cursor: z.string().optional(),
-  });
+      });
+    }
 
-  const parsed = querySchema.safeParse({
-    type: searchParams.get("type"),
-    limit: searchParams.get("limit"),
-    startingAfter: searchParams.get("startingAfter"),
-    cursor: searchParams.get("cursor"),
-  });
+    const { type, limit, startingAfter, cursor } = parsed.data;
 
-  if (!parsed.success) {
-    throw new DubApiError({
-      code: "unprocessable_entity",
-      message:
-        "Invalid query parameters. 'type' must be one of: subscription, partnerPayout, domainRenewal.",
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `[billing-lf/invoices] Fetching ${type} invoices for workspace ${workspace.id}`,
+      );
+    }
+
+    const invoices = await listInvoices(workspace.id, type, {
+      limit,
+      startingAfter,
+      cursor,
     });
+
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[billing-lf/invoices] Returning ${invoices.length} invoices`);
+    }
+
+    return NextResponse.json(invoices);
+  } catch (error) {
+    console.error("[billing-lf/invoices] Error:", error);
+    throw error;
   }
-
-  const { type, limit, startingAfter, cursor } = parsed.data;
-
-  const invoices = await listInvoices(workspace.id, type, {
-    limit,
-    startingAfter,
-    cursor,
-  });
-
-  return NextResponse.json(invoices);
 });
