@@ -20,9 +20,9 @@ export const GET = withWorkspace(async ({ req, workspace }) => {
 
     const rawParams = {
       type: searchParams.get("type"),
-      limit: searchParams.get("limit") ?? undefined,
-      startingAfter: searchParams.get("startingAfter") ?? undefined,
-      cursor: searchParams.get("cursor") ?? undefined,
+      limit: searchParams.get("limit") || undefined,
+      startingAfter: searchParams.get("startingAfter") || undefined,
+      cursor: searchParams.get("cursor") || undefined,
     };
 
     if (process.env.NODE_ENV === "development") {
