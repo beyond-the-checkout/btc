@@ -13,6 +13,7 @@ import { paymentIntentRequiresAction } from "./payment-intent-requires-action";
 
 // Disable body parsing to get raw body for Stripe signature verification
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const relevantEvents = new Set([
   "charge.succeeded",
