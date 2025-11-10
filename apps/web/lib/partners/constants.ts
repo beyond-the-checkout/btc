@@ -104,29 +104,3 @@ export const INVOICE_AVAILABLE_PAYOUT_STATUSES = [
   "completed",
 ];
 
-export const PROGRAM_IMPORT_SOURCES = [
-  {
-    id: "rewardful",
-    value: "Rewardful",
-    image: "https://assets.dub.co/misc/icons/rewardful.svg",
-    helpUrl: "https://dub.co/help/article/migrating-from-rewardful",
-  },
-  {
-    id: "tolt",
-    value: "Tolt",
-    image: "https://assets.dub.co/misc/icons/tolt.svg",
-    helpUrl: "https://dub.co/help/article/migrating-from-tolt",
-  },
-  {
-    id: "partnerstack",
-    value: "PartnerStack",
-    image: "https://assets.dub.co/misc/icons/partnerstack.svg",
-    helpUrl: "https://dub.co/help/article/migrating-from-partnerstack",
-  },
-  {
-    id: "firstpromoter",
-    value: "FirstPromoter",
-    image: "https://assets.dub.co/misc/icons/firstpromoter.svg",
-    helpUrl: "https://dub.co/help/article/migrating-from-firstpromoter",
-  },
-] as const;

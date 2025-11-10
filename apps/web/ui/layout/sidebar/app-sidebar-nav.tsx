@@ -425,7 +425,7 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
           {
             name: "Developer",
             icon: Key,
-            href: "#",
+            href: "/settings/developer",
             locked: true,
             badge: "Coming Soon",
           },
