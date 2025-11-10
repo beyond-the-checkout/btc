@@ -20,8 +20,13 @@ export default async function Layout({ children }: { children: ReactNode }) {
           sidebar={AppSidebarNav}
           toolContent={
             <>
-              <ReferButton />
-              <HelpButtonRSC />
+              {/* SIDEBAR_BUTTONS_DISABLED_BTCAYY4
+                  Referrals and Help buttons disabled from sidebar display.
+                  Functionality preserved - just hidden from UI.
+                  Related bead: btc-ayy4
+              */}
+              {/* <ReferButton /> */}
+              {/* <HelpButtonRSC /> */}
             </>
           }
           newsContent={<NewsRSC />}
