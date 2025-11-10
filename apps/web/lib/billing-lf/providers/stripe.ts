@@ -390,24 +390,33 @@ export class StripeAdapter implements BillingProvider {
     limit?: number;
     startingAfter?: string;
   }) {
+    console.log(`[stripe] listSubscriptionInvoices called for workspace ${args.workspaceId}`);
+    
     const workspace = await prisma.project.findUnique({
       where: { id: args.workspaceId },
       select: { stripeId: true },
     });
 
     if (!workspace?.stripeId) {
+      console.log(`[stripe] No stripeId found for workspace ${args.workspaceId}, returning empty array`);
       return [];
     }
+
+    console.log(`[stripe] Found stripeId: ${workspace.stripeId}`);
 
     const invoices = await (async () => {
       try {
         const stripeId = workspace.stripeId as string;
-        return await stripe.invoices.list({
+        console.log(`[stripe] Calling stripe.invoices.list with customer=${stripeId}`);
+        const result = await stripe.invoices.list({
           customer: stripeId,
           limit: args.limit ?? 50,
           ...(args.startingAfter ? { starting_after: args.startingAfter } : {}),
         });
+        console.log(`[stripe] Stripe API returned ${result.data.length} invoices`);
+        return result;
       } catch (error: any) {
+        console.error(`[stripe] Stripe API error:`, error);
         throw new DubApiError({
           code: "bad_request",
           message:
