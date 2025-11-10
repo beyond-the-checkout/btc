@@ -226,7 +226,7 @@ export const LinksToolbar = memo(
                     pagination={pagination}
                     setPagination={setPagination}
                     totalCount={linksCount}
-                    unit={(plural) => `${plural ? "links" : "link"}`}
+                    unit={(plural) => `${plural ? "codes" : "code"}`}
                     showTotalCount={!isMegaFolder}
                   >
                     {!isMegaFolder && (

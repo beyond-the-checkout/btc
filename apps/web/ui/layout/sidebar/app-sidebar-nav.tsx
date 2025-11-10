@@ -39,6 +39,7 @@ import {
   LinesY as LinesYStatic,
   MoneyBills2,
   Msgs,
+  QRCode,
   Receipt2,
   ShieldCheck,
   Sliders,
@@ -58,7 +59,6 @@ import { DubPartnersPopup } from "./dub-partners-popup";
 import { Compass } from "./icons/compass";
 import { ConnectedDots4 } from "./icons/connected-dots4";
 import { CursorRays } from "./icons/cursor-rays";
-import { Hyperlink } from "./icons/hyperlink";
 import { LinesY } from "./icons/lines-y";
 import { User } from "./icons/user";
 import {
@@ -159,7 +159,7 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
           items: [
             {
               name: "Codes",
-              icon: Hyperlink,
+              icon: QRCode,
               href: `/${slug}/links${pathname === `/${slug}/links` ? "" : queryString}`,
               isActive: (pathname: string, href: string) => {
                 const basePath = href.split("?")[0];
