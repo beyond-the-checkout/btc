@@ -5,8 +5,8 @@ import useTagsCount from "@/lib/swr/use-tags-count";
 import useUsers from "@/lib/swr/use-users";
 import { TagProps } from "@/lib/types";
 import { TAGS_MAX_PAGE_SIZE } from "@/lib/zod/schemas/tags";
-import { Avatar, BlurImage, Globe, Tag, User, useRouterStuff } from "@dub/ui";
-import { GOOGLE_FAVICON_URL, nFormatter } from "@dub/utils";
+import { Avatar, Tag, User, useRouterStuff } from "@dub/ui";
+import { nFormatter } from "@dub/utils";
 import { useContext, useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { LinksDisplayContext } from "./links-display-provider";
@@ -20,10 +20,6 @@ export function useLinkFilters() {
 
   const { tags, tagsAsync } = useTagFilterOptions({
     search: selectedFilter === "tagIds" ? debouncedSearch : "",
-    folderId: folderId ?? "",
-  });
-
-  const domains = useDomainFilterOptions({
     folderId: folderId ?? "",
   });
 
@@ -60,25 +56,6 @@ export function useLinkFilters() {
           })) ?? null,
       },
       {
-        key: "domain",
-        icon: Globe,
-        label: "Domain",
-        getOptionIcon: (value) => (
-          <BlurImage
-            src={`${GOOGLE_FAVICON_URL}${value}`}
-            alt={value}
-            className="h-4 w-4 rounded-full"
-            width={16}
-            height={16}
-          />
-        ),
-        options: domains.map(({ slug, count }) => ({
-          value: slug,
-          label: slug,
-          right: nFormatter(count, { full: true }),
-        })),
-      },
-      {
         key: "userId",
         icon: User,
         label: "Creator",
@@ -101,7 +78,7 @@ export function useLinkFilters() {
           })) ?? null,
       },
     ];
-  }, [domains, tags, users]);
+  }, [tags, users]);
 
   const selectedTagIds = useMemo(
     () => searchParamsObj["tagIds"]?.split(",")?.filter(Boolean) ?? [],
@@ -109,13 +86,12 @@ export function useLinkFilters() {
   );
 
   const activeFilters = useMemo(() => {
-    const { domain, tagIds, userId } = searchParamsObj;
+    const { tagIds, userId } = searchParamsObj;
     return [
-      ...(domain ? [{ key: "domain", value: domain }] : []),
       ...(tagIds ? [{ key: "tagIds", value: selectedTagIds }] : []),
       ...(userId ? [{ key: "userId", value: userId }] : []),
     ];
-  }, [searchParamsObj]);
+  }, [searchParamsObj, selectedTagIds]);
 
   const onSelect = (key: string, value: any) => {
     if (key === "tagIds") {
@@ -155,7 +131,7 @@ export function useLinkFilters() {
 
   const onRemoveAll = () => {
     queryParams({
-      del: ["domain", "tagIds", "userId", "search"],
+      del: ["tagIds", "userId", "search"],
     });
   };
 
