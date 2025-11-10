@@ -46,7 +46,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <Link
-          href={`/${slug}/settings/billing-lf`}
+          href={`/${slug}/settings/billing`}
           title="Back to billing"
           className="group flex items-center gap-2"
         >

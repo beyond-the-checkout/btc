@@ -110,6 +110,20 @@ export default async function AppMiddleware(req: NextRequest) {
     }
   }
 
+  // Rewrite "/[slug]/settings/billing/:path*" to "/[slug]/settings/billing-lf/:path*"
+  // This provides transparent routing - URL stays as /billing but serves /billing-lf content
+  const billingRegex = /^\/([^\/]+)\/settings\/billing(?:\/(.*))?$/;
+  if (billingRegex.test(path)) {
+    const rewritePath = path.replace(
+      billingRegex,
+      (_match, slug, subPath) =>
+        `/${slug}/settings/billing-lf${subPath ? `/${subPath}` : ""}`,
+    );
+    return NextResponse.rewrite(
+      new URL(`/app.chko.sh${rewritePath}${searchParamsString}`, req.url),
+    );
+  }
+
   // otherwise, rewrite the path to /app.chko.sh
   return NextResponse.rewrite(new URL(`/app.chko.sh${fullPath}`, req.url));
 }

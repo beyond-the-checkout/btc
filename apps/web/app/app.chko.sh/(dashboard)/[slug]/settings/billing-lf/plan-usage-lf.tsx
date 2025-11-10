@@ -132,7 +132,7 @@ export default function PlanUsageLF() {
         <div className="flex items-center gap-2">
           {plan !== "enterprise" && (
             <Link
-              href={`/${slug}/settings/billing-lf/upgrade`}
+              href={`/${slug}/settings/billing/upgrade`}
               className={cn(
                 buttonVariants({ variant: "primary" }),
                 "flex h-9 w-full items-center justify-center whitespace-nowrap rounded-md border px-4 text-sm",
@@ -142,7 +142,7 @@ export default function PlanUsageLF() {
             </Link>
           )}
           <Link
-            href={`/${slug}/settings/billing-lf/invoices`}
+            href={`/${slug}/settings/billing/invoices`}
             className={cn(
               buttonVariants({ variant: "secondary" }),
               "flex h-9 w-full items-center justify-center whitespace-nowrap rounded-md border px-4 text-sm",
