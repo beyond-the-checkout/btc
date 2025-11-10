@@ -1,21 +1,16 @@
 "use client";
 
 import { useBillingUsage, useTagsCount, useUsers, useWorkspace } from "@/lib/swr-lf";
-import usePartnersCount from "@/lib/swr/use-partners-count";
 import SubscriptionMenuLF from "@/ui/workspaces/subscription-menu-lf";
 import { buttonVariants, useRouterStuff } from "@dub/ui";
 import {
-  CirclePercentage,
-  CreditCard,
   CrownSmall,
   CursorRays,
   Folder5,
-  Globe,
   Hyperlink,
   Icon,
   Tag,
   Users,
-  Users6,
 } from "@dub/ui/icons";
 import {
   capitalize,
@@ -35,17 +30,12 @@ export default function PlanUsageLF() {
     slug,
     plan,
     stripeId,
-    defaultProgramId,
     usage,
     usageLimit,
     linksUsage,
     linksLimit,
     totalLinks,
-    payoutsUsage,
     payoutsLimit,
-    payoutFee,
-    domains,
-    domainsLimit,
     foldersUsage,
     foldersLimit,
     groupsLimit,
@@ -53,11 +43,6 @@ export default function PlanUsageLF() {
     usersLimit,
     billingCycleStart,
   } = useWorkspace();
-
-  const { partnersCount } = usePartnersCount<number>({
-    programId: defaultProgramId ?? undefined,
-    status: "approved",
-  });
 
   const { data: tags } = useTagsCount();
   const { users } = useUsers();
@@ -92,17 +77,17 @@ export default function PlanUsageLF() {
       {
         id: "links",
         icon: Hyperlink,
-        title: "Links created",
+        title: "QR Codes created",
         usage: linksUsage,
         limit: linksLimit,
       },
     ];
     if (totalLinks && totalLinks > 10_000) {
-      // Find the links tab and move it to the first position
-      const linksTabIndex = tabs.findIndex((tab) => tab.id === "links");
-      if (linksTabIndex !== -1) {
-        const linksTab = tabs.splice(linksTabIndex, 1)[0];
-        tabs.unshift(linksTab);
+      // Find the QR codes tab and move it to the first position
+      const codesTabIndex = tabs.findIndex((tab) => tab.id === "links");
+      if (codesTabIndex !== -1) {
+        const codesTab = tabs.splice(codesTabIndex, 1)[0];
+        tabs.unshift(codesTab);
       }
     }
     return tabs;
@@ -167,15 +152,9 @@ export default function PlanUsageLF() {
         <div
           className={cn(
             "grid grid-cols-1 gap-[1px] overflow-hidden rounded-b-lg bg-neutral-200 md:grid-cols-3",
-            "md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4",
+            "md:grid-cols-2 lg:grid-cols-3",
           )}
         >
-          <UsageCategory
-            title="Custom Domains"
-            icon={Globe}
-            usage={domains?.length}
-            usageLimit={domainsLimit}
-          />
           <UsageCategory
             title="Folders"
             icon={Folder5}
@@ -196,29 +175,6 @@ export default function PlanUsageLF() {
             usage={users?.filter((user) => !user.isMachine).length}
             usageLimit={usersLimit}
             href={`/${slug}/settings/people`}
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-[1px] overflow-hidden rounded-b-lg bg-neutral-200 md:grid-cols-3">
-          <UsageCategory
-            title="Partners"
-            icon={Users6}
-            usage={partnersCount ?? 0}
-            usageLimit={INFINITY_NUMBER}
-            href={`/${slug}/program/partners`}
-          />
-          <UsageCategory
-            title="Partner payouts"
-            icon={CreditCard}
-            usage={payoutsUsage}
-            usageLimit={payoutsLimit}
-            unit="$"
-            href={`/${slug}/program/payouts`}
-          />
-          <UsageCategory
-            title="Payout fees"
-            icon={CirclePercentage}
-            usage={plan && payoutFee && `${payoutFee * 100}%`}
-            href="https://dub.co/help/article/partner-payouts#payout-fees-and-timing"
           />
         </div>
       </div>
