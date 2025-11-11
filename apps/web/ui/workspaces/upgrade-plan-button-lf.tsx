@@ -74,10 +74,25 @@ export function UpgradePlanButtonLF({
 
             const data = await res.json();
 
+            console.log("🔍 Frontend: Received response:", data);
+
             // Handle sessionId (checkout) vs redirectUrl (portal)
             if (data.sessionId) {
-              const stripe = await getStripe();
-              stripe?.redirectToCheckout({ sessionId: data.sessionId });
+              console.log("🔍 Frontend: Redirecting to Stripe checkout:", {
+                sessionId: data.sessionId,
+                checkoutUrl: data.checkoutUrl,
+                publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY?.substring(0, 20),
+              });
+              
+              // Try using direct URL first if available
+              if (data.checkoutUrl) {
+                console.log("🔍 Using direct checkout URL");
+                window.location.href = data.checkoutUrl;
+              } else {
+                console.log("🔍 Using Stripe.js redirectToCheckout");
+                const stripe = await getStripe();
+                stripe?.redirectToCheckout({ sessionId: data.sessionId });
+              }
             } else if (data.redirectUrl) {
               router.push(data.redirectUrl);
             } else {

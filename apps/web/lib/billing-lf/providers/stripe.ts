@@ -131,6 +131,16 @@ export class StripeAdapter implements BillingProvider {
     // No subscription or canceled → checkout session
     const customer = await getDubCustomer(args.userId).catch(() => null);
 
+    console.log("🔍 Creating Stripe checkout session with:", {
+      workspaceId: args.workspaceId,
+      workspaceSlug: args.workspaceSlug,
+      plan,
+      period: args.period,
+      priceId,
+      hasStripeId: !!workspace?.stripeId,
+      stripeKeyPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 20),
+    });
+
     const stripeSession = await (async () => {
       try {
         return await stripe.checkout.sessions.create({
@@ -183,7 +193,19 @@ export class StripeAdapter implements BillingProvider {
       }
     })();
 
-    return { sessionId: stripeSession.id };
+    console.log("🔍 Stripe checkout session created:", {
+      sessionId: stripeSession.id,
+      url: stripeSession.url,
+      mode: stripeSession.mode,
+      customer: stripeSession.customer,
+      status: stripeSession.status,
+      livemode: stripeSession.livemode,
+    });
+
+    return {
+      sessionId: stripeSession.id,
+      checkoutUrl: stripeSession.url ?? undefined,
+    };
   }
 
   async createPortalSession(args: {
