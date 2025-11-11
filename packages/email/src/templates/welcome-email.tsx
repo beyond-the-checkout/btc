@@ -53,12 +53,7 @@ export default function WelcomeEmail({
                 1. Create your first dynamic QR code
               </strong>
               :{" "}
-              <Link
-                href={`${CHECKOUT_HELP_BASE}/article/how-to-create-qr-code`}
-                className="font-semibold text-black underline underline-offset-4"
-              >
-                Generate a QR code
-              </Link>{" "}
+              Generate a QR code
               that you can update anytime without reprinting.
             </Text>
 
@@ -67,12 +62,7 @@ export default function WelcomeEmail({
                 2. Understand your limits
               </strong>
               :{" "}
-              <Link
-                href={`${CHECKOUT_HELP_BASE}/article/pricing-plans`}
-                className="font-semibold text-black underline underline-offset-4"
-              >
-                Review your plan details
-              </Link>{" "}
+              Review your plan details
               with transparent pricing and no surprise charges.
             </Text>
 
@@ -81,12 +71,7 @@ export default function WelcomeEmail({
                 3. View scan analytics
               </strong>
               : Monitor{" "}
-              <Link
-                href={`${CHECKOUT_HELP_BASE}/article/scan-analytics`}
-                className="font-semibold text-black underline underline-offset-4"
-              >
-                scan data
-              </Link>{" "}
+              scan data
               in real time to see how your QR codes perform.
             </Text>
 
