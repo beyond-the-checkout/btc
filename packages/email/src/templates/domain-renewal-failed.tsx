@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, formatDate, pluralize } from "@dub/utils";
+import { CHECKOUT_WORDMARK, formatDate, pluralize } from "@dub/utils";
 import {
   Body,
   Column,
@@ -50,7 +50,7 @@ export default function DomainRenewalFailed({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-5 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="mx-0 mb-5 mt-10 p-0 text-lg font-semibold text-neutral-800">
@@ -107,7 +107,7 @@ export default function DomainRenewalFailed({
               {pluralize("domain", domains.length)}, turn off auto-renewal in
               your{" "}
               <Link
-                href={`https://app.dub.co/${workspace.slug}/links/domains`}
+                href={`https://app.chko.sh/${workspace.slug}/links/domains`}
                 className="font-semibold text-black underline"
               >
                 domain settings page

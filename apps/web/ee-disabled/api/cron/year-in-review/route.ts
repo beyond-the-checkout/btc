@@ -10,7 +10,12 @@ export const dynamic = "force-dynamic";
 const BATCH_SIZE = 100;
 
 // POST /api/cron/year-in-review
+// DISABLED: This sends Dub-branded year-in-review emails that are not compatible with Checkout
 export async function POST() {
+  // SAFEGUARD: Prevent accidental sending of Dub-branded email
+  return new Response("Year-in-review email is disabled for Checkout branding.", { status: 501 });
+
+  /* ORIGINAL CODE - DISABLED FOR CHECKOUT BRANDING
   try {
     if (process.env.VERCEL === "1") {
       return new Response("Not available in production.");

@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, formatDate, pluralize } from "@dub/utils";
+import { CHECKOUT_WORDMARK, formatDate, pluralize } from "@dub/utils";
 import {
   Body,
   Column,
@@ -48,7 +48,7 @@ export default function DomainRenewed({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-5 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="mx-0 mb-5 mt-10 p-0 text-lg font-semibold text-neutral-800">
@@ -93,7 +93,7 @@ export default function DomainRenewed({
               No further action is needed. If you don't want to renew your
               domains next year, you can turn off auto-renewal in your{" "}
               <Link
-                href={`https://app.dub.co/${workspace.slug}/settings/domains`}
+                href={`https://app.chko.sh/${workspace.slug}/settings/domains`}
                 className="font-semibold text-black underline"
               >
                 domain settings page
@@ -104,7 +104,7 @@ export default function DomainRenewed({
             <Section className="my-10">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.dub.co/${workspace.slug}/settings/domains`}
+                href={`https://app.chko.sh/${workspace.slug}/settings/domains`}
               >
                 Manage your domains
               </Link>

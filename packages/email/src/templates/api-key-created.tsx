@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, formatDate } from "@dub/utils";
+import { CHECKOUT_WORDMARK, formatDate } from "@dub/utils";
 import {
   Body,
   Container,
@@ -45,13 +45,13 @@ export default function APIKeyCreated({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mb-8 mt-6">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-6 p-0 text-lg font-medium text-black">
               New Workspace API Key Created
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              You've created a new API key for your Dub workspace{" "}
+              You've created a new API key for your Checkout workspace{" "}
               <strong>{workspace.name}</strong> with the name{" "}
               <strong>"{token.name}"</strong> on{" "}
               {formatDate(new Date().toString())}.
@@ -63,7 +63,7 @@ export default function APIKeyCreated({
             <Section className="mb-8 mt-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.dub.co/${workspace.slug}/settings/tokens`}
+                href={`https://app.chko.sh/${workspace.slug}/settings/tokens`}
               >
                 View API Keys
               </Link>
@@ -71,7 +71,7 @@ export default function APIKeyCreated({
             <Text className="text-sm leading-6 text-black">
               If you did not create this API key, you can{" "}
               <Link
-                href={`https://app.dub.co/${workspace.slug}/settings/tokens`}
+                href={`https://app.chko.sh/${workspace.slug}/settings/tokens`}
                 className="text-black underline"
               >
                 <strong>delete this key</strong>

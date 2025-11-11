@@ -1,4 +1,4 @@
-import { APP_DOMAIN, CHECKOUT_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
+import { CHECKOUT_APP_URL, CHECKOUT_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
 import {
   Body,
   Container,
@@ -105,8 +105,8 @@ export default function LinksLimitAlert({
             )}
             <Section className="mb-8">
               <Link
-                className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`${APP_DOMAIN}/${slug}/upgrade`}
+className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
+                href={`${CHECKOUT_APP_URL}/${slug}/settings/billing`}
               >
                 Upgrade my plan
               </Link>

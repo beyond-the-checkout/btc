@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, nFormatter, smartTruncate } from "@dub/utils";
+import { CHECKOUT_WORDMARK, nFormatter, smartTruncate } from "@dub/utils";
 import {
   Body,
   Column,
@@ -65,13 +65,13 @@ export default function ClicksSummary({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               Your 30-day Dub summary for {workspaceName}
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              In the last 30 days, your Dub workspace,{" "}
+              In the last 30 days, your Checkout workspace,{" "}
               <strong>{workspaceName}</strong> received{" "}
               <strong>{nFormatter(totalClicks)} link clicks</strong>. You also
               created <strong>{createdLinks} new links</strong> during that
@@ -119,7 +119,7 @@ export default function ClicksSummary({
                         <Row>
                           <Column align="left">
                             <Link
-                              href={`https://app.dub.co/${workspaceSlug}/analytics?domain=${domain}&key=${path}`}
+                              href={`https://app.chko.sh/${workspaceSlug}/analytics?domain=${domain}&key=${path}`}
                               className="text-sm font-medium text-black underline"
                             >
                               {smartTruncate(link, 33)}↗
@@ -152,7 +152,7 @@ export default function ClicksSummary({
                 <Section className="my-8 text-center">
                   <Link
                     className="rounded-full bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                    href={`https://app.dub.co/${workspaceSlug}`}
+                    href={`https://app.chko.sh/${workspaceSlug}`}
                   >
                     Start creating links
                   </Link>
@@ -166,7 +166,7 @@ export default function ClicksSummary({
                 <Section className="my-8">
                   <Link
                     className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                    href={`https://app.dub.co/${workspaceSlug}/analytics?interval=30d`}
+                    href={`https://app.chko.sh/${workspaceSlug}/analytics?interval=30d`}
                   >
                     View my stats
                   </Link>
@@ -175,7 +175,7 @@ export default function ClicksSummary({
             )}
             <Footer
               email={email}
-              notificationSettingsUrl={`https://app.dub.co/${workspaceSlug}/settings/notifications`}
+              notificationSettingsUrl={`https://app.chko.sh/${workspaceSlug}/settings/notifications`}
             />
           </Container>
         </Body>

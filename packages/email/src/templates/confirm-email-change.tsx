@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -17,7 +17,7 @@ import { Footer } from "../components/footer";
 export default function ConfirmEmailChange({
   email = "panic@thedis.co",
   newEmail = "panic+1@thedis.co",
-  confirmUrl = "https://dub.co/auth/confirm-email-change/d03324452e1ac9352954315f3ffc",
+  confirmUrl = "https://chko.sh/auth/confirm-email-change/d03324452e1ac9352954315f3ffc",
 }: {
   email: string;
   newEmail: string;
@@ -31,7 +31,7 @@ export default function ConfirmEmailChange({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               Confirm your email address change

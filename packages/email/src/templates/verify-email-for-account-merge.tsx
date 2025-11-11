@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -31,9 +31,9 @@ export default function VerifyEmailForAccountMerge({
           <Container className="mx-auto my-10 max-w-[600px] px-10 py-5">
             <Section className="mb-8 flex items-center">
               <Img
-                src={DUB_WORDMARK}
+                src={CHECKOUT_WORDMARK}
                 height="32"
-                alt="Dub"
+                alt="Checkout"
                 className="mr-auto"
               />
             </Section>

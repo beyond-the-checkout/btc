@@ -18,13 +18,13 @@ export function Footer({
           Don't want to get these emails?{" "}
           <Link
             className="text-neutral-700 underline"
-            href="https://app.dub.co/account/settings"
+            href="https://app.chko.sh/account/settings"
           >
             Unsubscribe here.
           </Link>
         </Text>
         <Text className="text-[12px] text-neutral-500">
-          Dub Technologies, Inc.
+          Beyond The Checkout
           <br />
           2261 Market Street STE 5906
           <br />

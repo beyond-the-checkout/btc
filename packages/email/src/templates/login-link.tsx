@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -24,18 +24,18 @@ export default function LoginLink({
   return (
     <Html>
       <Head />
-      <Preview>Your Dub Login Link</Preview>
+      <Preview>Your Checkout Login Link</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               Your Login Link
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              Welcome to Dub!
+              Welcome to Checkout!
             </Text>
             <Text className="text-sm leading-6 text-black">
               Please click the magic link below to sign in to your account.
