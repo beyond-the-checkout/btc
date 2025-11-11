@@ -28,20 +28,7 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
   // Restrict preview deployments to admins only
   if (process.env.VERCEL === "1" && process.env.VERCEL_ENV === "preview") {
     const { isDubAdmin } = await import("@/lib/auth");
-    const { DUB_WORKSPACE_ID } = await import("@dub/utils");
-    
-    console.log("🔍 Admin Check Debug:", {
-      userId: session.user.id,
-      userEmail: session.user.email,
-      DUB_WORKSPACE_ID,
-      BEYONDTC_WORKSPACE_ID: process.env.BEYONDTC_WORKSPACE_ID,
-      isPreview: process.env.VERCEL_ENV === "preview",
-    });
-    
     const isAdminUser = await isDubAdmin(session.user.id);
-    
-    console.log("🔍 isDubAdmin result:", isAdminUser);
-    
     if (!isAdminUser) {
       throw new DubApiError({
         code: "unauthorized",

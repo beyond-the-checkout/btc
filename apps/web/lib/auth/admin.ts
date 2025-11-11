@@ -16,12 +16,6 @@ interface WithAdminHandler {
 }
 
 export const isDubAdmin = async (userId: string) => {
-  console.log("🔍 isDubAdmin called with:", {
-    userId,
-    DUB_WORKSPACE_ID,
-    DUB_WORKSPACE_ID_type: typeof DUB_WORKSPACE_ID,
-  });
-  
   const response = await prisma.projectUsers.findUnique({
     where: {
       userId_projectId: {
@@ -30,13 +24,6 @@ export const isDubAdmin = async (userId: string) => {
       },
     },
   });
-  
-  console.log("🔍 Database query result:", {
-    found: !!response,
-    role: response?.role,
-    id: response?.id,
-  });
-  
   if (!response) {
     return false;
   }
