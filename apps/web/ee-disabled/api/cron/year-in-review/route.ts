@@ -156,4 +156,5 @@ export async function POST() {
   } catch (error) {
     return handleAndReturnErrorResponse(error);
   }
+  */
 }

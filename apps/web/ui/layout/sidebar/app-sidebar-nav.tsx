@@ -9,8 +9,8 @@
  * workspace-level entitlements. Keep both systems in mind when adding new nav
  * entries so that features can be hidden globally or per workspace.
  */
-import { getPlanCapabilities } from "@/lib/plan-capabilities";
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { getPlanCapabilities } from "@/lib/plan-capabilities";
 import {
   SubmissionsCountByStatus,
   useBountySubmissionsCount,
@@ -24,15 +24,12 @@ import { useRouterStuff } from "@dub/ui";
 import {
   Bell,
   Brush,
-  ConnectedDots,
-  CubeSettings,
   DiamondTurnRight,
   Discount,
   Folder,
   Gauge6,
   Gear2,
   Gift,
-  Globe,
   InvoiceDollar,
   Key,
   LifeRing,
@@ -48,7 +45,6 @@ import {
   UserPlus,
   Users,
   Users6,
-  Webhook,
 } from "@dub/ui/icons";
 import { Trophy } from "lucide-react";
 import { Session } from "next-auth";
@@ -573,7 +569,7 @@ export function AppSidebarNav({
           program?.partnerNetworkEnabledAt !== null,
       }}
       toolContent={toolContent}
-      newsContent={plan && (plan === "free" ? <SidebarUsage /> : newsContent)}
+      newsContent={plan && (plan === "free" ? <SidebarUsage /> : null)}
       switcher={<WorkspaceDropdown />}
     />
   );

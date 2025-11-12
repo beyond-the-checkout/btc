@@ -219,12 +219,8 @@ export function SidebarNav<T extends Record<any, any>>({
                   </div>
                 )}
 
-{/* NOTIFICATION_CARDS_DISABLED_BTCATQI
-                  This section has been disabled to remove default notification cards.
-                  Restore this code when ready to add custom notifications.
-                  Related bead: btc-atqi
-                */}
-                {/* <AnimatePresence>
+                {/* REPOMARK:SCOPE: 1 - Restore newsContent rendering with animation in the fixed bottom section of SidebarNav; render only when currentArea is set and areas[currentArea](data).showNews is true */}
+                <AnimatePresence>
                   {currentArea && areas[currentArea](data).showNews && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
@@ -238,7 +234,7 @@ export function SidebarNav<T extends Record<any, any>>({
                       {newsContent}
                     </motion.div>
                   )}
-                </AnimatePresence> */}
+                </AnimatePresence>
 
                 {bottom && <div className="flex flex-col">{bottom}</div>}
               </div>
