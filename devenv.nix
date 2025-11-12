@@ -34,6 +34,7 @@ in
   pkgs.nodePackages.yarn
   pkgs.opentofu
   pkgs.pnpm
+  pkgs.pscale
   pkgs.tenv
   pkgs.zsh
   pkgs.snyk
@@ -41,6 +42,7 @@ in
   pkgs.railway
   pkgs.stripe-cli
   pkgs.starship
+  pkgs.uv
 
   # Custom packages
   # customPkgs.tinybird  # TODO: Package not found on PyPI with version 3.0.0b50
