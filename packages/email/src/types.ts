@@ -4,5 +4,7 @@ export type WorkspaceProps = {
   slug: string;
   usage: number;
   usageLimit: number;
+  linksUsage: number;
+  linksLimit: number;
   plan: string;
 };

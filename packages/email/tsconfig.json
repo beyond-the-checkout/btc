@@ -4,7 +4,8 @@
     "src/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "../utils/**/*"
   ],
   "compilerOptions": {
     "baseUrl": ".",
@@ -13,8 +14,9 @@
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "strict": true,
+    "skipLibCheck": true,
     "paths": {
-      "@/*": ["../../apps/web/*"]
+      "react": ["./node_modules/@types/react"]
     }
   }
 }

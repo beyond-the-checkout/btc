@@ -1,10 +1,3 @@
-import { handleAndReturnErrorResponse } from "@/lib/api/errors";
-import { qstash } from "@/lib/cron";
-import { sendBatchEmail } from "@dub/email";
-import DubWrapped from "@dub/email/templates/dub-wrapped";
-import { prisma } from "@dub/prisma";
-import { APP_DOMAIN_WITH_NGROK } from "@dub/utils";
-
 export const dynamic = "force-dynamic";
 
 const BATCH_SIZE = 100;
@@ -13,7 +6,10 @@ const BATCH_SIZE = 100;
 // DISABLED: This sends Dub-branded year-in-review emails that are not compatible with Checkout
 export async function POST() {
   // SAFEGUARD: Prevent accidental sending of Dub-branded email
-  return new Response("Year-in-review email is disabled for Checkout branding.", { status: 501 });
+  return new Response(
+    "Year-in-review email is disabled for Checkout branding.",
+    { status: 501 },
+  );
 
   /* ORIGINAL CODE - DISABLED FOR CHECKOUT BRANDING
   try {

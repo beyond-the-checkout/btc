@@ -1,4 +1,10 @@
-import { CHECKOUT_APP_URL, CHECKOUT_WORDMARK, capitalize, getNextPlan, nFormatter } from "@dub/utils";
+import {
+  CHECKOUT_APP_URL,
+  CHECKOUT_WORDMARK,
+  capitalize,
+  getNextPlan,
+  nFormatter,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -12,7 +18,7 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import { WorkspaceProps } from "../../../../apps/web/lib/types";
+import { WorkspaceProps } from "../types";
 import { Footer } from "../components/footer";
 
 export default function LinksLimitAlert({
@@ -67,8 +73,8 @@ export default function LinksLimitAlert({
               QR codes limit included in the {capitalize(plan)} plan. You have
               created a total of{" "}
               <strong>{nFormatter(linksUsage, { full: true })} QR codes</strong>{" "}
-              (out of a maximum of {nFormatter(linksLimit, { full: true })}{" "}
-              QR codes) in your current billing cycle.
+              (out of a maximum of {nFormatter(linksLimit, { full: true })} QR
+              codes) in your current billing cycle.
             </Text>
 
             {plan === "enterprise" ? (
@@ -81,8 +87,8 @@ export default function LinksLimitAlert({
               </Text>
             ) : percentage === 100 ? (
               <Text className="text-sm leading-6 text-black">
-                All your existing QR codes will continue to work, and we are still
-                collecting data on them, but you'll need to upgrade to the{" "}
+                All your existing QR codes will continue to work, and we are
+                still collecting data on them, but you'll need to upgrade to the{" "}
                 <Link
                   href={nextPlan.link}
                   className="font-medium text-blue-600 no-underline"
@@ -105,7 +111,7 @@ export default function LinksLimitAlert({
             )}
             <Section className="mb-8">
               <Link
-className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
+                className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
                 href={`${CHECKOUT_APP_URL}/${slug}/settings/billing`}
               >
                 Upgrade my plan

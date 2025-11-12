@@ -1,9 +1,9 @@
 /**
  * Fix script to grant admin access to a user
- * 
+ *
  * This script adds a user to the platform workspace as an owner,
  * allowing them to pass the isDubAdmin check.
- * 
+ *
  * Usage:
  *   cd apps/web
  *   pnpm script scripts/fix-admin-access.ts <userEmail>
@@ -80,7 +80,7 @@ async function grantAdminAccess() {
   if (existingProjectUser) {
     console.log(`✅ User already has access!`);
     console.log(`   Role: ${existingProjectUser.role}`);
-    
+
     if (existingProjectUser.role !== "owner") {
       console.log("\n4️⃣ Upgrading role to owner...");
       await prisma.projectUsers.update({
@@ -91,7 +91,7 @@ async function grantAdminAccess() {
     }
   } else {
     console.log("❌ User does not have access\n");
-    
+
     // 4. Create ProjectUsers entry
     console.log("4️⃣ Creating ProjectUsers entry...");
     const projectUser = await prisma.projectUsers.create({
@@ -113,7 +113,9 @@ async function grantAdminAccess() {
   console.log("📋 Next Steps:");
   console.log("1. Verify BEYONDTC_WORKSPACE_ID is set in your environment:");
   console.log(`   BEYONDTC_WORKSPACE_ID=${workspace.id}`);
-  console.log("\n2. In Vercel, ensure this environment variable is set for preview deployments");
+  console.log(
+    "\n2. In Vercel, ensure this environment variable is set for preview deployments",
+  );
   console.log("\n3. Test by running the debug script:");
   console.log(`   pnpm script scripts/debug-admin-auth.ts ${userEmail}`);
   console.log();

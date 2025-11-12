@@ -21,7 +21,6 @@ import DomainRenewalFailed from "@dub/email/templates/domain-renewal-failed";
 import DomainRenewalReminder from "@dub/email/templates/domain-renewal-reminder";
 import DomainRenewed from "@dub/email/templates/domain-renewed";
 import DomainTransferred from "@dub/email/templates/domain-transferred";
-import DubWrapped from "@dub/email/templates/dub-wrapped";
 import EmailUpdated from "@dub/email/templates/email-updated";
 import FailedPayment from "@dub/email/templates/failed-payment";
 import FeedbackEmail from "@dub/email/templates/feedback-email";
@@ -36,6 +35,7 @@ import NewBountyAvailable from "@dub/email/templates/new-bounty-available";
 import NewCommissionAlertPartner from "@dub/email/templates/new-commission-alert-partner";
 import NewMessageFromPartner from "@dub/email/templates/new-message-from-partner";
 import NewMessageFromProgram from "@dub/email/templates/new-message-from-program";
+import NewReferralSignup from "@dub/email/templates/new-referral-signup";
 import NewSaleAlertProgramOwner from "@dub/email/templates/new-sale-alert-program-owner";
 import PartnerAccountMerged from "@dub/email/templates/partner-account-merged";
 import PartnerApplicationApproved from "@dub/email/templates/partner-application-approved";
@@ -55,17 +55,16 @@ import ProgramInvite from "@dub/email/templates/program-invite";
 import ProgramPayoutReminder from "@dub/email/templates/program-payout-reminder";
 import ProgramWelcome from "@dub/email/templates/program-welcome";
 import ReferralInvite from "@dub/email/templates/referral-invite";
-import NewReferralSignup from "@dub/email/templates/new-referral-signup";
 import ResetPasswordLink from "@dub/email/templates/reset-password-link";
 import UpgradeEmail from "@dub/email/templates/upgrade-email";
-import VerifyEmailForAccountMerge from "@dub/email/templates/verify-email-for-account-merge";
 import VerifyEmail from "@dub/email/templates/verify-email";
+import VerifyEmailForAccountMerge from "@dub/email/templates/verify-email-for-account-merge";
 import WebhookAdded from "@dub/email/templates/webhook-added";
 import WebhookDisabled from "@dub/email/templates/webhook-disabled";
 import WebhookFailed from "@dub/email/templates/webhook-failed";
+import WelcomeEmail from "@dub/email/templates/welcome-email";
 import WelcomeEmailPartner from "@dub/email/templates/welcome-email-partner";
 import WorkspaceInvite from "@dub/email/templates/workspace-invite";
-import WelcomeEmail from "@dub/email/templates/welcome-email";
 
 const TEST_EMAIL = process.argv[2] || "test@example.com";
 const APP_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN || "chko.sh";
@@ -288,7 +287,8 @@ const disabledTemplates: EmailTemplateEntry[] = [
     props: {
       bounty: mockBounty,
       program: mockProgram,
-      reason: "The submission did not meet the minimum requirement of 100 students.",
+      reason:
+        "The submission did not meet the minimum requirement of 100 students.",
       email: TEST_EMAIL,
     },
   },
@@ -383,7 +383,8 @@ const disabledTemplates: EmailTemplateEntry[] = [
       amount: 50000,
       periodStart: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       periodEnd: new Date(),
-      reason: "Invalid bank account details. Please update your payout information.",
+      reason:
+        "Invalid bank account details. Please update your payout information.",
       email: TEST_EMAIL,
     },
   },
@@ -412,7 +413,8 @@ const disabledTemplates: EmailTemplateEntry[] = [
     props: {
       program: mockProgram,
       amount: 50000,
-      reason: "Invalid PayPal account. Please verify your PayPal email address.",
+      reason:
+        "Invalid PayPal account. Please verify your PayPal email address.",
       email: TEST_EMAIL,
     },
   },
@@ -778,7 +780,9 @@ const disabledTemplates: EmailTemplateEntry[] = [
 async function sendAllEmails() {
   const emailTemplates = enabledTemplates; // Only send enabled templates
 
-  console.log(`\n📧 Sending ${emailTemplates.length} ENABLED email templates to ${TEST_EMAIL}`);
+  console.log(
+    `\n📧 Sending ${emailTemplates.length} ENABLED email templates to ${TEST_EMAIL}`,
+  );
   console.log(`   (${disabledTemplates.length} templates disabled)\n`);
   console.log(`🌐 View emails at: http://localhost:8025\n`);
 
@@ -796,7 +800,7 @@ async function sendAllEmails() {
       successCount++;
 
       // Small delay to avoid overwhelming Mailhog
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
       console.error(`❌ ${name}:`, error);
       failCount++;
