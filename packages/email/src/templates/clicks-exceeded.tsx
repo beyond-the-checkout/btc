@@ -54,7 +54,7 @@ export default function ClicksExceeded({
             <Text className="text-sm leading-6 text-black">
               Your Checkout workspace,{" "}
               <Link
-                href={`${APP_DOMAIN}/${slug}`}
+                href={`${CHECKOUT_APP_URL}/${slug}`}
                 className="text-black underline"
               >
                 <strong>{name}</strong>
