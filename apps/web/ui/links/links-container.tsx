@@ -6,9 +6,16 @@ import useLinks from "@/lib/swr/use-links";
 import useLinksCount from "@/lib/swr/use-links-count";
 import { ExpandedLinkProps, UserProps } from "@/lib/types";
 import { CardList } from "@dub/ui";
-import { CursorRays, Hyperlink } from "@dub/ui/icons";
+import { CursorRays, QRCode } from "@dub/ui/icons";
 import { useSearchParams } from "next/navigation";
-import { createContext, Dispatch, SetStateAction, useContext, useState, type JSX } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+  type JSX,
+} from "react";
 import { PageWidthWrapper } from "../layout/page-width-wrapper";
 import { AnimatedEmptyState } from "../shared/animated-empty-state";
 import { LinkCard } from "./link-card";
@@ -96,7 +103,7 @@ function LinksList({
       <LinkSelectionProvider links={links}>
         {!links || links.length ? (
           // Cards
-          (<CardList variant={compact ? "compact" : "loose"} loading={loading}>
+          <CardList variant={compact ? "compact" : "loose"} loading={loading}>
             {links?.length
               ? // Link cards
                 links.map((link) => <LinkCard key={link.id} link={link} />)
@@ -110,7 +117,7 @@ function LinksList({
                     <LinkCardPlaceholder />
                   </CardList.Card>
                 ))}
-          </CardList>)
+          </CardList>
         ) : (
           <AnimatedEmptyState
             title={isFiltered ? "No codes found" : "No codes yet"}
@@ -121,7 +128,7 @@ function LinksList({
             }
             cardContent={
               <>
-                <Hyperlink className="size-4 text-neutral-700" />
+                <QRCode className="size-4 text-neutral-700" />
                 <div className="h-2.5 w-24 min-w-0 rounded-sm bg-neutral-200" />
                 <div className="xs:flex hidden grow items-center justify-end gap-1.5 text-neutral-500">
                   <CursorRays className="size-3.5" />
