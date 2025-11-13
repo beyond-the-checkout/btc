@@ -4,7 +4,6 @@ import usePartnerProfile from "@/lib/swr/use-partner-profile";
 import {
   ArrowsOppositeDirectionX,
   Avatar,
-  Gift,
   Icon,
   Popover,
   useCurrentSubdomain,
@@ -53,13 +52,6 @@ export default function UserDropdown() {
     }
 
     if (subdomain === "app") {
-      options.push({
-        label: "Refer and earn",
-        icon: Gift,
-        href: "/account/settings/referrals",
-        onClick: () => setOpenPopover(false),
-      });
-
       if (partner) {
         options.push({
           label: "Switch to partner account",
