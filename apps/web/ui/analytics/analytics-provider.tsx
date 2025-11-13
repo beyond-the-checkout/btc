@@ -46,6 +46,7 @@ export const AnalyticsContext = createContext<{
   basePath: string;
   baseApiPath: string;
   eventsApiPath?: string;
+  allowedEvents: EventType[];
   selectedTab: EventType;
   saleUnit: AnalyticsSaleUnit;
   view: AnalyticsView;
@@ -71,6 +72,7 @@ export const AnalyticsContext = createContext<{
   basePath: "",
   baseApiPath: "",
   eventsApiPath: "",
+  allowedEvents: ["clicks"],
   selectedTab: "clicks",
   saleUnit: "saleAmount",
   view: "timeseries",
@@ -108,10 +110,6 @@ export default function AnalyticsProvider({
   const partnerPage = partner?.id && programSlug ? true : false;
 
   const domainSlug = searchParams?.get("domain");
-
-  // Show conversion tabs/data for all dashboards except shared (unless explicitly set)
-  const showConversions =
-    !dashboardProps || dashboardProps?.showConversions ? true : false;
 
   const [persistedSaleUnit, setPersistedSaleUnit] =
     useLocalStorage<AnalyticsSaleUnit>(`analytics-sale-unit`, "saleAmount");
@@ -218,22 +216,51 @@ export default function AnalyticsProvider({
   useEffect(() => setRequiresUpgrade(false), [queryString]);
 
   const { canTrackConversions } = getPlanCapabilities(workspacePlan);
+
+  const showConversions = useMemo(() => {
+    // Admin and partner analytics always show conversions
+    if (adminPage || partnerPage) return true;
+
+    // Public/shared dashboards: only show when explicitly opted in
+    if (dashboardId) return dashboardProps?.showConversions === true;
+
+    // Workspace analytics: gate by plan capability
+    return canTrackConversions === true;
+  }, [
+    adminPage,
+    partnerPage,
+    dashboardId,
+    dashboardProps?.showConversions,
+    canTrackConversions,
+  ]);
+
   const { data: customersCount } = useCustomersCount({
     enabled: canTrackConversions === true,
   });
 
   const fetchCompositeStats = useMemo(() => {
-    // show composite stats if:
-    // - shared dashboard and show conversions is set to true
-    // - it's an admin or partner page
-    // - it's a workspace that has tracked conversions/customers/leads before
-    return dashboardProps?.showConversions ||
-      adminPage ||
-      partnerPage ||
-      (customersCount && customersCount > 0)
-      ? true
-      : false;
-  }, [dashboardProps?.showConversions, adminPage, partnerPage, customersCount]);
+    // Always fetch composite for shared dashboards with conversions enabled, admin, or partner pages
+    if (dashboardProps?.showConversions || adminPage || partnerPage)
+      return true;
+
+    // For workspace pages: only composite if conversions are enabled AND there's historical data
+    return showConversions && !!customersCount && customersCount > 0;
+  }, [
+    dashboardProps?.showConversions,
+    adminPage,
+    partnerPage,
+    showConversions,
+    customersCount,
+  ]);
+
+  const allowedEvents = useMemo<EventType[]>(
+    () => (showConversions ? ["clicks", "leads", "sales"] : ["clicks"]),
+    [showConversions],
+  );
+
+  const sanitizedSelectedTab: EventType = useMemo(() => {
+    return allowedEvents.includes(selectedTab) ? selectedTab : "clicks";
+  }, [selectedTab, allowedEvents]);
 
   const { data: totalEvents, isLoading: totalEventsLoading } = useSWR<{
     [key in AnalyticsResponseOptions]: number;
@@ -278,7 +305,8 @@ export default function AnalyticsProvider({
       value={{
         basePath, // basePath for the page (e.g. /[slug]/analytics, /share/[dashboardId])
         baseApiPath, // baseApiPath for analytics API endpoints (e.g. /api/analytics)
-        selectedTab, // selected event tab (scans, leads, sales)
+        allowedEvents, // allowed event types based on plan capabilities
+        selectedTab: sanitizedSelectedTab, // selected event tab (scans, leads, sales) - sanitized to allowed events
         eventsApiPath, // eventsApiPath for events API endpoints (e.g. /api/events)
         saleUnit,
         view,

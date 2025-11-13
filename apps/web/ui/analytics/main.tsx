@@ -62,8 +62,7 @@ export default function Main() {
   const tab = tabs.find(({ id }) => id === selectedTab) ?? tabs[0];
 
   const showPaywall =
-    (tab.conversions || view === "funnel") &&
-    (plan === "free" || plan === "pro");
+    (tab.conversions || view === "funnel") && !showConversions;
 
   return (
     <div className="w-full overflow-hidden bg-white">

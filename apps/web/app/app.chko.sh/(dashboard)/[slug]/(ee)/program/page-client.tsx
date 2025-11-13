@@ -76,6 +76,7 @@ export default function ProgramOverviewPageClient() {
         value={{
           basePath: "",
           baseApiPath: "/api/analytics",
+          allowedEvents: ["clicks", "leads", "sales"],
           selectedTab: "sales",
           saleUnit: "saleAmount",
           view: "timeseries",

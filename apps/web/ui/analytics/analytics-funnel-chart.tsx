@@ -4,31 +4,34 @@ import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
 
 export function AnalyticsFunnelChart({ demo = false }: { demo?: boolean }) {
-  const { totalEvents } = useContext(AnalyticsContext);
+  const { totalEvents, showConversions } = useContext(AnalyticsContext);
+
+  const baseSteps = [
+    {
+      id: "clicks",
+      label: "Scans",
+      value: demo ? 130 : totalEvents?.clicks ?? 0,
+      colorClassName: "text-blue-600",
+    },
+    {
+      id: "leads",
+      label: "Leads",
+      value: demo ? 100 : totalEvents?.leads ?? 0,
+      colorClassName: "text-violet-600",
+    },
+    {
+      id: "sales",
+      label: "Sales",
+      value: demo ? 24 : totalEvents?.sales ?? 0,
+      additionalValue: demo ? 228_00 : totalEvents?.saleAmount ?? 0,
+      colorClassName: "text-teal-400",
+    },
+  ];
 
   const steps = useMemo(
-    () => [
-      {
-        id: "clicks",
-        label: "Scans",
-        value: demo ? 130 : totalEvents?.clicks ?? 0,
-        colorClassName: "text-blue-600",
-      },
-      {
-        id: "leads",
-        label: "Leads",
-        value: demo ? 100 : totalEvents?.leads ?? 0,
-        colorClassName: "text-violet-600",
-      },
-      {
-        id: "sales",
-        label: "Sales",
-        value: demo ? 24 : totalEvents?.sales ?? 0,
-        additionalValue: demo ? 228_00 : totalEvents?.saleAmount ?? 0,
-        colorClassName: "text-teal-400",
-      },
-    ],
-    [demo, totalEvents],
+    () =>
+      showConversions ? baseSteps : baseSteps.filter((s) => s.id === "clicks"),
+    [demo, totalEvents, showConversions],
   );
 
   return (
@@ -36,7 +39,9 @@ export function AnalyticsFunnelChart({ demo = false }: { demo?: boolean }) {
       {totalEvents || demo ? (
         <FunnelChart
           steps={steps}
-          defaultTooltipStepId={demo ? "sales" : undefined}
+          defaultTooltipStepId={
+            demo ? (showConversions ? "sales" : "clicks") : undefined
+          }
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center">

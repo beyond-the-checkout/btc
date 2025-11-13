@@ -139,6 +139,7 @@ export function ProgramAnalyticsPageClient() {
         value={{
           basePath: "",
           baseApiPath: "/api/analytics",
+          allowedEvents: ["clicks", "leads", "sales"],
           selectedTab,
           saleUnit,
           view,

@@ -18,8 +18,6 @@ export default function EventsTabs() {
   const { searchParams, queryParams } = useRouterStuff();
   const { isMobile } = useMediaQuery();
 
-  const tab = searchParams.get("event") || "clicks";
-
   const {
     baseApiPath,
     queryString,
@@ -27,7 +25,14 @@ export default function EventsTabs() {
     totalEvents,
     totalEventsLoading,
     fetchCompositeStats,
+    showConversions,
+    selectedTab: tab,
+    allowedEvents,
   } = useContext(AnalyticsContext);
+
+  const events = showConversions
+    ? (["clicks", "leads", "sales"] as const)
+    : (["clicks"] as const);
 
   const { data: timeseriesData, isLoading: isLoadingTimeseries } =
     useSWRImmutable<TimeseriesData>(
@@ -64,12 +69,19 @@ export default function EventsTabs() {
 
   useEffect(() => {
     const sortBy = searchParams.get("sort");
-    if (tab !== "sales" && sortBy !== "timestamp") queryParams({ del: "sort" });
-  }, [tab, searchParams.get("sort")]);
+    if (tab !== "sales" && sortBy) {
+      queryParams({ del: "sort" });
+    }
+  }, [tab, searchParams, queryParams]);
 
   return (
-    <div className="grid w-full grid-cols-3 gap-2 overflow-x-auto sm:gap-4">
-      {["clicks", "leads", "sales"].map((event) => (
+    <div
+      className="grid w-full gap-2 overflow-x-auto sm:gap-4"
+      style={{
+        gridTemplateColumns: `repeat(${events.length}, minmax(0, 1fr))`,
+      }}
+    >
+      {events.map((event) => (
         <button
           key={event}
           className={cn(
@@ -81,7 +93,9 @@ export default function EventsTabs() {
           onClick={() => onEventTabClick(event)}
         >
           <div>
-            <p className="text-sm text-neutral-600">{event === 'clicks' ? 'Scans' : capitalize(event)}</p>
+            <p className="text-sm text-neutral-600">
+              {event === "clicks" ? "Scans" : capitalize(event)}
+            </p>
             <div className="mt-2">
               {totalEvents ? (
                 <NumberFlow

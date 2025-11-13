@@ -58,6 +58,7 @@ export default function AnalyticsAreaChart({
     interval,
     saleUnit,
     requiresUpgrade,
+    showConversions,
   } = useContext(AnalyticsContext);
 
   const { data } = useSWR<
@@ -95,7 +96,7 @@ export default function AnalyticsAreaChart({
     [data, demo],
   );
 
-  const series = [
+  const allSeries = [
     {
       id: "clicks",
       valueAccessor: (d) => d.values.clicks,
@@ -115,6 +116,12 @@ export default function AnalyticsAreaChart({
       colorClassName: "text-teal-400",
     },
   ];
+
+  const series = useMemo(
+    () =>
+      showConversions ? allSeries : allSeries.filter((s) => s.id === "clicks"),
+    [showConversions, saleUnit, resource],
+  );
 
   const activeSeries = series.find(({ id }) => id === resource);
 
@@ -149,7 +156,9 @@ export default function AnalyticsAreaChart({
                           )}
                         />
                       )}
-                      <p className="capitalize text-neutral-600">{resource === 'clicks' ? 'scans' : resource}</p>
+                      <p className="capitalize text-neutral-600">
+                        {resource === "clicks" ? "scans" : resource}
+                      </p>
                     </div>
                     <p className="text-right font-medium text-neutral-900">
                       {resource === "sales" && saleUnit === "saleAmount"
