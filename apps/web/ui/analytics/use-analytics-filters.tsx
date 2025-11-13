@@ -18,14 +18,7 @@ import { CUSTOMERS_MAX_PAGE_SIZE } from "@/lib/zod/schemas/customers";
 import { DOMAINS_MAX_PAGE_SIZE } from "@/lib/zod/schemas/domains";
 import { FOLDERS_MAX_PAGE_SIZE } from "@/lib/zod/schemas/folders";
 import { TAGS_MAX_PAGE_SIZE } from "@/lib/zod/schemas/tags";
-import {
-  BlurImage,
-  Filter,
-  LinkLogo,
-  Sliders,
-  useRouterStuff,
-  UTM_PARAMETERS,
-} from "@dub/ui";
+import { Filter, LinkLogo, useRouterStuff, UTM_PARAMETERS } from "@dub/ui";
 import {
   Calendar6,
   Cube,
@@ -55,7 +48,6 @@ import {
   COUNTRIES,
   currencyFormatter,
   getApexDomain,
-  GOOGLE_FAVICON_URL,
   linkConstructor,
   nFormatter,
   OG_AVATAR_URL,
@@ -193,6 +185,8 @@ export function useAnalyticsFilters({
 
     // Handle special cases first
     const filters = [
+      // Handle qr quick filter special case - must come before domain/key
+      ...(params.trigger === "qr" ? [{ key: "qr", value: "qr" }] : []),
       // Handle domain/key special case
       ...(domain && !key ? [{ key: "domain", value: domain }] : []),
       ...(domain && key
@@ -225,6 +219,13 @@ export function useAnalyticsFilters({
         : []),
     ];
 
+    // If we mapped trigger=qr to the qr quick filter, remove trigger from params
+    // to prevent duplicate chips
+    const filteredParams = { ...params };
+    if (params.trigger === "qr") {
+      delete filteredParams.trigger;
+    }
+
     // Handle all other filters dynamically
     VALID_ANALYTICS_FILTERS.forEach((filter) => {
       // Skip special cases we handled above
@@ -234,10 +235,10 @@ export function useAnalyticsFilters({
         )
       )
         return;
-      // also skip date range filters and qr
-      if (["interval", "start", "end", "qr"].includes(filter)) return;
+      // also skip date range filters but NOT qr (we handle qr specially above)
+      if (["interval", "start", "end"].includes(filter)) return;
 
-      const value = params[filter];
+      const value = filteredParams[filter];
       if (value) {
         filters.push({ key: filter, value });
       }
@@ -374,7 +375,7 @@ export function useAnalyticsFilters({
         ? []
         : [
             {
-                value: `Scans on ${primaryDomain} domain this year`,
+              value: `Scans on ${primaryDomain} domain this year`,
               icon: Globe2,
             },
           ]),
@@ -400,29 +401,17 @@ export function useAnalyticsFilters({
 
   const [streaming, setStreaming] = useState<boolean>(false);
 
-  const LinkFilterItem = {
-    key: "link",
-    icon: Hyperlink,
-    label: "Link",
-    getOptionIcon: (value, props) => {
-      const url = props.option?.data?.url;
-      const [domain, key] = value.split("/");
-
-      return <LinkIcon url={url} domain={domain} linkKey={key} />;
-    },
-    options:
-      links?.map(
-        ({ domain, key, url, ...rest }: LinkProps & { count?: number }) => ({
-          value: linkConstructor({ domain, key, pretty: true }),
-          label: linkConstructor({ domain, key, pretty: true }),
-          right: getFilterOptionTotal(rest),
-          data: { url },
-          permalink:
-            slug && !partnerPage
-              ? `/${slug}/links/${linkConstructor({ domain, key, pretty: true })}`
-              : undefined,
-        }),
-      ) ?? null,
+  const QRCodeFilterItem = {
+    key: "qr",
+    icon: QRCode,
+    label: "Code",
+    options: [
+      {
+        value: "qr",
+        label: "QR Code",
+        icon: QRCode,
+      },
+    ],
   };
 
   const CustomerFilterItem = {
@@ -464,6 +453,31 @@ export function useAnalyticsFilters({
           ),
         };
       }) ?? null,
+  };
+
+  const LinkFilterItem = {
+    key: "link",
+    icon: Hyperlink,
+    label: "Link",
+    getOptionIcon: (value, props) => {
+      const url = props.option?.data?.url;
+      const [domain, key] = value.split("/");
+
+      return <LinkIcon url={url} domain={domain} linkKey={key} />;
+    },
+    options:
+      links?.map(
+        ({ domain, key, url, ...rest }: LinkProps & { count?: number }) => ({
+          value: linkConstructor({ domain, key, pretty: true }),
+          label: linkConstructor({ domain, key, pretty: true }),
+          right: getFilterOptionTotal(rest),
+          data: { url },
+          permalink:
+            slug && !partnerPage
+              ? `/${slug}/links/${linkConstructor({ domain, key, pretty: true })}`
+              : undefined,
+        }),
+      ) ?? null,
   };
 
   const SaleTypeFilterItem = {
@@ -528,7 +542,7 @@ export function useAnalyticsFilters({
               SaleTypeFilterItem,
             ]
           : partnerPage
-            ? [LinkFilterItem, CustomerFilterItem, SaleTypeFilterItem]
+            ? [QRCodeFilterItem]
             : [
                 ...(canManageCustomers ? [CustomerFilterItem] : []),
                 {
@@ -571,12 +585,14 @@ export function useAnalyticsFilters({
                         label: folder.name,
                       })),
                 },
+                QRCodeFilterItem,
                 {
                   key: "tagIds",
                   icon: Tag,
                   label: "Tag",
                   multiple: true,
                   shouldFilter: !tagsAsync,
+                  separatorAfter: true,
                   getOptionIcon: (value, props) => {
                     const tagColor =
                       props.option?.data?.color ??
@@ -602,59 +618,6 @@ export function useAnalyticsFilters({
                         data: { color },
                       })),
                 },
-                {
-                  key: "domain",
-                  icon: Globe2,
-                  label: "Domain",
-                  shouldFilter: !domainsAsync,
-                  getOptionIcon: (value) => (
-                    <BlurImage
-                      src={`${GOOGLE_FAVICON_URL}${value}`}
-                      alt={value}
-                      className="h-4 w-4 rounded-full"
-                      width={16}
-                      height={16}
-                    />
-                  ),
-                  options: loadingDomains
-                    ? null
-                    : [
-                        ...domains.map((domain) => ({
-                          value: domain.slug,
-                          label: domain.slug,
-                        })),
-                        // Add currently filtered domain if not already in the list
-                        ...(!searchParamsObj.domain ||
-                        domains.some((d) => d.slug === searchParamsObj.domain)
-                          ? []
-                          : [
-                              {
-                                value: searchParamsObj.domain,
-                                label: searchParamsObj.domain,
-                                hideDuringSearch: true,
-                              },
-                            ]),
-                      ],
-                },
-                LinkFilterItem,
-                {
-                  key: "root",
-                  icon: Sliders,
-                  label: "Link type",
-                  options: [
-                    {
-                      value: true,
-                      icon: Globe2,
-                      label: "Root domain link",
-                    },
-                    {
-                      value: false,
-                      icon: Hyperlink,
-                      label: "Regular short link",
-                    },
-                  ],
-                },
-                SaleTypeFilterItem,
               ]),
       {
         key: "country",
@@ -913,6 +876,12 @@ export function useAnalyticsFilters({
           filters: activeFilters,
         });
         setStreaming(false);
+      } else if (key === "qr") {
+        queryParams({
+          set: { trigger: "qr" },
+          del: "page",
+          scroll: false,
+        });
       } else {
         queryParams({
           set:
@@ -939,18 +908,23 @@ export function useAnalyticsFilters({
   const onRemove = useCallback(
     (key, value) =>
       queryParams(
-        key === "tagIds" &&
-          !(selectedTagIds.length === 1 && selectedTagIds[0] === value)
+        key === "qr"
           ? {
-              set: {
-                tagIds: selectedTagIds.filter((id) => id !== value).join(","),
-              },
+              del: "trigger",
               scroll: false,
             }
-          : {
-              del: key === "link" ? ["domain", "key", "url"] : key,
-              scroll: false,
-            },
+          : key === "tagIds" &&
+              !(selectedTagIds.length === 1 && selectedTagIds[0] === value)
+            ? {
+                set: {
+                  tagIds: selectedTagIds.filter((id) => id !== value).join(","),
+                },
+                scroll: false,
+              }
+            : {
+                del: key === "link" ? ["domain", "key", "url"] : key,
+                scroll: false,
+              },
       ),
     [queryParams, selectedTagIds],
   );
