@@ -20,6 +20,7 @@ export type PopoverProps = PropsWithChildren<{
   onEscapeKeyDown?: (event: KeyboardEvent) => void;
   onWheel?: WheelEventHandler;
   sideOffset?: number;
+  ariaLabel?: string;
 }>;
 
 export function Popover({
@@ -37,6 +38,7 @@ export function Popover({
   onEscapeKeyDown,
   onWheel,
   sideOffset = 8,
+  ariaLabel,
 }: PopoverProps) {
   const { isMobile } = useMediaQuery();
 
@@ -93,6 +95,7 @@ export function Popover({
           onOpenAutoFocus={onOpenAutoFocus}
           onEscapeKeyDown={onEscapeKeyDown}
           onWheel={onWheel}
+          aria-label={ariaLabel || "Popover content"}
         >
           {content}
         </PopoverPrimitive.Content>
