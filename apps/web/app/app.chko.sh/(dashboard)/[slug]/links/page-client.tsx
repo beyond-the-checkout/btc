@@ -37,7 +37,7 @@ import {
   TooltipContent,
   useRouterStuff,
 } from "@dub/ui";
-import { Download, Globe, TableIcon, Tag } from "@dub/ui/icons";
+import { Download, TableIcon, Tag } from "@dub/ui/icons";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
@@ -276,71 +276,8 @@ const MoreLinkOptions = () => {
           <div className="w-full md:w-52">
             <div className="grid gap-px p-2">
               <p className="mb-1.5 mt-1 flex items-center gap-2 px-1 text-xs font-medium text-neutral-500">
-                Import Links
+                Import URLs
               </p>
-              <ImportOption
-                onClick={() => {
-                  setOpenPopover(false);
-                  queryParams({
-                    set: {
-                      import: "bitly",
-                    },
-                  });
-                }}
-              >
-                <IconMenu
-                  text="Import from Bitly"
-                  icon={
-                    <img
-                      src="https://assets.dub.co/misc/icons/bitly.svg"
-                      alt="Bitly logo"
-                      className="h-4 w-4"
-                    />
-                  }
-                />
-              </ImportOption>
-              <ImportOption
-                onClick={() => {
-                  setOpenPopover(false);
-                  queryParams({
-                    set: {
-                      import: "rebrandly",
-                    },
-                  });
-                }}
-              >
-                <IconMenu
-                  text="Import from Rebrandly"
-                  icon={
-                    <img
-                      src="https://assets.dub.co/misc/icons/rebrandly.svg"
-                      alt="Rebrandly logo"
-                      className="h-4 w-4"
-                    />
-                  }
-                />
-              </ImportOption>
-              <ImportOption
-                onClick={() => {
-                  setOpenPopover(false);
-                  queryParams({
-                    set: {
-                      import: "short",
-                    },
-                  });
-                }}
-              >
-                <IconMenu
-                  text="Import from Short.io"
-                  icon={
-                    <img
-                      src="https://assets.dub.co/misc/icons/short.svg"
-                      alt="Short.io logo"
-                      className="h-4 w-4"
-                    />
-                  }
-                />
-              </ImportOption>
               <ImportOption
                 onClick={() => {
                   setOpenPopover(false);
@@ -356,12 +293,6 @@ const MoreLinkOptions = () => {
                   icon={<TableIcon className="size-4" />}
                 />
               </ImportOption>
-            </div>
-            <div className="border-t border-neutral-200" />
-            <div className="grid gap-px p-2">
-              <p className="mb-1.5 mt-1 flex items-center gap-2 px-1 text-xs font-medium text-neutral-500">
-                Export Links
-              </p>
               <button
                 onClick={() => {
                   setOpenPopover(false);
