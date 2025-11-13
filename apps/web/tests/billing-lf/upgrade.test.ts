@@ -1,4 +1,4 @@
-import { UpgradeResponse } from "@/lib/billing-lf/types";
+import { UpgradeResponse, UpgradeResponseT } from "@/lib/billing-lf/types";
 import { APP_DOMAIN } from "@dub/utils";
 import { describe, expect, test } from "vitest";
 import { IntegrationHarness } from "../utils/integration";
@@ -43,7 +43,7 @@ describe.skipIf(skipE2E).sequential("POST /billing-lf/upgrade", async () => {
   });
 
   test("accepts valid APP_DOMAIN baseUrl", async () => {
-    const { status, data } = await http.post<UpgradeResponse>({
+    const { status, data } = await http.post<UpgradeResponseT>({
       path: `/workspaces/${slug}/billing-lf/upgrade`,
       body: {
         plan: "business",
@@ -79,7 +79,7 @@ describe.skipIf(skipE2E).sequential("POST /billing-lf/upgrade", async () => {
   });
 
   test("supports onboarding parameter", async () => {
-    const { status, data } = await http.post<UpgradeResponse>({
+    const { status, data } = await http.post<UpgradeResponseT>({
       path: `/workspaces/${slug}/billing-lf/upgrade`,
       body: {
         plan: "base",
