@@ -6,6 +6,7 @@ import { Menu3 } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { useContext } from "react";
 import AnalyticsProvider, { AnalyticsContext } from "../analytics-provider";
+import { getEventDisplayLabel } from "../display-labels";
 import Toggle from "../toggle";
 import EventsTable from "./events-table";
 import EventsTabs from "./events-tabs";
@@ -56,7 +57,7 @@ function EventsTableContainer() {
         <EmptyState
           icon={Menu3}
           title="Real-time Events Stream"
-          description={`Want more data on your link ${selectedTab === "clicks" ? "scans" : selectedTab}? Upgrade to our Business Plan to get a detailed, real-time stream of events in your workspace.`}
+          description={`Want more data on your link ${getEventDisplayLabel(selectedTab, { case: "lower" })}? Upgrade to our Business Plan to get a detailed, real-time stream of events in your workspace.`}
           learnMore="https://d.to/events"
           buttonText="Upgrade to Business"
           buttonLink={`/${slug}/upgrade`}

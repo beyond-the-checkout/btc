@@ -1,10 +1,11 @@
 import { editQueryString } from "@/lib/analytics/utils";
 import { MiniAreaChart, useMediaQuery, useRouterStuff } from "@dub/ui";
-import { capitalize, cn, fetcher } from "@dub/utils";
+import { cn, fetcher } from "@dub/utils";
 import NumberFlow from "@number-flow/react";
 import { useCallback, useContext, useEffect } from "react";
 import useSWRImmutable from "swr/immutable";
 import { AnalyticsContext } from "../analytics-provider";
+import { getEventDisplayLabel } from "../display-labels";
 
 type TimeseriesData = {
   start: Date;
@@ -94,7 +95,7 @@ export default function EventsTabs() {
         >
           <div>
             <p className="text-sm text-neutral-600">
-              {event === "clicks" ? "Scans" : capitalize(event)}
+              {getEventDisplayLabel(event)}
             </p>
             <div className="mt-2">
               {totalEvents ? (

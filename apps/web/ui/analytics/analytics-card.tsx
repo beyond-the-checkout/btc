@@ -8,7 +8,7 @@ import {
   ToggleGroup,
   useMediaQuery,
 } from "@dub/ui";
-import { CursorRays, InvoiceDollar, UserCheck } from "@dub/ui/icons";
+import { InvoiceDollar, QRCode, UserCheck } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { ChevronsUpDown } from "lucide-react";
 import {
@@ -19,6 +19,7 @@ import {
   useState,
 } from "react";
 import { AnalyticsContext } from "./analytics-provider";
+import { getEventDisplayLabel } from "./display-labels";
 
 export function AnalyticsCard<T extends string>({
   tabs,
@@ -73,9 +74,11 @@ export function AnalyticsCard<T extends string>({
             ) : event === "leads" ? (
               <UserCheck className="h-4 w-4" />
             ) : (
-              <CursorRays className="h-4 w-4" />
+              <QRCode className="h-4 w-4" />
             )}
-            <p className="text-xs uppercase">{event}</p>
+            <p className="text-xs uppercase">
+              {getEventDisplayLabel(event).toUpperCase()}
+            </p>
           </div>
         </div>
         {subTabs && selectedSubTabId && onSelectSubTab && (
@@ -149,9 +152,11 @@ export function AnalyticsCard<T extends string>({
             ) : event === "leads" ? (
               <UserCheck className="hidden h-4 w-4 sm:block" />
             ) : (
-              <CursorRays className="hidden h-4 w-4 sm:block" />
+              <QRCode className="hidden h-4 w-4 sm:block" />
             )}
-            <p className="text-xs uppercase">{event}</p>
+            <p className="text-xs uppercase">
+              {getEventDisplayLabel(event).toUpperCase()}
+            </p>
           </div>
         </div>
         <AnimatedSizeContainer

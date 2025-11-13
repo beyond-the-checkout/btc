@@ -9,6 +9,7 @@ import NumberFlow, { NumberFlowGroup } from "@number-flow/react";
 import { ChevronRight, Lock } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { EVENT_LABELS } from "./display-labels";
 
 type Tab = {
   id: EventType;
@@ -41,7 +42,7 @@ export function AnalyticsTabs({
       [
         {
           id: "clicks",
-          label: "Scans",
+          label: EVENT_LABELS.clicks,
           colorClassName: "text-blue-500/50",
           conversions: false,
         },

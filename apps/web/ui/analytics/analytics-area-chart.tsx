@@ -10,6 +10,7 @@ import { Fragment, useContext, useMemo } from "react";
 import useSWR from "swr";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
+import { getEventDisplayLabel } from "./display-labels";
 
 const DEMO_DATA = [
   180, 230, 320, 305, 330, 290, 340, 310, 380, 360, 270, 360, 280, 270, 350,
@@ -157,7 +158,7 @@ export default function AnalyticsAreaChart({
                         />
                       )}
                       <p className="capitalize text-neutral-600">
-                        {resource === "clicks" ? "scans" : resource}
+                        {getEventDisplayLabel(resource, { case: "lower" })}
                       </p>
                     </div>
                     <p className="text-right font-medium text-neutral-900">

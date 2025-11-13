@@ -10,6 +10,7 @@ import { AnalyticsFunnelChart } from "./analytics-funnel-chart";
 import { AnalyticsContext } from "./analytics-provider";
 import { AnalyticsTabs } from "./analytics-tabs";
 import { ChartViewSwitcher } from "./chart-view-switcher";
+import { EVENT_LABELS } from "./display-labels";
 
 type Tab = {
   id: EventType;
@@ -35,7 +36,7 @@ export default function Main() {
       [
         {
           id: "clicks",
-          label: "Scans",
+          label: EVENT_LABELS.clicks,
           colorClassName: "text-blue-500/50",
           conversions: false,
         },

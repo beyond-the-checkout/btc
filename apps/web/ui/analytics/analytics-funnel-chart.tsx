@@ -2,6 +2,7 @@ import { FunnelChart } from "@dub/ui/charts";
 import { useContext, useMemo } from "react";
 import { AnalyticsLoadingSpinner } from "./analytics-loading-spinner";
 import { AnalyticsContext } from "./analytics-provider";
+import { EVENT_LABELS } from "./display-labels";
 
 export function AnalyticsFunnelChart({ demo = false }: { demo?: boolean }) {
   const { totalEvents, showConversions } = useContext(AnalyticsContext);
@@ -9,7 +10,7 @@ export function AnalyticsFunnelChart({ demo = false }: { demo?: boolean }) {
   const baseSteps = [
     {
       id: "clicks",
-      label: "Scans",
+      label: EVENT_LABELS.clicks,
       value: demo ? 130 : totalEvents?.clicks ?? 0,
       colorClassName: "text-blue-600",
     },
