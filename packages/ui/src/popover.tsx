@@ -2,6 +2,7 @@
 
 import { cn } from "@dub/utils";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { PropsWithChildren, ReactNode, WheelEventHandler } from "react";
 import { Drawer } from "vaul";
 import { useMediaQuery } from "./hooks";
@@ -63,6 +64,12 @@ export function Popover({
               }
             }}
           >
+            <VisuallyHidden.Root>
+              <Drawer.Title>Popover</Drawer.Title>
+              <Drawer.Description>
+                {typeof content === "string" ? content : "Popover content"}
+              </Drawer.Description>
+            </VisuallyHidden.Root>
             <div className="sticky top-0 z-20 flex w-full items-center justify-center rounded-t-[10px] bg-inherit">
               <div className="bg-border-default my-3 h-1 w-12 rounded-full" />
             </div>
