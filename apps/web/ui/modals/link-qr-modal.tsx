@@ -1,29 +1,10 @@
-import { DotType, getQRAsCanvas, getQRAsSVGDataUri, getQRData } from "@/lib/qr";
-import {
-  CORNER_DOT_TYPES,
-  CORNER_SQUARE_TYPES,
-  CornerDotType,
-  CornerSquareType,
-  DOT_TYPES,
-  FrameType,
-} from "@/lib/qr/constants";
-import {
-  generateCornerDotPath,
-  generateCornerSquarePath,
-} from "@/lib/qr/eye-patterns";
-import { frameStyleToFrameType } from "@/lib/qr/types";
+import { getQRAsCanvas, getQRAsSVGDataUri, getQRData, DotType } from "@/lib/qr";
+import { DOT_TYPES, CORNER_SQUARE_TYPES, CORNER_DOT_TYPES, CornerSquareType, CornerDotType } from "@/lib/qr/constants";
 import { generatePath } from "@/lib/qr/utils";
+import { generateCornerSquarePath, generateCornerDotPath } from "@/lib/qr/eye-patterns";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
-import { getItemFromLocalStorage } from "@/ui/hooks/use-local-storage";
-import type { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
-import { useLinkDrafts } from "@/ui/modals/link-builder/use-link-drafts";
-import {
-  DEFAULT_QR_CODE_DESIGN,
-  migrateQRCodeDesign,
-  QRCodeDesign,
-} from "@/ui/modals/link-qr-modal.types";
 import { QRCode } from "@/ui/shared/qr-code";
 import {
   Button,
@@ -40,6 +21,7 @@ import {
   useCopyToClipboard,
   useMediaQuery,
 } from "@dub/ui";
+import { useLocalStorage } from "@/ui/hooks/use-local-storage";
 import {
   Check,
   Check2,
@@ -49,13 +31,8 @@ import {
   Hyperlink,
   Photo,
 } from "@dub/ui/icons";
-import {
-  API_DOMAIN,
-  cn,
-  DUB_QR_LOGO,
-  linkConstructor,
-  nanoid,
-} from "@dub/utils";
+import { API_DOMAIN, cn, DUB_QR_LOGO, linkConstructor } from "@dub/utils";
+import { frameStyleToFrameType } from "@/lib/qr/types";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Dispatch,
@@ -72,6 +49,7 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";
+import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 export type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 
 const DEFAULT_COLORS = [
@@ -86,13 +64,7 @@ const DEFAULT_COLORS = [
 ];
 
 // Pattern preview using actual QR rendering functions
-function PatternPreview({
-  pattern,
-  color,
-}: {
-  pattern: DotType;
-  color: string;
-}) {
+function PatternPreview({ pattern, color }: { pattern: DotType; color: string }) {
   const size = 32;
 
   // Create a small module grid with an S-pattern to demonstrate the pattern style
@@ -101,10 +73,10 @@ function PatternPreview({
   //   X
   // X X X
   const modules: boolean[][] = [
-    [true, true, true],
-    [true, false, false],
-    [false, true, false],
-    [true, true, true],
+    [true,  true,  true],
+    [true,  false, false],
+    [false, true,  false],
+    [true,  true,  true],
   ];
 
   // Use the actual generatePath function from our QR rendering
@@ -128,13 +100,7 @@ function PatternPreview({
 }
 
 // Corner Square preview (7x7 outer frame)
-function CornerSquarePreview({
-  type,
-  color,
-}: {
-  type: CornerSquareType;
-  color: string;
-}) {
+function CornerSquarePreview({ type, color }: { type: CornerSquareType; color: string }) {
   const size = 32;
   const eyeSize = 7;
 
@@ -153,24 +119,13 @@ function CornerSquarePreview({
       fill="none"
       preserveAspectRatio="xMidYMid meet"
     >
-      <path
-        d={path}
-        fill={color}
-        fillRule="evenodd"
-        shapeRendering="crispEdges"
-      />
+      <path d={path} fill={color} fillRule="evenodd" shapeRendering="crispEdges" />
     </svg>
   );
 }
 
 // Corner Dot preview (3x3 inner dot)
-function CornerDotPreview({
-  type,
-  color,
-}: {
-  type: CornerDotType;
-  color: string;
-}) {
+function CornerDotPreview({ type, color }: { type: CornerDotType; color: string }) {
   const size = 32;
   const eyeSize = 7;
 
@@ -194,129 +149,6 @@ function CornerDotPreview({
   );
 }
 
-// Frame preview component
-function FramePreview({ type, color }: { type: FrameType; color: string }) {
-  const size = 32;
-  const viewBoxSize = 24;
-  const padding = 2;
-  const innerSize = viewBoxSize - padding * 2;
-  const borderWidth = 1.5;
-
-  if (type === "none") {
-    // Show a simple square with an X through it to indicate "no frame"
-    return (
-      <svg
-        width={size}
-        height={size}
-        viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
-        fill="none"
-      >
-        <rect
-          x={padding}
-          y={padding}
-          width={innerSize}
-          height={innerSize}
-          fill="#f5f5f5"
-          stroke={color}
-          strokeWidth={borderWidth}
-          opacity={0.5}
-        />
-        <line
-          x1={padding}
-          y1={padding}
-          x2={viewBoxSize - padding}
-          y2={viewBoxSize - padding}
-          stroke={color}
-          strokeWidth={borderWidth}
-          opacity={0.5}
-        />
-        <line
-          x1={viewBoxSize - padding}
-          y1={padding}
-          x2={padding}
-          y2={viewBoxSize - padding}
-          stroke={color}
-          strokeWidth={borderWidth}
-          opacity={0.5}
-        />
-      </svg>
-    );
-  }
-
-  // Create a small QR-like pattern in the center
-  const qrSize = innerSize - 4;
-  const qrX = padding + 2;
-  const qrY = padding + 2;
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
-      fill="none"
-    >
-      {/* Inner QR pattern */}
-      <rect x={qrX} y={qrY} width={qrSize} height={qrSize} fill="#f5f5f5" />
-
-      {/* Frame based on type */}
-      {type === "square" && (
-        <rect
-          x={padding}
-          y={padding}
-          width={innerSize}
-          height={innerSize}
-          fill="none"
-          stroke={color}
-          strokeWidth={borderWidth}
-        />
-      )}
-
-      {type === "rounded-square" && (
-        <rect
-          x={padding}
-          y={padding}
-          width={innerSize}
-          height={innerSize}
-          rx={3}
-          ry={3}
-          fill="none"
-          stroke={color}
-          strokeWidth={borderWidth}
-        />
-      )}
-
-      {type === "circle" && (
-        <circle
-          cx={viewBoxSize / 2}
-          cy={viewBoxSize / 2}
-          r={(innerSize / 2) * 0.9}
-          fill="none"
-          stroke={color}
-          strokeWidth={borderWidth}
-        />
-      )}
-
-      {type === "dots-circle" && (
-        <>
-          {Array.from({ length: 16 }).map((_, i) => {
-            const angle = (i / 16) * Math.PI * 2;
-            const circleCenterRadius = (innerSize / 2) * 0.9;
-            const dotRadius = 0.8;
-            // Match the outer extent of the solid circle: adjust dot centers
-            const dotCenterRadius =
-              circleCenterRadius - (dotRadius - borderWidth / 2);
-            const cx = viewBoxSize / 2 + Math.cos(angle) * dotCenterRadius;
-            const cy = viewBoxSize / 2 + Math.sin(angle) * dotCenterRadius;
-            return (
-              <circle key={i} cx={cx} cy={cy} r={dotRadius} fill={color} />
-            );
-          })}
-        </>
-      )}
-    </svg>
-  );
-}
-
 // Using shared QRCodeDesign from link-qr-modal.types
 
 type LinkQRModalProps = {
@@ -334,7 +166,7 @@ function LinkQRModal(
     <Modal
       showModal={props.showLinkQRModal}
       setShowModal={props.setShowLinkQRModal}
-      className="max-w-screen-lg"
+      className="max-w-[500px]"
     >
       <LinkQRModalInner {...props} />
     </Modal>
@@ -364,21 +196,50 @@ function LinkQRModalInner({
       : undefined;
   }, [props.key, props.domain]);
 
-  // Use link drafts for QR customization storage
-  const { drafts, saveDraft } = useLinkDrafts({
-    linkId: props.id,
-    workspaceId: workspaceId || "",
-  });
+  // Use per-link localStorage key instead of workspace-level
+  // This ensures each link has its own QR customization
+  const localStorageKey = props.domain && props.key
+    ? `qr-code-design-${props.domain}-${props.key}`
+    : `qr-code-design-new-link`; // Fallback for links being created
 
-  const latestLinkDraft = drafts[0];
-
-  const baseDesign = useMemo(
-    () =>
-      migrateQRCodeDesign(latestLinkDraft?.qrDesign ?? DEFAULT_QR_CODE_DESIGN),
-    [latestLinkDraft?.qrDesign],
+  const [rawData, setData] = useLocalStorage<QRCodeDesign>(
+    localStorageKey,
+    {
+      fgColor: "#000000",
+      qrHideLogo: false,
+      qrDotType: "square",
+      qrCornerSquareType: "square",
+      qrCornerDotType: "square",
+      qrShape: "square",
+      hasFrame: false,
+      qrFrameStyle: undefined,
+      qrFrameColor: undefined,
+      qrDotsColor: undefined,
+      qrCornerSquareColor: undefined,
+      qrCornerDotColor: undefined,
+    },
   );
 
-  // Using shared migrateQRCodeDesign from link-qr-modal.types
+  // Migrate any legacy keys and provide defaults for missing fields
+  const baseDesign = useMemo(() => {
+    const d = rawData || ({} as Partial<QRCodeDesign>);
+    const migrated: QRCodeDesign = {
+      fgColor: d.fgColor ?? "#000000",
+      qrHideLogo: d.qrHideLogo ?? (d as any).hideLogo ?? false,
+      qrDotType: d.qrDotType ?? (d as any).dotType ?? "square",
+      qrCornerSquareType: d.qrCornerSquareType ?? (d as any).cornerSquareType ?? "square",
+      qrCornerDotType: d.qrCornerDotType ?? (d as any).cornerDotType ?? "square",
+      qrShape: d.qrShape ?? "square",
+      hasFrame: Boolean(d.qrFrameStyle ?? (d as any).frameStyle),
+      qrFrameStyle:
+        (d.qrFrameStyle ?? ((d as any).frameStyle === "none" ? undefined : (d as any).frameStyle)) ?? undefined,
+      qrFrameColor: d.qrFrameColor ?? (d as any).frameColor ?? undefined,
+      qrDotsColor: d.qrDotsColor ?? (d as any).dotsColor ?? undefined,
+      qrCornerSquareColor: d.qrCornerSquareColor ?? (d as any).cornerSquareColor ?? undefined,
+      qrCornerDotColor: d.qrCornerDotColor ?? (d as any).cornerDotColor ?? undefined,
+    };
+    return migrated;
+  }, [rawData]);
 
   // Local draft state: edits apply here and only persist on Save
   const [draft, setDraft] = useState<QRCodeDesign>(baseDesign);
@@ -398,7 +259,7 @@ function LinkQRModalInner({
           color: draft.qrFrameColor || draft.fgColor,
         }
       : undefined;
-  }, [draft.qrFrameStyle, draft.qrShape, draft.qrFrameColor, draft.fgColor]);
+  }, [draft.qrFrameStyle, draft.qrFrameColor, draft.fgColor]);
 
   const hideLogo = draft.qrHideLogo && plan !== "free";
   const logo =
@@ -409,7 +270,7 @@ function LinkQRModalInner({
       url
         ? getQRData({
             url,
-            fgColor: draft.qrDotsColor || draft.fgColor, // Use dotsColor if available, fallback to fgColor
+            fgColor: draft.qrDotsColor || draft.fgColor,
             hideLogo,
             logo,
             qrShape: draft.qrShape,
@@ -451,59 +312,6 @@ function LinkQRModalInner({
     [qrData, frameOptions],
   );
 
-  const persistQRCodeDesign = useCallback(
-    (design: QRCodeDesign) => {
-      const draftId = latestLinkDraft?.id ?? nanoid();
-      const linkPartial: Partial<LinkFormData> = {
-        id: props.id,
-        key: props.key,
-        domain: props.domain,
-      };
-      saveDraft(draftId, linkPartial, design);
-    },
-    [latestLinkDraft?.id, saveDraft, props.id, props.key, props.domain],
-  );
-
-  // One-time migration from legacy per-link localStorage keys
-  const hasMigratedLegacy = useRef(false);
-
-  useEffect(() => {
-    if (!showLinkQRModal || hasMigratedLegacy.current) return;
-
-    // Recreate the old key logic
-    const legacyKey =
-      props.domain && props.key
-        ? `qr-code-design-${props.domain}-${props.key}`
-        : `qr-code-design-new-link`;
-
-    const legacy = getItemFromLocalStorage(legacyKey);
-
-    // Skip if no legacy data or if we already have a design in drafts
-    if (!legacy || latestLinkDraft?.qrDesign) {
-      hasMigratedLegacy.current = true;
-      return;
-    }
-
-    // Migrate the legacy design into drafts
-    const migratedDesign = migrateQRCodeDesign(legacy);
-    persistQRCodeDesign(migratedDesign);
-
-    // Clean up the old localStorage key
-    try {
-      window.localStorage.removeItem(legacyKey);
-    } catch {
-      // Ignore errors (SSR, quota, etc.)
-    }
-
-    hasMigratedLegacy.current = true;
-  }, [
-    showLinkQRModal,
-    latestLinkDraft?.qrDesign,
-    props.domain,
-    props.key,
-    persistQRCodeDesign,
-  ]);
-
   const onColorChange = useDebouncedCallback(
     (color: string) =>
       setDraft((d) => ({
@@ -523,749 +331,614 @@ function LinkQRModalInner({
 
   return (
     <form
-      className="flex flex-col"
+      className="flex flex-col gap-6 p-4"
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
         // Flush any pending debounced updates before closing
-        // so the last change (e.g., color) persists
         // @ts-ignore - flush is provided by use-debounce
         onColorChange.flush?.();
         // @ts-ignore - flush is provided by use-debounce
         onFrameColorChange.flush?.();
-        // Persist final draft state
-        persistQRCodeDesign(draft);
+        // Persist final draft state to localStorage
+        setData(draft);
         setShowLinkQRModal(false);
-
-        // Persisted via link drafts storage
-        // onSave callback available for potential server persistence
         onSave?.(draft);
       }}
     >
-      {/* Sticky header */}
-      <div className="sticky top-0 z-10 border-b border-neutral-200 bg-white px-5 py-4">
-        <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-medium">QR Code</h3>
+          <BaseBadgeTooltip
+            content={
+              <SimpleTooltipContent
+                title="Set a custom QR code design to improve click-through rates."
+                cta="Learn more."
+                href="https://dub.co/help/article/custom-qr-codes"
+              />
+            }
+          />
+        </div>
+        <div className="max-md:hidden">
+          <Tooltip
+            content={
+              <div className="px-2 py-1 text-xs text-neutral-700">
+                Press{" "}
+                <strong className="font-medium text-neutral-950">Q</strong> to
+                open this quickly
+              </div>
+            }
+            side="right"
+          >
+            <kbd className="flex size-6 cursor-default items-center justify-center rounded-md border border-neutral-200 font-sans text-xs text-neutral-950">
+              Q
+            </kbd>
+          </Tooltip>
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-medium">QR Code</h3>
-            <BaseBadgeTooltip
+            <span className="text-sm font-medium text-neutral-700">
+              QR Code Preview
+            </span>
+            <InfoTooltip
               content={
-                <SimpleTooltipContent title="Set a custom QR code design to improve click-through rates." />
+                <SimpleTooltipContent
+                  title="Customize your QR code to fit your brand."
+                  cta="Learn more."
+                  href="https://dub.co/help/article/custom-qr-codes"
+                />
               }
             />
           </div>
-          <div className="max-md:hidden">
-            <Tooltip
-              content={
-                <div className="px-2 py-1 text-xs text-neutral-700">
-                  Press{" "}
-                  <strong className="font-medium text-neutral-950">Q</strong> to
-                  open this quickly
+          {url && qrDataForActions && (
+            <div className="flex items-center gap-2">
+              <DownloadPopover qrData={qrDataForActions} props={props}>
+                <div>
+                  <ButtonTooltip
+                    tooltipProps={{
+                      content: "Download QR code",
+                    }}
+                  >
+                    <Download className="h-4 w-4 text-neutral-500" />
+                  </ButtonTooltip>
                 </div>
-              }
-              side="right"
-            >
-              <kbd className="flex size-6 cursor-default items-center justify-center rounded-md border border-neutral-200 font-sans text-xs text-neutral-950">
-                Q
-              </kbd>
-            </Tooltip>
-          </div>
+              </DownloadPopover>
+              <CopyPopover qrData={qrDataForActions} props={props}>
+                <div>
+                  <ButtonTooltip
+                    tooltipProps={{
+                      content: "Copy QR code",
+                    }}
+                  >
+                    <Copy className="h-4 w-4 text-neutral-500" />
+                  </ButtonTooltip>
+                </div>
+              </CopyPopover>
+            </div>
+          )}
+        </div>
+        <div className="relative mt-2 flex h-52 items-center justify-center overflow-hidden rounded-md border border-neutral-300">
+          {!isMobile && (
+            <ShimmerDots className="opacity-30 [mask-image:radial-gradient(40%_80%,transparent_50%,black)]" />
+          )}
+          {url && (
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={
+                  draft.fgColor +
+                  draft.qrHideLogo +
+                  draft.qrDotType +
+                  draft.qrCornerSquareType +
+                  draft.qrCornerDotType +
+                  draft.qrShape +
+                  draft.hasFrame +
+                  draft.qrFrameStyle +
+                  draft.qrFrameColor
+                }
+                initial={{ filter: "blur(2px)", opacity: 0.4 }}
+                animate={{ filter: "blur(0px)", opacity: 1 }}
+                exit={{ filter: "blur(2px)", opacity: 0.4 }}
+                transition={{ duration: 0.1 }}
+                className="relative flex size-full items-center justify-center"
+              >
+                <QRCode
+                  url={url}
+                  fgColor={draft.fgColor}
+                  hideLogo={draft.qrHideLogo}
+                  logo={logo}
+                  scale={1}
+                  qrShape={draft.qrShape}
+                  dotsOptions={{
+                    type: draft.qrDotType,
+                    color: draft.fgColor,
+                  }}
+                  eyeOptions={{
+                    cornerSquare: {
+                      type: draft.qrCornerSquareType,
+                      color: draft.fgColor,
+                    },
+                    cornerDot: {
+                      type: draft.qrCornerDotType,
+                      color: draft.fgColor,
+                    },
+                  }}
+                  frameOptions={frameOptions}
+                />
+              </motion.div>
+            </AnimatePresence>
+          )}
         </div>
       </div>
 
-      {/* Responsive grid: desktop 2fr/1fr; mobile scroll container */}
-      <div
-        className={cn(
-          "grid w-full gap-y-6 max-md:overflow-auto md:grid-cols-[2fr_1fr]",
-          "max-md:max-h-[calc(100dvh-200px)] max-md:min-h-[min(566px,_calc(100dvh-200px))]",
-          "md:[&>div]:max-h-[calc(100dvh-200px)] md:[&>div]:min-h-[min(566px,_calc(100dvh-200px))]",
-        )}
-      >
-        {/* Left column: controls (independently scrollable on desktop) */}
-        <div className="scrollbar-hide order-2 px-6 md:order-1 md:overflow-auto">
-          <div className="flex min-h-full flex-col gap-6 py-4">
-            {/* Logo toggle */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <label
-                  className="text-sm font-medium text-neutral-700"
-                  htmlFor={`${id}-show-logo`}
-                >
-                  Logo
-                </label>
-                <InfoTooltip
-                  content={
-                    <SimpleTooltipContent title="Display your logo in the center of the QR code." />
-                  }
-                />
-              </div>
-              <Switch
-                id={`${id}-hide-logo`}
-                checked={!draft.qrHideLogo}
-                fn={() => {
-                  setDraft((d) => ({ ...d, qrHideLogo: !d.qrHideLogo }));
-                }}
-                disabledTooltip={
-                  !plan || plan === "free" ? (
-                    <TooltipContent
-                      title="You need to be on the Base plan and above to customize your QR Code logo."
-                      cta="Upgrade to Base"
-                      href={
-                        slug ? `/${slug}/upgrade` : "https://dub.co/pricing"
-                      }
-                      target="_blank"
-                    />
-                  ) : undefined
-                }
-                thumbIcon={
-                  !plan || plan === "free" ? (
-                    <CrownSmall className="size-full text-neutral-500" />
-                  ) : undefined
-                }
+      {/* Logo toggle */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <label
+            className="text-sm font-medium text-neutral-700"
+            htmlFor={`${id}-show-logo`}
+          >
+            Logo
+          </label>
+          <InfoTooltip
+            content={
+              <SimpleTooltipContent
+                title="Display your logo in the center of the QR code."
+                cta="Learn more."
+                href="https://dub.co/help/article/custom-qr-codes"
               />
-            </div>
+            }
+          />
+        </div>
+        <Switch
+          id={`${id}-hide-logo`}
+          checked={!draft.qrHideLogo}
+          fn={() => {
+            setDraft((d) => ({ ...d, qrHideLogo: !d.qrHideLogo }));
+          }}
+          disabledTooltip={
+            !plan || plan === "free" ? (
+              <TooltipContent
+                title="You need to be on the Base plan and above to customize your QR Code logo."
+                cta="Upgrade to Base"
+                href={slug ? `/${slug}/upgrade` : "https://dub.co/pricing"}
+                target="_blank"
+              />
+            ) : undefined
+          }
+          thumbIcon={
+            !plan || plan === "free" ? (
+              <CrownSmall className="size-full text-neutral-500" />
+            ) : undefined
+          }
+        />
+      </div>
 
-            {/* Dot Pattern selector */}
-            <div>
-              <span className="mb-2 block text-sm font-medium text-neutral-700">
-                Dot Pattern
-              </span>
-              <div className="flex flex-wrap items-center gap-3">
-                {DOT_TYPES.map((pattern) => {
-                  const isSelected = draft.qrDotType === pattern;
-                  const patternLabels: Record<DotType, string> = {
-                    square: "Square",
-                    rounded: "Rounded",
-                    dots: "Dots",
-                    classy: "Classy",
-                    "extra-rounded": "Extra Rounded",
-                  };
-                  return (
-                    <Tooltip key={pattern} content={patternLabels[pattern]}>
-                      <button
-                        type="button"
-                        aria-pressed={isSelected}
-                        aria-label={`Select ${patternLabels[pattern]} pattern`}
-                        onClick={() =>
-                          setDraft((d) => ({ ...d, qrDotType: pattern }))
-                        }
-                        className={cn(
-                          "flex size-12 items-center justify-center rounded-md border transition-all",
-                          isSelected
-                            ? "border-black bg-neutral-50 ring-1 ring-black"
-                            : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                        )}
-                      >
-                        <PatternPreview
-                          pattern={pattern}
-                          color={draft.fgColor}
-                        />
-                      </button>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Eye Pattern selectors */}
-            <div>
-              <span className="block text-sm font-medium text-neutral-700">
-                Corner Eyes
-              </span>
-              <div className="mt-3 space-y-3">
-                {/* Outer Frame (Corner Square) */}
-                <div>
-                  <label className="mb-2 block text-xs font-medium text-neutral-600">
-                    Outer Frame
-                  </label>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {CORNER_SQUARE_TYPES.map((type) => {
-                      const isSelected = draft.qrCornerSquareType === type;
-                      const typeLabels: Record<CornerSquareType, string> = {
-                        square: "Square",
-                        rounded: "Rounded",
-                        dots: "Circle",
-                        "extra-rounded": "Extra Rounded",
-                        leaf: "Leaf",
-                      };
-                      return (
-                        <Tooltip key={type} content={typeLabels[type]}>
-                          <button
-                            type="button"
-                            aria-pressed={isSelected}
-                            aria-label={`Select ${typeLabels[type]} outer frame`}
-                            onClick={() =>
-                              setDraft((d) => ({
-                                ...d,
-                                qrCornerSquareType: type,
-                              }))
-                            }
-                            className={cn(
-                              "flex size-12 items-center justify-center rounded-md border transition-all",
-                              isSelected
-                                ? "border-black bg-neutral-50 ring-1 ring-black"
-                                : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                            )}
-                          >
-                            <CornerSquarePreview
-                              type={type}
-                              color={draft.fgColor}
-                            />
-                          </button>
-                        </Tooltip>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Inner Dot (Corner Dot) */}
-                <div>
-                  <label className="mb-2 block text-xs font-medium text-neutral-600">
-                    Inner Dot
-                  </label>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {CORNER_DOT_TYPES.map((type) => {
-                      const isSelected = draft.qrCornerDotType === type;
-                      const typeLabels: Record<CornerDotType, string> = {
-                        square: "Square",
-                        dots: "Circle",
-                        rounded: "Rounded",
-                      };
-                      return (
-                        <Tooltip key={type} content={typeLabels[type]}>
-                          <button
-                            type="button"
-                            aria-pressed={isSelected}
-                            aria-label={`Select ${typeLabels[type]} inner dot`}
-                            onClick={() =>
-                              setDraft((d) => ({ ...d, qrCornerDotType: type }))
-                            }
-                            className={cn(
-                              "flex size-12 items-center justify-center rounded-md border transition-all",
-                              isSelected
-                                ? "border-black bg-neutral-50 ring-1 ring-black"
-                                : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                            )}
-                          >
-                            <CornerDotPreview
-                              type={type}
-                              color={draft.fgColor}
-                            />
-                          </button>
-                        </Tooltip>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* QR Shape selector */}
-            <div>
-              <span className="mb-2 block text-sm font-medium text-neutral-700">
-                QR Code Shape
-              </span>
-              <div className="flex items-center gap-3">
-                <Tooltip content="Square">
-                  <button
-                    type="button"
-                    aria-pressed={draft.qrShape === "square"}
-                    aria-label="Select square shape"
-                    onClick={() =>
-                      setDraft((d) => {
-                        // Auto-convert circle frames to square frames when switching shape
-                        const newFrameStyle = d.qrFrameStyle
-                          ? d.qrFrameStyle === "solid-circle" ||
-                            d.qrFrameStyle === "dotted-circle"
-                            ? "square" // Convert circle frame to default square frame
-                            : d.qrFrameStyle // Keep existing square frame (square/rounded)
-                          : undefined; // Keep no frame
-                        return {
-                          ...d,
-                          qrShape: "square",
-                          qrFrameStyle: newFrameStyle,
-                        };
-                      })
-                    }
-                    className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
-                      draft.qrShape === "square"
-                        ? "border-black bg-neutral-50 ring-1 ring-black"
-                        : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                    )}
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <rect
-                        x="6"
-                        y="6"
-                        width="12"
-                        height="12"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                      />
-                    </svg>
-                  </button>
-                </Tooltip>
-                <Tooltip content="Circle">
-                  <button
-                    type="button"
-                    aria-pressed={draft.qrShape === "circle"}
-                    aria-label="Select circle shape"
-                    onClick={() =>
-                      setDraft((d) => {
-                        // Auto-convert square frames to circle frames when switching shape
-                        const newFrameStyle = d.qrFrameStyle
-                          ? d.qrFrameStyle === "square" ||
-                            d.qrFrameStyle === "rounded"
-                            ? "solid-circle" // Convert square frame to default circle frame
-                            : d.qrFrameStyle // Keep existing circle frame (solid-circle/dotted-circle)
-                          : undefined; // Keep no frame
-                        return {
-                          ...d,
-                          qrShape: "circle",
-                          qrFrameStyle: newFrameStyle,
-                        };
-                      })
-                    }
-                    className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
-                      draft.qrShape === "circle"
-                        ? "border-black bg-neutral-50 ring-1 ring-black"
-                        : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                    )}
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="6"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="none"
-                      />
-                    </svg>
-                  </button>
-                </Tooltip>
-              </div>
-            </div>
-
-            {/* Frame style selector */}
-            <div>
-              <span className="mb-2 block text-sm font-medium text-neutral-700">
-                Frame Style
-              </span>
-              <div className="flex items-center gap-3">
-                {/* No Frame option */}
-                <Tooltip content="No Frame">
-                  <button
-                    type="button"
-                    aria-pressed={draft.qrFrameStyle === undefined}
-                    aria-label="No frame"
-                    onClick={() =>
-                      setDraft((d) => ({ ...d, qrFrameStyle: undefined }))
-                    }
-                    className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
-                      draft.qrFrameStyle === undefined
-                        ? "border-black bg-neutral-50 ring-1 ring-black"
-                        : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                    )}
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <line
-                        x1="4"
-                        y1="20"
-                        x2="20"
-                        y2="4"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
-                </Tooltip>
-                {draft.qrShape === "square" ? (
-                  <>
-                    <Tooltip content="Square">
-                      <button
-                        type="button"
-                        aria-pressed={draft.qrFrameStyle === "square"}
-                        aria-label="Select square frame"
-                        onClick={() =>
-                          setDraft((d) => ({ ...d, qrFrameStyle: "square" }))
-                        }
-                        className={cn(
-                          "flex size-12 items-center justify-center rounded-md border transition-all",
-                          draft.qrFrameStyle === "square"
-                            ? "border-black bg-neutral-50 ring-1 ring-black"
-                            : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                        )}
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <rect
-                            x="6"
-                            y="6"
-                            width="12"
-                            height="12"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            fill="none"
-                          />
-                        </svg>
-                      </button>
-                    </Tooltip>
-                    <Tooltip content="Rounded">
-                      <button
-                        type="button"
-                        aria-pressed={draft.qrFrameStyle === "rounded"}
-                        aria-label="Select rounded frame"
-                        onClick={() =>
-                          setDraft((d) => ({ ...d, qrFrameStyle: "rounded" }))
-                        }
-                        className={cn(
-                          "flex size-12 items-center justify-center rounded-md border transition-all",
-                          draft.qrFrameStyle === "rounded"
-                            ? "border-black bg-neutral-50 ring-1 ring-black"
-                            : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                        )}
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <rect
-                            x="6"
-                            y="6"
-                            width="12"
-                            height="12"
-                            rx="2"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            fill="none"
-                          />
-                        </svg>
-                      </button>
-                    </Tooltip>
-                  </>
-                ) : (
-                  <>
-                    <Tooltip content="Solid Circle">
-                      <button
-                        type="button"
-                        aria-pressed={draft.qrFrameStyle === "solid-circle"}
-                        aria-label="Select solid circle frame"
-                        onClick={() =>
-                          setDraft((d) => ({
-                            ...d,
-                            qrFrameStyle: "solid-circle",
-                          }))
-                        }
-                        className={cn(
-                          "flex size-12 items-center justify-center rounded-md border transition-all",
-                          draft.qrFrameStyle === "solid-circle"
-                            ? "border-black bg-neutral-50 ring-1 ring-black"
-                            : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                        )}
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="6"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            fill="none"
-                          />
-                        </svg>
-                      </button>
-                    </Tooltip>
-                    <Tooltip content="Dotted Circle">
-                      <button
-                        type="button"
-                        aria-pressed={draft.qrFrameStyle === "dotted-circle"}
-                        aria-label="Select dotted circle frame"
-                        onClick={() =>
-                          setDraft((d) => ({
-                            ...d,
-                            qrFrameStyle: "dotted-circle",
-                          }))
-                        }
-                        className={cn(
-                          "flex size-12 items-center justify-center rounded-md border transition-all",
-                          draft.qrFrameStyle === "dotted-circle"
-                            ? "border-black bg-neutral-50 ring-1 ring-black"
-                            : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
-                        )}
-                      >
-                        <svg
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle
-                            cx="12"
-                            cy="12"
-                            r="6"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeDasharray="2 2"
-                            fill="none"
-                          />
-                        </svg>
-                      </button>
-                    </Tooltip>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Frame Color selector */}
-            <div
-              className={cn(
-                "transition-opacity",
-                !draft.qrFrameStyle && "opacity-40",
-              )}
-            >
-              <span className="mb-2 block text-sm font-medium text-neutral-700">
-                Frame Color
-              </span>
-              <div className="flex gap-6">
-                <div
+      {/* Dot Pattern selector */}
+      <div>
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
+          Dot Pattern
+        </span>
+        <div className="flex flex-wrap items-center gap-3">
+          {DOT_TYPES.map((pattern) => {
+            const isSelected = draft.qrDotType === pattern;
+            const patternLabels: Record<DotType, string> = {
+              square: "Square",
+              rounded: "Rounded",
+              dots: "Dots",
+              classy: "Classy",
+              "extra-rounded": "Extra Rounded",
+            };
+            return (
+              <Tooltip
+                key={pattern}
+                content={patternLabels[pattern]}
+              >
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  aria-label={`Select ${patternLabels[pattern]} pattern`}
+                  onClick={() => setDraft((d) => ({ ...d, qrDotType: pattern }))}
                   className={cn(
-                    "relative flex h-9 w-32 shrink-0 rounded-md shadow-sm",
-                    !draft.qrFrameStyle &&
-                      "pointer-events-none cursor-not-allowed",
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    isSelected
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
                   )}
                 >
-                  <Tooltip
-                    content={
-                      draft.qrFrameStyle ? (
-                        <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
-                          <HexColorPicker
-                            color={draft.qrFrameColor || draft.fgColor}
-                            onChange={onFrameColorChange}
-                          />
-                        </div>
-                      ) : (
-                        "Select a frame style to customize color"
-                      )
-                    }
-                  >
-                    <div
-                      className="h-full w-12 rounded-l-md border"
-                      style={{
-                        backgroundColor: draft.qrFrameColor || draft.fgColor,
-                        borderColor: draft.qrFrameColor || draft.fgColor,
-                      }}
-                    />
-                  </Tooltip>
-                  <HexColorInput
-                    color={draft.qrFrameColor || draft.fgColor}
-                    onChange={onFrameColorChange}
-                    prefixed
-                    disabled={!draft.qrFrameStyle}
-                    style={{ borderColor: draft.qrFrameColor || draft.fgColor }}
-                    className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black disabled:cursor-not-allowed disabled:bg-neutral-50 sm:text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Dots Color selector */}
-            <div>
-              <span className="block text-sm font-medium text-neutral-700">
-                Dots Color
-              </span>
-              <div className="mt-2 flex gap-6">
-                <div className="relative flex h-9 w-32 shrink-0 rounded-md shadow-sm">
-                  <Tooltip
-                    content={
-                      <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
-                        <HexColorPicker
-                          color={draft.fgColor}
-                          onChange={onColorChange}
-                        />
-                      </div>
-                    }
-                  >
-                    <div
-                      className="h-full w-12 rounded-l-md border"
-                      style={{
-                        backgroundColor: draft.fgColor,
-                        borderColor: draft.fgColor,
-                      }}
-                    />
-                  </Tooltip>
-                  <HexColorInput
-                    id="color"
-                    name="color"
+                  <PatternPreview
+                    pattern={pattern}
                     color={draft.fgColor}
-                    onChange={onColorChange}
-                    prefixed
-                    style={{ borderColor: draft.fgColor }}
-                    className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm"
                   />
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-3">
-                  {DEFAULT_COLORS.map((color) => {
-                    const isSelected = draft.fgColor === color;
-                    return (
-                      <button
-                        key={color}
-                        type="button"
-                        aria-pressed={isSelected}
-                        onClick={() =>
-                          setDraft((d) => ({ ...d, fgColor: color }))
-                        }
-                        className={cn(
-                          "flex size-7 items-center justify-center rounded-full transition-all",
-                          isSelected
-                            ? "ring-1 ring-black ring-offset-[3px]"
-                            : "ring-black/10 hover:ring-4",
-                        )}
-                        style={{ backgroundColor: color }}
-                      >
-                        {isSelected && <Check2 className="size-4 text-white" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Eye Pattern selectors */}
+      <div>
+        <span className="block text-sm font-medium text-neutral-700">
+          Corner Eyes
+        </span>
+        <div className="mt-3 space-y-3">
+          {/* Outer Frame (Corner Square) */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-neutral-600">
+              Outer Frame
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {CORNER_SQUARE_TYPES.map((type) => {
+                const isSelected = draft.qrCornerSquareType === type;
+                const typeLabels: Record<CornerSquareType, string> = {
+                  square: "Square",
+                  rounded: "Rounded",
+                  dots: "Circle",
+                  "extra-rounded": "Extra Rounded",
+                  leaf: "Leaf",
+                };
+                return (
+                  <Tooltip
+                    key={type}
+                    content={typeLabels[type]}
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={isSelected}
+                      aria-label={`Select ${typeLabels[type]} outer frame`}
+                      onClick={() => setDraft((d) => ({ ...d, qrCornerSquareType: type }))}
+                      className={cn(
+                        "flex size-12 items-center justify-center rounded-md border transition-all",
+                        isSelected
+                          ? "border-black bg-neutral-50 ring-1 ring-black"
+                          : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                      )}
+                    >
+                      <CornerSquarePreview
+                        type={type}
+                        color={draft.fgColor}
+                      />
+                    </button>
+                  </Tooltip>
+                );
+              })}
             </div>
           </div>
-        </div>
 
-        {/* Right column: preview (independently scrollable on desktop; sticky inner) */}
-        <div className="scrollbar-hide order-1 px-6 md:order-2 md:overflow-auto md:pl-0 md:pr-4">
-          <div className="py-4 md:sticky md:top-4">
-            {/* Preview header + actions */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-neutral-700">
-                  QR Code Preview
-                </span>
-                <InfoTooltip
-                  content={
-                    <SimpleTooltipContent title="Customize your QR code to fit your brand." />
-                  }
-                />
-              </div>
-              {url && qrDataForActions && (
-                <div className="flex items-center gap-2">
-                  <DownloadPopover qrData={qrDataForActions} props={props}>
-                    <div>
-                      <ButtonTooltip
-                        tooltipProps={{
-                          content: "Download QR code",
-                        }}
-                      >
-                        <Download className="h-4 w-4 text-neutral-500" />
-                      </ButtonTooltip>
-                    </div>
-                  </DownloadPopover>
-                  <CopyPopover qrData={qrDataForActions} props={props}>
-                    <div>
-                      <ButtonTooltip
-                        tooltipProps={{
-                          content: "Copy QR code",
-                        }}
-                      >
-                        <Copy className="h-4 w-4 text-neutral-500" />
-                      </ButtonTooltip>
-                    </div>
-                  </CopyPopover>
-                </div>
-              )}
-            </div>
-
-            {/* Preview panel */}
-            <div className="relative mt-2 flex h-52 items-center justify-center overflow-hidden rounded-md border border-neutral-300">
-              {!isMobile && (
-                <ShimmerDots className="opacity-30 [mask-image:radial-gradient(40%_80%,transparent_50%,black)]" />
-              )}
-              {url && (
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={
-                      draft.fgColor +
-                      draft.qrHideLogo +
-                      draft.qrDotType +
-                      draft.qrCornerSquareType +
-                      draft.qrCornerDotType +
-                      draft.qrShape +
-                      draft.hasFrame +
-                      draft.qrFrameStyle +
-                      draft.qrFrameColor
-                    }
-                    initial={{ filter: "blur(2px)", opacity: 0.4 }}
-                    animate={{ filter: "blur(0px)", opacity: 1 }}
-                    exit={{ filter: "blur(2px)", opacity: 0.4 }}
-                    transition={{ duration: 0.1 }}
-                    className="relative flex size-full items-center justify-center"
+          {/* Inner Dot (Corner Dot) */}
+          <div>
+            <label className="mb-2 block text-xs font-medium text-neutral-600">
+              Inner Dot
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {CORNER_DOT_TYPES.map((type) => {
+                const isSelected = draft.qrCornerDotType === type;
+                const typeLabels: Record<CornerDotType, string> = {
+                  square: "Square",
+                  dots: "Circle",
+                  rounded: "Rounded",
+                };
+                return (
+                  <Tooltip
+                    key={type}
+                    content={typeLabels[type]}
                   >
-                    <QRCode
-                      url={url}
-                      fgColor={draft.fgColor}
-                      hideLogo={draft.qrHideLogo}
-                      logo={logo}
-                      scale={1}
-                      qrShape={draft.qrShape}
-                      dotsOptions={{
-                        type: draft.qrDotType,
-                        color: draft.fgColor,
-                      }}
-                      eyeOptions={{
-                        cornerSquare: {
-                          type: draft.qrCornerSquareType,
-                          color: draft.fgColor,
-                        },
-                        cornerDot: {
-                          type: draft.qrCornerDotType,
-                          color: draft.fgColor,
-                        },
-                      }}
-                      frameOptions={frameOptions}
-                    />
-                  </motion.div>
-                </AnimatePresence>
-              )}
+                    <button
+                      type="button"
+                      aria-pressed={isSelected}
+                      aria-label={`Select ${typeLabels[type]} inner dot`}
+                      onClick={() => setDraft((d) => ({ ...d, qrCornerDotType: type }))}
+                      className={cn(
+                        "flex size-12 items-center justify-center rounded-md border transition-all",
+                        isSelected
+                          ? "border-black bg-neutral-50 ring-1 ring-black"
+                          : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                      )}
+                    >
+                      <CornerDotPreview
+                        type={type}
+                        color={draft.fgColor}
+                      />
+                    </button>
+                  </Tooltip>
+                );
+              })}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Footer: always visible; sticky on mobile */}
-      <div className="z-10 border-t border-neutral-100 bg-neutral-50 p-4 max-md:sticky max-md:bottom-0">
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            text="Cancel"
-            className="h-9 w-fit"
-            onClick={() => {
-              setShowLinkQRModal(false);
-            }}
-          />
-          <Button
-            type="submit"
-            variant="primary"
-            text="Save changes"
-            className="h-9 w-fit"
-          />
+      {/* QR Shape selector */}
+      <div>
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
+          QR Code Shape
+        </span>
+        <div className="flex items-center gap-3">
+          <Tooltip content="Square">
+            <button
+              type="button"
+              aria-pressed={draft.qrShape === "square"}
+              aria-label="Select square shape"
+              onClick={() => setDraft((d) => {
+                // Auto-convert circle frames to square frames when switching shape
+                const newFrameStyle = d.qrFrameStyle
+                  ? (d.qrFrameStyle === "solid-circle" || d.qrFrameStyle === "dotted-circle")
+                    ? "square"
+                    : d.qrFrameStyle
+                  : undefined;
+                return { ...d, qrShape: "square", qrFrameStyle: newFrameStyle };
+              })}
+              className={cn(
+                "flex size-12 items-center justify-center rounded-md border transition-all",
+                draft.qrShape === "square"
+                  ? "border-black bg-neutral-50 ring-1 ring-black"
+                  : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+              )}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <rect x="6" y="6" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+            </button>
+          </Tooltip>
+          <Tooltip content="Circle">
+            <button
+              type="button"
+              aria-pressed={draft.qrShape === "circle"}
+              aria-label="Select circle shape"
+              onClick={() => setDraft((d) => {
+                // Auto-convert square frames to circle frames when switching shape
+                const newFrameStyle = d.qrFrameStyle
+                  ? (d.qrFrameStyle === "square" || d.qrFrameStyle === "rounded")
+                    ? "solid-circle"
+                    : d.qrFrameStyle
+                  : undefined;
+                return { ...d, qrShape: "circle", qrFrameStyle: newFrameStyle };
+              })}
+              className={cn(
+                "flex size-12 items-center justify-center rounded-md border transition-all",
+                draft.qrShape === "circle"
+                  ? "border-black bg-neutral-50 ring-1 ring-black"
+                  : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+              )}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+              </svg>
+            </button>
+          </Tooltip>
         </div>
+      </div>
+
+      {/* Frame style selector - Always visible with "No Frame" option */}
+      <div>
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
+          Frame Style
+        </span>
+        <div className="flex items-center gap-3">
+          {/* No Frame option - always available */}
+          <Tooltip content="No Frame">
+            <button
+              type="button"
+              aria-pressed={draft.qrFrameStyle === undefined}
+              aria-label="No frame"
+              onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: undefined }))}
+              className={cn(
+                "flex size-12 items-center justify-center rounded-md border transition-all",
+                draft.qrFrameStyle === undefined
+                  ? "border-black bg-neutral-50 ring-1 ring-black"
+                  : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+              )}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <line x1="4" y1="20" x2="20" y2="4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </button>
+          </Tooltip>
+          {draft.qrShape === "square" ? (
+            <>
+              <Tooltip content="Square">
+                <button
+                  type="button"
+                  aria-pressed={draft.qrFrameStyle === "square"}
+                  aria-label="Select square frame"
+                  onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "square" }))}
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    draft.qrFrameStyle === "square"
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                  )}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="6" y="6" width="12" height="12" stroke="currentColor" strokeWidth="2" fill="none" />
+                  </svg>
+                </button>
+              </Tooltip>
+              <Tooltip content="Rounded">
+                <button
+                  type="button"
+                  aria-pressed={draft.qrFrameStyle === "rounded"}
+                  aria-label="Select rounded frame"
+                  onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "rounded" }))}
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    draft.qrFrameStyle === "rounded"
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                  )}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="6" y="6" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                  </svg>
+                </button>
+              </Tooltip>
+            </>
+          ) : (
+            <>
+              <Tooltip content="Solid Circle">
+                <button
+                  type="button"
+                  aria-pressed={draft.qrFrameStyle === "solid-circle"}
+                  aria-label="Select solid circle frame"
+                  onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "solid-circle" }))}
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    draft.qrFrameStyle === "solid-circle"
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                  )}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" fill="none" />
+                  </svg>
+                </button>
+              </Tooltip>
+              <Tooltip content="Dotted Circle">
+                <button
+                  type="button"
+                  aria-pressed={draft.qrFrameStyle === "dotted-circle"}
+                  aria-label="Select dotted circle frame"
+                  onClick={() => setDraft((d) => ({ ...d, qrFrameStyle: "dotted-circle" }))}
+                  className={cn(
+                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    draft.qrFrameStyle === "dotted-circle"
+                      ? "border-black bg-neutral-50 ring-1 ring-black"
+                      : "border-neutral-200 hover:border-border-emphasis hover:bg-neutral-50",
+                  )}
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" strokeDasharray="2 2" fill="none" />
+                  </svg>
+                </button>
+              </Tooltip>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Frame Color selector - Always visible, disabled when no frame selected */}
+      <div className={cn("transition-opacity", !draft.qrFrameStyle && "opacity-40")}>
+        <span className="mb-2 block text-sm font-medium text-neutral-700">
+          Frame Color
+        </span>
+        <div className="flex gap-6">
+          <div className={cn(
+            "relative flex h-9 w-32 shrink-0 rounded-md shadow-sm",
+            !draft.qrFrameStyle && "pointer-events-none cursor-not-allowed"
+          )}>
+            <Tooltip
+              content={
+                draft.qrFrameStyle ? (
+                  <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
+                    <HexColorPicker
+                      color={draft.qrFrameColor || draft.fgColor}
+                      onChange={onFrameColorChange}
+                    />
+                  </div>
+                ) : (
+                  "Select a frame style to customize color"
+                )
+              }
+            >
+              <div
+                className="h-full w-12 rounded-l-md border"
+                style={{
+                  backgroundColor: draft.qrFrameColor || draft.fgColor,
+                  borderColor: draft.qrFrameColor || draft.fgColor,
+                }}
+              />
+            </Tooltip>
+            <HexColorInput
+              color={draft.qrFrameColor || draft.fgColor}
+              onChange={onFrameColorChange}
+              prefixed
+              disabled={!draft.qrFrameStyle}
+              style={{ borderColor: draft.qrFrameColor || draft.fgColor }}
+              className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm disabled:cursor-not-allowed disabled:bg-neutral-50"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Color selector */}
+      <div>
+        <span className="block text-sm font-medium text-neutral-700">
+          Dots Color
+        </span>
+        <div className="mt-2 flex gap-6">
+          <div className="relative flex h-9 w-32 shrink-0 rounded-md shadow-sm">
+            <Tooltip
+              content={
+                <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
+                  <HexColorPicker
+                    color={draft.fgColor}
+                    onChange={onColorChange}
+                  />
+                </div>
+              }
+            >
+              <div
+                className="h-full w-12 rounded-l-md border"
+                style={{
+                  backgroundColor: draft.fgColor,
+                  borderColor: draft.fgColor,
+                }}
+              />
+            </Tooltip>
+            <HexColorInput
+              id="color"
+              name="color"
+              color={draft.fgColor}
+              onChange={onColorChange}
+              prefixed
+              style={{ borderColor: draft.fgColor }}
+              className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm"
+            />
+          </div>
+          <div className="mt-1 flex flex-wrap items-center gap-3">
+            {DEFAULT_COLORS.map((color) => {
+              const isSelected = draft.fgColor === color;
+              return (
+                <button
+                  key={color}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => setDraft((d) => ({ ...d, fgColor: color }))}
+                  className={cn(
+                    "flex size-7 items-center justify-center rounded-full transition-all",
+                    isSelected
+                      ? "ring-1 ring-black ring-offset-[3px]"
+                      : "ring-black/10 hover:ring-4",
+                  )}
+                  style={{ backgroundColor: color }}
+                >
+                  {isSelected && <Check2 className="size-4 text-white" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-end gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          text="Cancel"
+          className="h-9 w-fit"
+          onClick={() => {
+            setShowLinkQRModal(false);
+          }}
+        />
+        <Button
+          type="submit"
+          variant="primary"
+          text="Save changes"
+          className="h-9 w-fit"
+        />
       </div>
     </form>
   );
