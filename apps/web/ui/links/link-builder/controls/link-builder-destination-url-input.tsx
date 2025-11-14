@@ -18,7 +18,6 @@ import { useAvailableDomains } from "../../use-available-domains";
 export const LinkBuilderDestinationUrlInput = memo(
   forwardRef<HTMLInputElement>((_, ref) => {
     const { control, setValue, clearErrors } = useFormContext<LinkFormData>();
-    0;
 
     const { errors } = useFormState({ control, name: ["url"] });
     const [domain, key, url] = useWatch({
@@ -39,12 +38,14 @@ export const LinkBuilderDestinationUrlInput = memo(
             ref={ref}
             domain={domain}
             _key={key}
-            value={field.value}
+            name={field.name}
+            value={field.value ?? ""}
             domains={domains}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               clearErrors("url");
-              field.onChange(e.target.value);
+              field.onChange(e);
             }}
+            onBlur={field.onBlur}
             required={key !== "_root"}
             error={errors.url?.message || undefined}
             right={

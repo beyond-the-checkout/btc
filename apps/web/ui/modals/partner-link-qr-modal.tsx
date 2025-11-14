@@ -43,14 +43,15 @@ const DEFAULT_COLORS = [
   "#AE49BF",
 ];
 
-export type QRCodeDesign = {
+export type PartnerQRCodeDesign = {
   fgColor: string;
   logo?: string;
 };
+export type QRCodeDesign = PartnerQRCodeDesign;
 
 type PartnerLinkQRModalProps = {
   props: QRLinkProps;
-  onSave?: (data: QRCodeDesign) => void;
+  onSave?: (data: PartnerQRCodeDesign) => void;
 };
 
 function PartnerLinkQRModal(
@@ -88,13 +89,14 @@ function PartnerLinkQRModalInner({
       : undefined;
   }, [props.key, props.domain]);
 
-  const [dataPersisted, setDataPersisted] = useLocalStorage<QRCodeDesign>(
-    `qr-code-design-program-${programEnrollment?.program?.id}`,
-    {
-      fgColor: "#000000",
-      logo: logo ?? undefined,
-    },
-  );
+  const [dataPersisted, setDataPersisted] =
+    useLocalStorage<PartnerQRCodeDesign>(
+      `qr-code-design-program-${programEnrollment?.program?.id}`,
+      {
+        fgColor: "#000000",
+        logo: logo ?? undefined,
+      },
+    );
 
   const [data, setData] = useState(dataPersisted);
 

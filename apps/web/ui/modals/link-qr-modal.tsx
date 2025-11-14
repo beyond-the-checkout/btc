@@ -16,7 +16,14 @@ import { generatePath } from "@/lib/qr/utils";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
-import { useLocalStorage } from "@/ui/hooks/use-local-storage";
+import { getItemFromLocalStorage } from "@/ui/hooks/use-local-storage";
+import type { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
+import { useLinkDrafts } from "@/ui/modals/link-builder/use-link-drafts";
+import {
+  DEFAULT_QR_CODE_DESIGN,
+  migrateQRCodeDesign,
+  QRCodeDesign,
+} from "@/ui/modals/link-qr-modal.types";
 import { QRCode } from "@/ui/shared/qr-code";
 import {
   Button,
@@ -42,7 +49,13 @@ import {
   Hyperlink,
   Photo,
 } from "@dub/ui/icons";
-import { API_DOMAIN, cn, DUB_QR_LOGO, linkConstructor } from "@dub/utils";
+import {
+  API_DOMAIN,
+  cn,
+  DUB_QR_LOGO,
+  linkConstructor,
+  nanoid,
+} from "@dub/utils";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Dispatch,
@@ -59,6 +72,7 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
 import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";
+export type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 
 const DEFAULT_COLORS = [
   "#000000",
@@ -303,21 +317,7 @@ function FramePreview({ type, color }: { type: FrameType; color: string }) {
   );
 }
 
-export type QRCodeDesign = {
-  fgColor: string; // Legacy field, used as fallback
-  qrHideLogo: boolean;
-  qrDotType: DotType;
-  qrCornerSquareType: CornerSquareType;
-  qrCornerDotType: CornerDotType;
-  qrShape: "square" | "circle";
-  hasFrame: boolean; // Computed from qrFrameStyle - not stored in DB
-  qrFrameStyle?: "square" | "rounded" | "solid-circle" | "dotted-circle";
-  qrFrameColor?: string;
-  // Separate color fields for individual customization
-  qrDotsColor?: string;
-  qrCornerSquareColor?: string;
-  qrCornerDotColor?: string;
-};
+// Using shared QRCodeDesign from link-qr-modal.types
 
 type LinkQRModalProps = {
   props: QRLinkProps;
@@ -364,99 +364,31 @@ function LinkQRModalInner({
       : undefined;
   }, [props.key, props.domain]);
 
-  // Use per-link localStorage key instead of workspace-level
-  // This ensures each link has its own QR customization
-  const localStorageKey =
-    props.domain && props.key
-      ? `qr-code-design-${props.domain}-${props.key}`
-      : `qr-code-design-new-link`; // Fallback for links being created
-
-  const [rawData, setData] = useLocalStorage<QRCodeDesign>(localStorageKey, {
-    fgColor: "#000000",
-    qrHideLogo: false,
-    qrDotType: "square",
-    qrCornerSquareType: "square",
-    qrCornerDotType: "square",
-    qrShape: "square",
-    hasFrame: false,
-    qrFrameStyle: undefined,
-    qrFrameColor: undefined,
-    qrDotsColor: undefined,
-    qrCornerSquareColor: undefined,
-    qrCornerDotColor: undefined,
+  // Use link drafts for QR customization storage
+  const { drafts, saveDraft } = useLinkDrafts({
+    linkId: props.id,
+    workspaceId: workspaceId || "",
   });
 
-  // Migrate any legacy schema to the new qr* fields
-  function migrateQRCodeDesign(d: any): QRCodeDesign {
-    if (!d || typeof d !== "object") {
-      return {
-        fgColor: "#000000",
-        qrHideLogo: false,
-        qrDotType: "square",
-        qrCornerSquareType: "square",
-        qrCornerDotType: "square",
-        qrShape: "square",
-        hasFrame: false,
-        qrFrameStyle: undefined,
-        qrFrameColor: undefined,
-        qrDotsColor: undefined,
-        qrCornerSquareColor: undefined,
-        qrCornerDotColor: undefined,
-      } as QRCodeDesign;
-    }
+  const latestLinkDraft = drafts[0];
 
-    const migrated: QRCodeDesign = {
-      fgColor: d.fgColor ?? "#000000",
-      qrHideLogo: d.qrHideLogo ?? d.hideLogo ?? false,
-      qrDotType: d.qrDotType ?? d.dotType ?? "square",
-      qrCornerSquareType:
-        d.qrCornerSquareType ?? d.cornerSquareType ?? "square",
-      qrCornerDotType: d.qrCornerDotType ?? d.cornerDotType ?? "square",
-      qrShape: d.qrShape ?? "square",
-      hasFrame: Boolean(d.qrFrameStyle ?? d.frameStyle),
-      qrFrameStyle:
-        d.qrFrameStyle ??
-        (d.frameStyle === "none" ? undefined : d.frameStyle) ??
-        undefined,
-      qrFrameColor: d.qrFrameColor ?? d.frameColor ?? undefined,
-      qrDotsColor: d.qrDotsColor ?? d.dotsColor ?? undefined,
-      qrCornerSquareColor:
-        d.qrCornerSquareColor ?? d.cornerSquareColor ?? undefined,
-      qrCornerDotColor: d.qrCornerDotColor ?? d.cornerDotColor ?? undefined,
-    };
+  const baseDesign = useMemo(
+    () =>
+      migrateQRCodeDesign(latestLinkDraft?.qrDesign ?? DEFAULT_QR_CODE_DESIGN),
+    [latestLinkDraft?.qrDesign],
+  );
 
-    return migrated;
-  }
-
-  const data = migrateQRCodeDesign(rawData);
+  // Using shared migrateQRCodeDesign from link-qr-modal.types
 
   // Local draft state: edits apply here and only persist on Save
-  const [draft, setDraft] = useState<QRCodeDesign>(data);
+  const [draft, setDraft] = useState<QRCodeDesign>(baseDesign);
 
   // Reset draft when opening the modal to the latest persisted design
   useEffect(() => {
     if (showLinkQRModal) {
-      setDraft(migrateQRCodeDesign(rawData));
+      setDraft(baseDesign);
     }
-  }, [showLinkQRModal]);
-
-  // If migration changed structure, persist the new version once
-  useEffect(() => {
-    if (!rawData) return;
-    const hasLegacyFields =
-      (rawData as any).hideLogo !== undefined ||
-      (rawData as any).dotType !== undefined ||
-      (rawData as any).cornerSquareType !== undefined ||
-      (rawData as any).cornerDotType !== undefined ||
-      (rawData as any).frameStyle !== undefined ||
-      (rawData as any).frameColor !== undefined ||
-      (rawData as any).dotsColor !== undefined ||
-      (rawData as any).cornerSquareColor !== undefined ||
-      (rawData as any).cornerDotColor !== undefined;
-    if (hasLegacyFields) {
-      setData(data);
-    }
-  }, [rawData, setData, data]);
+  }, [showLinkQRModal, baseDesign]);
 
   const frameOptions = useMemo(() => {
     const type = frameStyleToFrameType(draft.qrFrameStyle as any);
@@ -519,6 +451,59 @@ function LinkQRModalInner({
     [qrData, frameOptions],
   );
 
+  const persistQRCodeDesign = useCallback(
+    (design: QRCodeDesign) => {
+      const draftId = latestLinkDraft?.id ?? nanoid();
+      const linkPartial: Partial<LinkFormData> = {
+        id: props.id,
+        key: props.key,
+        domain: props.domain,
+      };
+      saveDraft(draftId, linkPartial, design);
+    },
+    [latestLinkDraft?.id, saveDraft, props.id, props.key, props.domain],
+  );
+
+  // One-time migration from legacy per-link localStorage keys
+  const hasMigratedLegacy = useRef(false);
+
+  useEffect(() => {
+    if (!showLinkQRModal || hasMigratedLegacy.current) return;
+
+    // Recreate the old key logic
+    const legacyKey =
+      props.domain && props.key
+        ? `qr-code-design-${props.domain}-${props.key}`
+        : `qr-code-design-new-link`;
+
+    const legacy = getItemFromLocalStorage(legacyKey);
+
+    // Skip if no legacy data or if we already have a design in drafts
+    if (!legacy || latestLinkDraft?.qrDesign) {
+      hasMigratedLegacy.current = true;
+      return;
+    }
+
+    // Migrate the legacy design into drafts
+    const migratedDesign = migrateQRCodeDesign(legacy);
+    persistQRCodeDesign(migratedDesign);
+
+    // Clean up the old localStorage key
+    try {
+      window.localStorage.removeItem(legacyKey);
+    } catch {
+      // Ignore errors (SSR, quota, etc.)
+    }
+
+    hasMigratedLegacy.current = true;
+  }, [
+    showLinkQRModal,
+    latestLinkDraft?.qrDesign,
+    props.domain,
+    props.key,
+    persistQRCodeDesign,
+  ]);
+
   const onColorChange = useDebouncedCallback(
     (color: string) =>
       setDraft((d) => ({
@@ -549,11 +534,11 @@ function LinkQRModalInner({
         // @ts-ignore - flush is provided by use-debounce
         onFrameColorChange.flush?.();
         // Persist final draft state
-        setData(draft);
+        persistQRCodeDesign(draft);
         setShowLinkQRModal(false);
 
-        // Data is automatically persisted to per-link localStorage via useLocalStorage hook
-        // onSave callback available for future database persistence (Phase 2)
+        // Persisted via link drafts storage
+        // onSave callback available for potential server persistence
         onSave?.(draft);
       }}
     >

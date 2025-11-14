@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function getItemFromLocalStorage(key: string) {
+export function getItemFromLocalStorage(key: string) {
   if (typeof window === "undefined") return null;
 
   const item = window.localStorage.getItem(key);
@@ -28,7 +28,8 @@ export function useLocalStorage<T>(
 
   const setValue = (value: T | ((prev: T) => T)) => {
     setStoredValue((prev) => {
-      const next = typeof value === "function" ? (value as (p: T) => T)(prev) : value;
+      const next =
+        typeof value === "function" ? (value as (p: T) => T)(prev) : value;
       try {
         window.localStorage.setItem(key, JSON.stringify(next));
       } catch {

@@ -145,6 +145,7 @@ export interface SimpleLinkProps {
 }
 
 export interface QRLinkProps {
+  id?: string;
   domain: string;
   key?: string;
   url?: string;

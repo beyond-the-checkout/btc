@@ -1,4 +1,5 @@
 import { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
+import { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 import { useLocalStorage } from "@dub/ui";
 import { subDays } from "date-fns";
 import { useCallback, useLayoutEffect, useMemo } from "react";
@@ -7,6 +8,7 @@ export type LinkDraft = {
   timestamp: number;
   id: string;
   link: Partial<LinkFormData>;
+  qrDesign?: QRCodeDesign;
 };
 
 export function useLinkDrafts({
@@ -37,24 +39,32 @@ export function useLinkDrafts({
     else removeOldDrafts();
   }, []);
 
-  const saveDraft = (id: string, link: Partial<LinkFormData>) => {
-    setDrafts([
-      ...drafts.filter((d) => d.id !== id),
-      { id, link, timestamp: new Date().getTime() },
-    ]);
+  const saveDraft = (
+    id: string,
+    link: Partial<LinkFormData>,
+    qrDesign?: QRCodeDesign,
+  ) => {
+    const existing = drafts.find((d) => d.id === id);
+    const mergedLink = { ...(existing?.link ?? {}), ...link };
+    const merged: LinkDraft = {
+      id,
+      link: mergedLink,
+      qrDesign: qrDesign !== undefined ? qrDesign : existing?.qrDesign,
+      timestamp: new Date().getTime(),
+    };
+    setDrafts([merged, ...drafts.filter((d) => d.id !== id)]);
   };
 
   const removeDraft = (id: string) => {
     setDrafts(drafts.filter((draft) => draft.id !== id));
   };
 
-  const filteredDrafts = useMemo(
-    () =>
-      linkId
-        ? drafts.filter((draft) => draft.link.id === linkId)
-        : drafts.filter((draft) => !draft.link.id),
-    [drafts, linkId],
-  );
+  const filteredDrafts = useMemo(() => {
+    const list = linkId
+      ? drafts.filter((draft) => draft.link.id === linkId)
+      : drafts.filter((draft) => !draft.link.id);
+    return list.slice().sort((a, b) => b.timestamp - a.timestamp);
+  }, [drafts, linkId]);
 
   return { drafts: filteredDrafts, saveDraft, removeDraft };
 }

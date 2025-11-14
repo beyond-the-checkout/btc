@@ -11,9 +11,12 @@ import { ChevronDown } from "lucide-react";
 import {
   forwardRef,
   SVGProps,
+  useCallback,
   useEffect,
   useImperativeHandle,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { useFormContext } from "react-hook-form";
@@ -35,6 +38,7 @@ export const DraftControls = forwardRef<
   DraftControlsProps
 >(({ props, workspaceId }: DraftControlsProps, ref) => {
   const { isMobile } = useMediaQuery();
+  const DEBUG_RESTORE = process.env.NODE_ENV === "development";
 
   const {
     watch,
@@ -57,15 +61,64 @@ export const DraftControls = forwardRef<
     workspaceId,
   });
 
+  const latestQrDesignFromDrafts = useCallback(() => {
+    // Read directly from localStorage to avoid race conditions with React state
+    const storageKey = `link-drafts:${workspaceId}`;
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      if (!stored) return undefined;
+
+      const allStoredDrafts = JSON.parse(stored) as LinkDraft[];
+
+      // Filter to current link's drafts
+      const relevantDrafts = props?.id
+        ? allStoredDrafts.filter((d) => d.link.id === props.id)
+        : allStoredDrafts.filter((d) => !d.link.id);
+
+      // Find the most recent one with qrDesign
+      const sorted = relevantDrafts.sort((a, b) => b.timestamp - a.timestamp);
+      return sorted.find((d) => d.qrDesign)?.qrDesign;
+    } catch {
+      return undefined;
+    }
+  }, [workspaceId, props?.id]);
+
+  const getLatestDraftFromStorage = useCallback((): LinkDraft | undefined => {
+    const storageKey = `link-drafts:${workspaceId}`;
+    try {
+      const stored = window.localStorage.getItem(storageKey);
+      if (!stored) return undefined;
+
+      const allStoredDrafts = JSON.parse(stored) as LinkDraft[];
+
+      // Filter to current link's drafts
+      const relevantDrafts = props?.id
+        ? allStoredDrafts.filter((d) => d.link.id === props.id)
+        : allStoredDrafts.filter((d) => !d.link.id);
+
+      // Return the most recent draft (if any)
+      const sorted = relevantDrafts.sort((a, b) => b.timestamp - a.timestamp);
+      return sorted[0];
+    } catch {
+      return undefined;
+    }
+  }, [workspaceId, props?.id]);
+
   const drafts = useMemo(() => {
     return allDrafts.filter((draft) => draft.id !== sessionId);
   }, [allDrafts, sessionId]);
 
-  const saveDraftDebounced = useDebouncedCallback(() => {
-    saveDraft(sessionId, getValues());
-    setIsSavePending(false);
-    setHasSaved(true);
-  }, 1000);
+  const saveDraftDebounced = useDebouncedCallback(
+    (draftId: string, link: Partial<LinkFormData>) => {
+      const qrToPersist = latestQrDesignFromDrafts();
+      saveDraft(draftId, link, qrToPersist);
+      setIsSavePending(false);
+      setHasSaved(true);
+    },
+    1000,
+  );
+
+  const restoredRef = useRef(false);
 
   // Watch for form changes and save draft
   useEffect(() => {
@@ -73,11 +126,115 @@ export const DraftControls = forwardRef<
       const [url, key] = getValues(["url", "key"]);
       if ((url || key) && isDirty) {
         setIsSavePending(true);
-        saveDraftDebounced();
+        const link = getValues();
+
+        // Prefer session draft for "new link"; else latest for existing link
+        const preferSessionDraft = !props?.id
+          ? allDrafts.find((d) => d.id === sessionId)
+          : undefined;
+        const latest = preferSessionDraft ?? allDrafts[0];
+
+        const draftId = latest?.id ?? sessionId;
+
+        saveDraftDebounced(draftId, link);
       }
     });
     return () => unsubscribe();
-  }, [watch, isDirty]);
+  }, [
+    watch,
+    isDirty,
+    getValues,
+    allDrafts,
+    sessionId,
+    saveDraftDebounced,
+    props?.id,
+  ]);
+
+  // Restore latest draft on open (new link only) - field-specific restore with early timing
+  useLayoutEffect(() => {
+    if (DEBUG_RESTORE) {
+      try {
+        console.log("[restore] start", {
+          restored: restoredRef.current,
+          hasLinkId: !!props?.id,
+          isDirty,
+          currentUrl: getValues("url"),
+          currentKey: getValues("key"),
+          sessionId,
+        });
+      } catch {}
+    }
+
+    if (restoredRef.current) {
+      if (DEBUG_RESTORE) console.log("[restore] already restored; skipping");
+      return;
+    }
+
+    // Only auto-restore for "new link"
+    if (props?.id) {
+      if (DEBUG_RESTORE)
+        console.log("[restore] existing link; skipping auto-restore");
+      restoredRef.current = true;
+      return;
+    }
+
+    const latest = getLatestDraftFromStorage();
+    if (!latest) {
+      if (DEBUG_RESTORE) console.log("[restore] no latest draft found");
+      restoredRef.current = true; // Avoid repeated checks
+      return;
+    }
+
+    // Adopt the existing draft ID for this session
+    if (sessionId !== latest.id) {
+      setSessionId(latest.id);
+      if (DEBUG_RESTORE) console.log("[restore] adopt sessionId:", latest.id);
+    }
+
+    // Hydrate only missing fields without marking dirty or touched
+    const url = getValues("url")?.trim();
+    const key = getValues("key")?.trim();
+
+    if (!url && latest.link.url) {
+      setValue("url", latest.link.url, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+      if (DEBUG_RESTORE) console.log("[restore] set url:", latest.link.url);
+    }
+
+    if (!key && latest.link.key) {
+      setValue("key", latest.link.key, {
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+      if (DEBUG_RESTORE) console.log("[restore] set key:", latest.link.key);
+    }
+
+    restoredRef.current = true;
+  }, [
+    props?.id,
+    isDirty,
+    getValues,
+    setValue,
+    getLatestDraftFromStorage,
+    sessionId,
+  ]);
+
+  // Debug: watch form changes to trace potential clears/resets
+  useEffect(() => {
+    if (!DEBUG_RESTORE) return;
+    const { unsubscribe } = watch((_, meta) => {
+      try {
+        console.log("[watch]", meta?.name, {
+          url: getValues("url"),
+          key: getValues("key"),
+          isDirty,
+        });
+      } catch {}
+    });
+    return () => unsubscribe();
+  }, [watch, getValues, isDirty]);
 
   useImperativeHandle(
     ref,
@@ -91,12 +248,43 @@ export const DraftControls = forwardRef<
           // Save draft instantly when the link builder is closed
           const [url, key] = getValues(["url", "key"]);
           if ((url || key) && isDirty) {
-            saveDraft(sessionId, getValues());
+            // Flush any pending debounced saves first
+            saveDraftDebounced.flush?.();
+
+            const link = getValues();
+
+            // Prefer session draft for "new link"; else latest for existing link
+            const preferSessionDraft = !props?.id
+              ? allDrafts.find((d) => d.id === sessionId)
+              : undefined;
+            const latest = preferSessionDraft ?? allDrafts[0];
+
+            const draftId = latest?.id ?? sessionId;
+
+            // Rescue QR design from any draft that has it
+            const qrToPersist = latestQrDesignFromDrafts();
+
+            if (DEBUG_RESTORE) {
+              console.log("onClose - draftId:", draftId);
+              console.log("onClose - rescued qrDesign:", !!qrToPersist);
+            }
+
+            saveDraft(draftId, link, qrToPersist);
           }
         },
       };
     },
-    [sessionId, isDirty],
+    [
+      sessionId,
+      isDirty,
+      allDrafts,
+      getValues,
+      saveDraft,
+      removeDraft,
+      props?.id,
+      saveDraftDebounced,
+      latestQrDesignFromDrafts,
+    ],
   );
 
   return (isDirty && hasSaved) || drafts.length > 0 ? (
