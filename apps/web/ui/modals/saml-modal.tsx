@@ -147,8 +147,6 @@ function SAMLModal({
                     content={
                       <SimpleTooltipContent
                         title={`Your ${currentProvider.samlModalCopy} is the URL to your SAML provider's metadata.`}
-                        cta="Learn more."
-                        href={`https://dub.co/help/article/${selectedProvider}-saml`}
                       />
                     }
                   />
@@ -204,8 +202,6 @@ function SAMLModal({
                     content={
                       <SimpleTooltipContent
                         title={`Your ${currentProvider.samlModalCopy} is the URL to your SAML provider's metadata.`}
-                        cta="Learn more."
-                        href={`https://dub.co/help/article/${selectedProvider}-saml#step-4-copy-the-metadata-url`}
                       />
                     }
                   />

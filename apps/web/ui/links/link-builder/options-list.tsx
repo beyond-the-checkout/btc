@@ -164,11 +164,7 @@ function LinkCloakingToggleBadge({
             <p>Your link will be successfully cloaked.</p>
           </div>
         ) : (
-          <SimpleTooltipContent
-            title="Your link is not cloakable – make sure you have the right security headers set on your target URL."
-            cta="Learn more"
-            href="https://dub.co/help/article/link-cloaking#link-cloaking-with-security-headers"
-          />
+          <SimpleTooltipContent title="Your link is not cloakable – make sure you have the right security headers set on your target URL." />
         )
       }
     >

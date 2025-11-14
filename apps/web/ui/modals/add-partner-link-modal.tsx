@@ -183,11 +183,7 @@ const AddPartnerLinkModal = ({
 
                   <InfoTooltip
                     content={
-                      <SimpleTooltipContent
-                        title="This is the short link that will redirect to your destination URL."
-                        cta="Learn more."
-                        href="https://dub.co/help/article/how-to-create-link"
-                      />
+                      <SimpleTooltipContent title="This is the short link that will redirect to your destination URL." />
                     }
                   />
                 </div>
@@ -229,11 +225,7 @@ const AddPartnerLinkModal = ({
 
                   <InfoTooltip
                     content={
-                      <SimpleTooltipContent
-                        title="The URL your users will get redirected to when they visit your short link."
-                        cta="Learn more."
-                        href="https://dub.co/help/article/how-to-create-link"
-                      />
+                      <SimpleTooltipContent title="The URL your users will get redirected to when they visit your short link." />
                     }
                   />
                 </div>

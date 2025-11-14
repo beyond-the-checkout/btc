@@ -95,11 +95,7 @@ function PasswordModalInner({
           <h3 className="text-lg font-medium">Link Password</h3>
           <BaseBadgeTooltip
             content={
-              <SimpleTooltipContent
-                title="Restrict access to your short links by encrypting it with a password."
-                cta="Learn more."
-                href="https://dub.co/help/article/password-protected-links"
-              />
+              <SimpleTooltipContent title="Restrict access to your short links by encrypting it with a password." />
             }
           />
         </div>

@@ -112,21 +112,13 @@ export const DestinationUrlInput = forwardRef<
             {key === "_root" ? (
               <BaseBadgeTooltip
                 content={
-                  <SimpleTooltipContent
-                    title="The URL your users will get redirected to when they visit your root domain link."
-                    cta="Learn more."
-                    href="https://dub.co/help/article/how-to-redirect-root-domain"
-                  />
+                  <SimpleTooltipContent title="The URL your users will get redirected to when they visit your root domain link." />
                 }
               />
             ) : (
               <InfoTooltip
                 content={
-                  <SimpleTooltipContent
-                    title="The URL your users will get redirected to when they visit your short link."
-                    cta="Learn more."
-                    href="https://dub.co/help/article/how-to-create-link"
-                  />
+                  <SimpleTooltipContent title="The URL your users will get redirected to when they visit your short link." />
                 }
               />
             )}

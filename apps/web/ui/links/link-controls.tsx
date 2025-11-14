@@ -322,11 +322,7 @@ export function LinkControls({
                   className="h-9 px-2 font-medium"
                   disabledTooltip={
                     !isDubDomain(link.domain) ? (
-                      <SimpleTooltipContent
-                        title="Since this is a custom domain link, you can only transfer it to another workspace if you transfer the domain as well."
-                        cta="Learn more."
-                        href="https://dub.co/help/article/how-to-transfer-domains"
-                      />
+                      <SimpleTooltipContent title="Since this is a custom domain link, you can only transfer it to another workspace if you transfer the domain as well." />
                     ) : !canManageLink ? (
                       "You don't have permission to transfer this link."
                     ) : undefined

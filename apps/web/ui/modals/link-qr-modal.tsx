@@ -549,11 +549,7 @@ function LinkQRModalInner({
             <h3 className="text-lg font-medium">QR Code</h3>
             <BaseBadgeTooltip
               content={
-                <SimpleTooltipContent
-                  title="Set a custom QR code design to improve click-through rates."
-                  cta="Learn more."
-                  href="https://dub.co/help/article/custom-qr-codes"
-                />
+                <SimpleTooltipContent title="Set a custom QR code design to improve click-through rates." />
               }
             />
           </div>
@@ -598,11 +594,7 @@ function LinkQRModalInner({
                 </label>
                 <InfoTooltip
                   content={
-                    <SimpleTooltipContent
-                      title="Display your logo in the center of the QR code."
-                      cta="Learn more."
-                      href="https://dub.co/help/article/custom-qr-codes"
-                    />
+                    <SimpleTooltipContent title="Display your logo in the center of the QR code." />
                   }
                 />
               </div>
@@ -1167,11 +1159,7 @@ function LinkQRModalInner({
                 </span>
                 <InfoTooltip
                   content={
-                    <SimpleTooltipContent
-                      title="Customize your QR code to fit your brand."
-                      cta="Learn more."
-                      href="https://dub.co/help/article/custom-qr-codes"
-                    />
+                    <SimpleTooltipContent title="Customize your QR code to fit your brand." />
                   }
                 />
               </div>

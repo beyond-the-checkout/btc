@@ -104,21 +104,13 @@ function AdvancedModal({
                 External ID{" "}
                 <InfoTooltip
                   content={
-                    <SimpleTooltipContent
-                      title="A unique identifier for this link in your database."
-                      cta="Learn more about external IDs."
-                      href="https://d.to/externalId"
-                    />
+                    <SimpleTooltipContent title="A unique identifier for this link in your database." />
                   }
                 />
               </label>
               <Tooltip
                 content={
-                  <SimpleTooltipContent
-                    title="A unique identifier for this link in your system."
-                    cta="Learn more about external IDs."
-                    href="https://d.to/externalId"
-                  />
+                  <SimpleTooltipContent title="A unique identifier for this link in your system." />
                 }
               />
             </div>

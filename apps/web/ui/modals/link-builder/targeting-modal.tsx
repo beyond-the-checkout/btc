@@ -147,11 +147,7 @@ function TargetingModal({
                 </span>
                 <BaseBadgeTooltip
                   content={
-                    <SimpleTooltipContent
-                      title="Redirect your users to different links based on their location."
-                      cta="Learn more about geo targeting."
-                      href="https://dub.co/help/article/geo-targeting"
-                    />
+                    <SimpleTooltipContent title="Redirect your users to different links based on their location." />
                   }
                 />
               </div>
@@ -293,11 +289,7 @@ function TargetingModal({
                 </label>
                 <BaseBadgeTooltip
                   content={
-                    <SimpleTooltipContent
-                      title="Redirect your iOS users to a different link."
-                      cta="Learn more about device targeting."
-                      href="https://dub.co/help/article/device-targeting"
-                    />
+                    <SimpleTooltipContent title="Redirect your iOS users to a different link." />
                   }
                 />
               </div>
@@ -333,11 +325,7 @@ function TargetingModal({
                 </label>
                 <BaseBadgeTooltip
                   content={
-                    <SimpleTooltipContent
-                      title="Redirect your Android users to a different link."
-                      cta="Learn more about device targeting."
-                      href="https://dub.co/help/article/device-targeting"
-                    />
+                    <SimpleTooltipContent title="Redirect your Android users to a different link." />
                   }
                 />
               </div>

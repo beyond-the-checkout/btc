@@ -172,11 +172,7 @@ function UTMModalInner({ setShowUTMModal }: UTMModalProps) {
           <h3 className="text-lg font-medium">UTM Builder</h3>
           <InfoTooltip
             content={
-              <SimpleTooltipContent
-                title="Add UTM parameters to your short links for conversion tracking."
-                cta="Learn more."
-                href="https://dub.co/help/article/utm-builder"
-              />
+              <SimpleTooltipContent title="Add UTM parameters to your short links for conversion tracking." />
             }
           />
         </div>

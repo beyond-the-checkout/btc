@@ -17,11 +17,7 @@ export const LinkCommentsInput = memo(() => {
         </label>
         <InfoTooltip
           content={
-            <SimpleTooltipContent
-              title="Use comments to add context to your short links – for you and your team."
-              cta="Learn more."
-              href="https://dub.co/help/article/link-comments"
-            />
+            <SimpleTooltipContent title="Use comments to add context to your short links – for you and your team." />
           }
         />
       </div>

@@ -289,11 +289,7 @@ function ABTestingEdit({
             <h3 className="text-lg font-medium">A/B Testing</h3>
             <BusinessBadgeTooltip
               content={
-                <SimpleTooltipContent
-                  title="Test different URLs against each other to optimize your conversion rates."
-                  cta="Learn more."
-                  href="https://dub.co/help/article/ab-testing"
-                />
+                <SimpleTooltipContent title="Test different URLs against each other to optimize your conversion rates." />
               }
             />
           </div>
@@ -323,11 +319,7 @@ function ABTestingEdit({
             </label>
             <InfoTooltip
               content={
-                <SimpleTooltipContent
-                  title="Add up to 3 additional destination URLs to test for this short link."
-                  cta="Learn more"
-                  href="https://dub.co/help/article/ab-testing" // TODO: Add article
-                />
+                <SimpleTooltipContent title="Add up to 3 additional destination URLs to test for this short link." />
               }
             />
           </div>
@@ -434,11 +426,7 @@ function ABTestingEdit({
             </label>
             <InfoTooltip
               content={
-                <SimpleTooltipContent
-                  title="Set when the A/B test should complete. After this date, all traffic will go to the best performing URL."
-                  cta="Learn more."
-                  href="https://dub.co/help/article/ab-testing"
-                />
+                <SimpleTooltipContent title="Set when the A/B test should complete. After this date, all traffic will go to the best performing URL." />
               }
             />
           </div>

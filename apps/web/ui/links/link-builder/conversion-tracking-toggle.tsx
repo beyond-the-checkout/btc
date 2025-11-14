@@ -45,11 +45,7 @@ export const ConversionTrackingToggle = memo(() => {
           Conversion Tracking
           <InfoTooltip
             content={
-              <SimpleTooltipContent
-                title="View analytics on conversions from your short links."
-                cta="Learn more."
-                href="https://dub.co/docs/conversions/quickstart"
-              />
+              <SimpleTooltipContent title="View analytics on conversions from your short links." />
             }
           />
         </span>

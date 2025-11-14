@@ -94,11 +94,7 @@ function ExpirationModal({
             <h3 className="text-lg font-medium">Link Expiration</h3>
             <BaseBadgeTooltip
               content={
-                <SimpleTooltipContent
-                  title="Set an expiration date for your links – after which it won't be accessible."
-                  cta="Learn more."
-                  href="https://dub.co/help/article/link-expiration"
-                />
+                <SimpleTooltipContent title="Set an expiration date for your links – after which it won't be accessible." />
               }
             />
           </div>
@@ -143,11 +139,7 @@ function ExpirationModal({
             </label>
             <InfoTooltip
               content={
-                <SimpleTooltipContent
-                  title="Redirect users to a specific URL when the link has expired."
-                  cta="Learn more."
-                  href="https://dub.co/help/article/link-expiration#setting-a-custom-expiration-url"
-                />
+                <SimpleTooltipContent title="Redirect users to a specific URL when the link has expired." />
               }
             />
           </div>
