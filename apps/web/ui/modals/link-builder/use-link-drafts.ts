@@ -11,6 +11,16 @@ export type LinkDraft = {
   qrDesign?: QRCodeDesign;
 };
 
+export type LinkDraftsAPI = {
+  drafts: LinkDraft[];
+  saveDraft: (
+    id: string,
+    link: Partial<LinkFormData>,
+    qr?: QRCodeDesign,
+  ) => void;
+  removeDraft: (id: string) => void;
+};
+
 export function useLinkDrafts({
   linkId,
   workspaceId,
