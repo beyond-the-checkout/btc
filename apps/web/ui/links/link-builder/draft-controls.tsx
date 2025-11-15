@@ -2,6 +2,7 @@ import { ExpandedLinkProps } from "@/lib/types";
 import { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
 import {
   LinkDraft,
+  LinkDraftsAPI,
   useLinkDrafts,
 } from "@/ui/modals/link-builder/use-link-drafts";
 import { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
@@ -20,30 +21,7 @@ import {
 } from "react";
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-import { useDebouncedCallback } from "use-debounce";
-
-const DESIGN_KEYS: (keyof QRCodeDesign)[] = [
-  "fgColor",
-  "qrHideLogo",
-  "qrDotType",
-  "qrCornerSquareType",
-  "qrCornerDotType",
-  "qrShape",
-  "qrFrameStyle",
-  "qrFrameColor",
-  "qrDotsColor",
-  "qrCornerSquareColor",
-  "qrCornerDotColor",
-];
-
-const shallowEqualQr = (a?: QRCodeDesign, b?: QRCodeDesign) => {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  for (const k of DESIGN_KEYS) {
-    if (a[k] !== b[k]) return false;
-  }
-  return true;
-};
+import { DraftAutoSaveEngine } from "./auto-save-engine";
 
 export type DraftControlsHandle = {
   onSubmitSuccessful: () => void;
@@ -55,6 +33,10 @@ type DraftControlsProps = {
   workspaceId: string;
   qrDesignFromModal?: QRCodeDesign;
   onRestoreQrDesignFromDraft?: (d?: QRCodeDesign) => void;
+  // Testability hooks
+  debounceMs?: number;
+  persistenceOverride?: LinkDraftsAPI;
+  pendingOnSwitch?: "flush" | "cancel";
 };
 
 export const DraftControls = forwardRef<
@@ -67,6 +49,9 @@ export const DraftControls = forwardRef<
       workspaceId,
       qrDesignFromModal,
       onRestoreQrDesignFromDraft,
+      debounceMs,
+      persistenceOverride,
+      pendingOnSwitch,
     }: DraftControlsProps,
     ref,
   ) => {
@@ -86,14 +71,57 @@ export const DraftControls = forwardRef<
     const [openPopover, setOpenPopover] = useState(false);
     const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null);
 
-    const {
-      drafts: allDrafts,
-      saveDraft,
-      removeDraft,
-    } = useLinkDrafts({
-      linkId: props?.id,
-      workspaceId,
-    });
+    const draftsAPI =
+      persistenceOverride ??
+      useLinkDrafts({
+        linkId: props?.id,
+        workspaceId,
+      });
+    const { drafts: allDrafts, removeDraft } = draftsAPI;
+
+    // Keep latest dynamic values in refs for stable engine getters
+    const selectedDraftIdRef = useRef(selectedDraftId);
+    useEffect(() => {
+      selectedDraftIdRef.current = selectedDraftId;
+    }, [selectedDraftId]);
+
+    const sessionIdRef = useRef(sessionId);
+    useEffect(() => {
+      sessionIdRef.current = sessionId;
+    }, [sessionId]);
+
+    const allDraftsRef = useRef(allDrafts);
+    useEffect(() => {
+      allDraftsRef.current = allDrafts;
+    }, [allDrafts]);
+
+    const pendingOnSwitchRef = useRef(pendingOnSwitch ?? "flush");
+    useEffect(() => {
+      pendingOnSwitchRef.current = pendingOnSwitch ?? "flush";
+    }, [pendingOnSwitch]);
+
+    // Proxy persistence functions to always use the latest closures
+    const saveDraftRef = useRef(draftsAPI.saveDraft);
+    useEffect(() => {
+      saveDraftRef.current = draftsAPI.saveDraft;
+    }, [draftsAPI.saveDraft]);
+    const removeDraftStable = draftsAPI.removeDraft;
+
+    const getActiveDraftIdStable = (): string => {
+      if (selectedDraftIdRef.current) return selectedDraftIdRef.current;
+      if (props?.id) {
+        return allDraftsRef.current[0]?.id ?? sessionIdRef.current;
+      }
+      return sessionIdRef.current;
+    };
+
+    const persistenceForEngine: LinkDraftsAPI = {
+      get drafts() {
+        return allDraftsRef.current;
+      },
+      saveDraft: (id, link, qr) => saveDraftRef.current(id, link, qr),
+      removeDraft: (id: string) => removeDraftStable(id),
+    };
 
     const getActiveDraftId = (): string => {
       if (selectedDraftId) return selectedDraftId;
@@ -107,74 +135,59 @@ export const DraftControls = forwardRef<
       return allDrafts.filter((draft) => draft.id !== sessionId);
     }, [allDrafts, sessionId]);
 
-    const saveDraftDebounced = useDebouncedCallback(
-      (
-        draftId: string,
-        link: Partial<LinkFormData>,
-        qrDesign?: QRCodeDesign,
-      ) => {
-        saveDraft(draftId, link, qrDesign);
-        setIsSavePending(false);
-        setHasSaved(true);
-      },
-      1000,
-    );
-
-    const prevQrRef = useRef<QRCodeDesign | undefined>(undefined);
+    // Restoration guard and QR design ref for engine getters
     const isRestoringRef = useRef(false);
     const qrDesignRef = useRef<QRCodeDesign | undefined>(qrDesignFromModal);
-
-    // Keep a ref of the latest QR design to avoid resubscribing the watch effect
     useEffect(() => {
       qrDesignRef.current = qrDesignFromModal;
     }, [qrDesignFromModal]);
 
-    // Watch for form changes and save draft
+    // Instantiate autosave engine once; keep dependencies fresh via refs
+    const engineRef = useRef<DraftAutoSaveEngine | null>(null);
     useEffect(() => {
-      const { unsubscribe } = watch(() => {
-        const [url, key] = getValues(["url", "key"]);
-        if ((url || key) && isDirty) {
+      engineRef.current = new DraftAutoSaveEngine({
+        debounceMs: debounceMs ?? 1000,
+        persistence: persistenceForEngine,
+        getActiveDraftId: getActiveDraftIdStable,
+        getLink: () => getValues(),
+        getQr: () => qrDesignRef.current,
+        isRestoring: () => isRestoringRef.current,
+        pendingOnSwitch: pendingOnSwitchRef.current,
+        onBeforeSave: () => {
           setIsSavePending(true);
-          const link = getValues();
-
-          const draftId = getActiveDraftId();
-          saveDraftDebounced(draftId, link, qrDesignRef.current);
-        }
+        },
+        onAfterSave: () => {
+          setIsSavePending(false);
+          setHasSaved(true);
+        },
       });
-      return () => unsubscribe();
-    }, [
-      watch,
-      isDirty,
-      getValues,
-      sessionId,
-      saveDraftDebounced,
-      props?.id,
-      selectedDraftId,
-    ]);
 
-    // Auto-save when QR design changes, even if form is unchanged
+      return () => {
+        engineRef.current?.dispose();
+      };
+    }, [debounceMs]);
+
+    // No-op on first QR change after restoration; otherwise delegate to engine
     useEffect(() => {
-      // Skip one cycle if a draft is being restored
       if (isRestoringRef.current) {
         isRestoringRef.current = false;
         return;
       }
+      engineRef.current?.onQrChange();
+    }, [qrDesignFromModal]);
 
-      const current = qrDesignFromModal;
-      const prev = prevQrRef.current;
-
-      if (shallowEqualQr(prev, current)) return;
-
-      prevQrRef.current = current;
-
-      const [url, key] = getValues(["url", "key"]);
-      if (!(url || key)) return;
-
-      setIsSavePending(true);
-      const draftId = getActiveDraftId();
-      const link = getValues();
-      saveDraftDebounced(draftId, link, current);
-    }, [qrDesignFromModal, getValues, selectedDraftId, saveDraftDebounced]);
+    // Watch for form changes and delegate to engine
+    useEffect(() => {
+      const { unsubscribe } = watch(() => {
+        const [url, key] = getValues(["url", "key"]);
+        if ((url || key) && isDirty) {
+          // Show pending immediately; engine will finalize via onBefore/AfterSave
+          setIsSavePending(true);
+          engineRef.current?.onFormChange();
+        }
+      });
+      return () => unsubscribe();
+    }, [watch, getValues, isDirty]);
 
     // Debug: watch form changes to trace potential clears/resets
     useEffect(() => {
@@ -200,39 +213,12 @@ export const DraftControls = forwardRef<
             removeDraft(getActiveDraftId());
           },
           onClose() {
-            // Save draft instantly when the link builder is closed
-            const [url, key] = getValues(["url", "key"]);
-            if ((url || key) && isDirty) {
-              // Flush any pending debounced saves first
-              saveDraftDebounced.flush?.();
-
-              const link = getValues();
-
-              const draftId = getActiveDraftId();
-
-              // Rescue QR design from any draft that has it
-              if (DEBUG_RESTORE) {
-                console.log("onClose - draftId:", draftId);
-              }
-
-              isRestoringRef.current = true;
-              saveDraft(draftId, link, qrDesignFromModal);
-            }
+            // Delegate close to engine so pending saves are flushed and final state is persisted if needed
+            engineRef.current?.onClose(isDirty);
           },
         };
       },
-      [
-        sessionId,
-        isDirty,
-        allDrafts,
-        getValues,
-        saveDraft,
-        removeDraft,
-        props?.id,
-        saveDraftDebounced,
-        qrDesignFromModal,
-        selectedDraftId,
-      ],
+      [removeDraft, getActiveDraftId, isDirty],
     );
 
     return (isDirty && hasSaved) || drafts.length > 0 ? (
@@ -257,8 +243,9 @@ export const DraftControls = forwardRef<
                       key={draft.id}
                       draft={draft}
                       onSelect={() => {
-                        // Flush any pending debounced saves before switching
-                        saveDraftDebounced.flush?.();
+                        // Notify engine about draft switch to handle pending behavior
+                        engineRef.current?.onDraftSwitch(draft);
+
                         setSelectedDraftId(draft.id);
                         setSessionId(draft.id);
                         setOpenPopover(false);
