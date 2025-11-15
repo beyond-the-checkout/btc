@@ -155,6 +155,7 @@ function LinkBuilderInner({
     onSuccess: onSubmitSuccess,
   });
 
+  const { qrDraftDesign, setQrDraftDesign } = useLinkBuilderContext();
   return (
     <>
       <Modal
@@ -185,6 +186,8 @@ function LinkBuilderInner({
               ref={draftControlsRef}
               props={props}
               workspaceId={workspaceId!}
+              qrDesignFromModal={qrDraftDesign}
+              onRestoreQrDesignFromDraft={setQrDraftDesign}
             />
           </LinkBuilderHeader>
 

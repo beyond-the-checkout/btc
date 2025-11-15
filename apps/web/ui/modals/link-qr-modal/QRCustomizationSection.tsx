@@ -5,11 +5,21 @@ import {
   CornerSquareType,
   DOT_TYPES,
 } from "@/lib/qr/constants";
-import { PatternPreview, CornerSquarePreview, CornerDotPreview } from "./components/preview-icons";
-import { cn } from "@dub/utils";
+import {
+  InfoTooltip,
+  SimpleTooltipContent,
+  Switch,
+  Tooltip,
+  TooltipContent,
+} from "@dub/ui";
 import { CrownSmall } from "@dub/ui/icons";
-import { Switch, Tooltip, TooltipContent, InfoTooltip, SimpleTooltipContent } from "@dub/ui";
+import { cn } from "@dub/utils";
 import { useLinkQRContext } from "../link-qr-modal.context";
+import {
+  CornerDotPreview,
+  CornerSquarePreview,
+  PatternPreview,
+} from "./components/preview-icons";
 
 export function QRCustomizationSection(): JSX.Element {
   const { id, draft, setDraft, plan, slug } = useLinkQRContext();
@@ -67,7 +77,10 @@ export function QRCustomizationSection(): JSX.Element {
         <div className="flex flex-wrap items-center gap-3">
           {DOT_TYPES.map((pattern) => {
             const isSelected = draft.qrDotType === pattern;
-            const patternLabels: Record<"square" | "rounded" | "dots" | "classy" | "extra-rounded", string> = {
+            const patternLabels: Record<
+              "square" | "rounded" | "dots" | "classy" | "extra-rounded",
+              string
+            > = {
               square: "Square",
               rounded: "Rounded",
               dots: "Dots",
@@ -138,10 +151,7 @@ export function QRCustomizationSection(): JSX.Element {
                           : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                       )}
                     >
-                      <CornerSquarePreview
-                        type={type}
-                        color={draft.fgColor}
-                      />
+                      <CornerSquarePreview type={type} color={draft.fgColor} />
                     </button>
                   </Tooltip>
                 );
@@ -212,6 +222,7 @@ export function QRCustomizationSection(): JSX.Element {
                     ...d,
                     qrShape: "square",
                     qrFrameStyle: newFrameStyle,
+                    hasFrame: !!newFrameStyle,
                   };
                 })
               }
@@ -253,6 +264,7 @@ export function QRCustomizationSection(): JSX.Element {
                     ...d,
                     qrShape: "circle",
                     qrFrameStyle: newFrameStyle,
+                    hasFrame: !!newFrameStyle,
                   };
                 })
               }
@@ -291,7 +303,11 @@ export function QRCustomizationSection(): JSX.Element {
               aria-pressed={draft.qrFrameStyle === undefined}
               aria-label="No frame"
               onClick={() =>
-                setDraft((d) => ({ ...d, qrFrameStyle: undefined }))
+                setDraft((d) => ({
+                  ...d,
+                  qrFrameStyle: undefined,
+                  hasFrame: false,
+                }))
               }
               className={cn(
                 "flex size-12 items-center justify-center rounded-md border transition-all",
@@ -321,7 +337,11 @@ export function QRCustomizationSection(): JSX.Element {
                   aria-pressed={draft.qrFrameStyle === "square"}
                   aria-label="Select square frame"
                   onClick={() =>
-                    setDraft((d) => ({ ...d, qrFrameStyle: "square" }))
+                    setDraft((d) => ({
+                      ...d,
+                      qrFrameStyle: "square",
+                      hasFrame: true,
+                    }))
                   }
                   className={cn(
                     "flex size-12 items-center justify-center rounded-md border transition-all",
@@ -349,7 +369,11 @@ export function QRCustomizationSection(): JSX.Element {
                   aria-pressed={draft.qrFrameStyle === "rounded"}
                   aria-label="Select rounded frame"
                   onClick={() =>
-                    setDraft((d) => ({ ...d, qrFrameStyle: "rounded" }))
+                    setDraft((d) => ({
+                      ...d,
+                      qrFrameStyle: "rounded",
+                      hasFrame: true,
+                    }))
                   }
                   className={cn(
                     "flex size-12 items-center justify-center rounded-md border transition-all",

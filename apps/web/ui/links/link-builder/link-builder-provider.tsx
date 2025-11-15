@@ -1,4 +1,8 @@
 import { ExpandedLinkProps } from "@/lib/types";
+import {
+  migrateQRCodeDesign,
+  QRCodeDesign,
+} from "@/ui/modals/link-qr-modal.types";
 import { DEFAULT_LINK_PROPS, PLANS } from "@dub/utils";
 import {
   createContext,
@@ -6,6 +10,8 @@ import {
   PropsWithChildren,
   SetStateAction,
   useContext,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -30,6 +36,8 @@ const LinkBuilderContext = createContext<
   | (LinkBuilderProps & {
       generatingMetatags: boolean;
       setGeneratingMetatags: Dispatch<SetStateAction<boolean>>;
+      qrDraftDesign?: QRCodeDesign;
+      setQrDraftDesign: Dispatch<SetStateAction<QRCodeDesign | undefined>>;
     })
   | null
 >(null);
@@ -54,6 +62,51 @@ export function LinkBuilderProvider({
     Boolean(rest.props),
   );
 
+  // Shared QR draft design state
+  const [qrDraftDesign, setQrDraftDesign] = useState<QRCodeDesign | undefined>(
+    undefined,
+  );
+
+  // Legacy migration: migrate per-link QR design from localStorage when editing an existing link
+  const migratedStorageKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const linkId = rest.props?.id;
+    const domain = rest.props?.domain;
+    const key = rest.props?.key;
+    if (!linkId || !domain || !key) return; // only migrate for existing links
+
+    const storageKey = `qr-code-design-${domain}-${key}`;
+    if (migratedStorageKeyRef.current === storageKey) return;
+
+    migratedStorageKeyRef.current = storageKey;
+
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (raw) {
+        const migrated = migrateQRCodeDesign(JSON.parse(raw));
+        setQrDraftDesign(migrated);
+        // Clean up the legacy key after successful migration
+        window.localStorage.removeItem(storageKey);
+      } else {
+        // No legacy state for this link; ensure we don't carry previous session state
+        setQrDraftDesign(undefined);
+      }
+    } catch {
+      // no-op on parse or access errors
+    }
+  }, [rest.props?.id, rest.props?.domain, rest.props?.key]);
+
+  // Reset QR design for new sessions (no existing link id)
+  useEffect(() => {
+    if (!rest.props?.id) {
+      setQrDraftDesign(undefined);
+      migratedStorageKeyRef.current = null; // allow fresh migration on next edit session
+    }
+  }, [rest.props?.id]);
+
   const form = useForm<LinkFormData>({
     defaultValues: rest.props ||
       rest.duplicateProps || {
@@ -66,7 +119,13 @@ export function LinkBuilderProvider({
 
   return (
     <LinkBuilderContext.Provider
-      value={{ ...rest, generatingMetatags, setGeneratingMetatags }}
+      value={{
+        ...rest,
+        generatingMetatags,
+        setGeneratingMetatags,
+        qrDraftDesign,
+        setQrDraftDesign,
+      }}
     >
       <FormProvider {...form}>{children}</FormProvider>
     </LinkBuilderContext.Provider>

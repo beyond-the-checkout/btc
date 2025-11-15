@@ -4,6 +4,7 @@ import {
   LinkDraft,
   useLinkDrafts,
 } from "@/ui/modals/link-builder/use-link-drafts";
+import { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 import { AnimatedSizeContainer, Button, Popover, useMediaQuery } from "@dub/ui";
 import { CircleCheck, CircleInfo, LoadingCircle, Xmark } from "@dub/ui/icons";
 import { cn, nanoid, punycode, timeAgo, truncate } from "@dub/utils";
@@ -11,10 +12,8 @@ import { ChevronDown } from "lucide-react";
 import {
   forwardRef,
   SVGProps,
-  useCallback,
   useEffect,
   useImperativeHandle,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -22,6 +21,29 @@ import {
 import { useFormContext } from "react-hook-form";
 import { toast } from "sonner";
 import { useDebouncedCallback } from "use-debounce";
+
+const DESIGN_KEYS: (keyof QRCodeDesign)[] = [
+  "fgColor",
+  "qrHideLogo",
+  "qrDotType",
+  "qrCornerSquareType",
+  "qrCornerDotType",
+  "qrShape",
+  "qrFrameStyle",
+  "qrFrameColor",
+  "qrDotsColor",
+  "qrCornerSquareColor",
+  "qrCornerDotColor",
+];
+
+const shallowEqualQr = (a?: QRCodeDesign, b?: QRCodeDesign) => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  for (const k of DESIGN_KEYS) {
+    if (a[k] !== b[k]) return false;
+  }
+  return true;
+};
 
 export type DraftControlsHandle = {
   onSubmitSuccessful: () => void;
@@ -31,337 +53,271 @@ export type DraftControlsHandle = {
 type DraftControlsProps = {
   props?: ExpandedLinkProps;
   workspaceId: string;
+  qrDesignFromModal?: QRCodeDesign;
+  onRestoreQrDesignFromDraft?: (d?: QRCodeDesign) => void;
 };
 
 export const DraftControls = forwardRef<
   DraftControlsHandle,
   DraftControlsProps
->(({ props, workspaceId }: DraftControlsProps, ref) => {
-  const { isMobile } = useMediaQuery();
-  const DEBUG_RESTORE = process.env.NODE_ENV === "development";
-
-  const {
-    watch,
-    getValues,
-    setValue,
-    formState: { isDirty },
-  } = useFormContext<LinkFormData>();
-
-  const [sessionId, setSessionId] = useState(() => nanoid());
-  const [isSavePending, setIsSavePending] = useState(false);
-  const [hasSaved, setHasSaved] = useState(false);
-  const [openPopover, setOpenPopover] = useState(false);
-
-  const {
-    drafts: allDrafts,
-    saveDraft,
-    removeDraft,
-  } = useLinkDrafts({
-    linkId: props?.id,
-    workspaceId,
-  });
-
-  const latestQrDesignFromDrafts = useCallback(() => {
-    // Read directly from localStorage to avoid race conditions with React state
-    const storageKey = `link-drafts:${workspaceId}`;
-    try {
-      const stored = window.localStorage.getItem(storageKey);
-      if (!stored) return undefined;
-
-      const allStoredDrafts = JSON.parse(stored) as LinkDraft[];
-
-      // Filter to current link's drafts
-      const relevantDrafts = props?.id
-        ? allStoredDrafts.filter((d) => d.link.id === props.id)
-        : allStoredDrafts.filter((d) => !d.link.id);
-
-      // Find the most recent one with qrDesign
-      const sorted = relevantDrafts.sort((a, b) => b.timestamp - a.timestamp);
-      return sorted.find((d) => d.qrDesign)?.qrDesign;
-    } catch {
-      return undefined;
-    }
-  }, [workspaceId, props?.id]);
-
-  const getLatestDraftFromStorage = useCallback((): LinkDraft | undefined => {
-    const storageKey = `link-drafts:${workspaceId}`;
-    try {
-      const stored = window.localStorage.getItem(storageKey);
-      if (!stored) return undefined;
-
-      const allStoredDrafts = JSON.parse(stored) as LinkDraft[];
-
-      // Filter to current link's drafts
-      const relevantDrafts = props?.id
-        ? allStoredDrafts.filter((d) => d.link.id === props.id)
-        : allStoredDrafts.filter((d) => !d.link.id);
-
-      // Return the most recent draft (if any)
-      const sorted = relevantDrafts.sort((a, b) => b.timestamp - a.timestamp);
-      return sorted[0];
-    } catch {
-      return undefined;
-    }
-  }, [workspaceId, props?.id]);
-
-  const drafts = useMemo(() => {
-    return allDrafts.filter((draft) => draft.id !== sessionId);
-  }, [allDrafts, sessionId]);
-
-  const saveDraftDebounced = useDebouncedCallback(
-    (draftId: string, link: Partial<LinkFormData>) => {
-      const qrToPersist = latestQrDesignFromDrafts();
-      saveDraft(draftId, link, qrToPersist);
-      setIsSavePending(false);
-      setHasSaved(true);
-    },
-    1000,
-  );
-
-  const restoredRef = useRef(false);
-
-  // Watch for form changes and save draft
-  useEffect(() => {
-    const { unsubscribe } = watch(() => {
-      const [url, key] = getValues(["url", "key"]);
-      if ((url || key) && isDirty) {
-        setIsSavePending(true);
-        const link = getValues();
-
-        // Prefer session draft for "new link"; else latest for existing link
-        const preferSessionDraft = !props?.id
-          ? allDrafts.find((d) => d.id === sessionId)
-          : undefined;
-        const latest = preferSessionDraft ?? allDrafts[0];
-
-        const draftId = latest?.id ?? sessionId;
-
-        saveDraftDebounced(draftId, link);
-      }
-    });
-    return () => unsubscribe();
-  }, [
-    watch,
-    isDirty,
-    getValues,
-    allDrafts,
-    sessionId,
-    saveDraftDebounced,
-    props?.id,
-  ]);
-
-  // Restore latest draft on open (new link only) - field-specific restore with early timing
-  useLayoutEffect(() => {
-    if (DEBUG_RESTORE) {
-      try {
-        console.log("[restore] start", {
-          restored: restoredRef.current,
-          hasLinkId: !!props?.id,
-          isDirty,
-          currentUrl: getValues("url"),
-          currentKey: getValues("key"),
-          sessionId,
-        });
-      } catch {}
-    }
-
-    if (restoredRef.current) {
-      if (DEBUG_RESTORE) console.log("[restore] already restored; skipping");
-      return;
-    }
-
-    // Only auto-restore for "new link"
-    if (props?.id) {
-      if (DEBUG_RESTORE)
-        console.log("[restore] existing link; skipping auto-restore");
-      restoredRef.current = true;
-      return;
-    }
-
-    const latest = getLatestDraftFromStorage();
-    if (!latest) {
-      if (DEBUG_RESTORE) console.log("[restore] no latest draft found");
-      restoredRef.current = true; // Avoid repeated checks
-      return;
-    }
-
-    // Adopt the existing draft ID for this session
-    if (sessionId !== latest.id) {
-      setSessionId(latest.id);
-      if (DEBUG_RESTORE) console.log("[restore] adopt sessionId:", latest.id);
-    }
-
-    // Hydrate only missing fields without marking dirty or touched
-    const url = getValues("url")?.trim();
-    const key = getValues("key")?.trim();
-
-    if (!url && latest.link.url) {
-      setValue("url", latest.link.url, {
-        shouldDirty: false,
-        shouldTouch: false,
-      });
-      if (DEBUG_RESTORE) console.log("[restore] set url:", latest.link.url);
-    }
-
-    if (!key && latest.link.key) {
-      setValue("key", latest.link.key, {
-        shouldDirty: false,
-        shouldTouch: false,
-      });
-      if (DEBUG_RESTORE) console.log("[restore] set key:", latest.link.key);
-    }
-
-    restoredRef.current = true;
-  }, [
-    props?.id,
-    isDirty,
-    getValues,
-    setValue,
-    getLatestDraftFromStorage,
-    sessionId,
-  ]);
-
-  // Debug: watch form changes to trace potential clears/resets
-  useEffect(() => {
-    if (!DEBUG_RESTORE) return;
-    const { unsubscribe } = watch((_, meta) => {
-      try {
-        console.log("[watch]", meta?.name, {
-          url: getValues("url"),
-          key: getValues("key"),
-          isDirty,
-        });
-      } catch {}
-    });
-    return () => unsubscribe();
-  }, [watch, getValues, isDirty]);
-
-  useImperativeHandle(
+>(
+  (
+    {
+      props,
+      workspaceId,
+      qrDesignFromModal,
+      onRestoreQrDesignFromDraft,
+    }: DraftControlsProps,
     ref,
-    () => {
-      return {
-        onSubmitSuccessful() {
-          // Remove the current draft when it's submitted
-          removeDraft(sessionId);
-        },
-        onClose() {
-          // Save draft instantly when the link builder is closed
-          const [url, key] = getValues(["url", "key"]);
-          if ((url || key) && isDirty) {
-            // Flush any pending debounced saves first
-            saveDraftDebounced.flush?.();
+  ) => {
+    const { isMobile } = useMediaQuery();
+    const DEBUG_RESTORE = process.env.NODE_ENV === "development";
 
-            const link = getValues();
-
-            // Prefer session draft for "new link"; else latest for existing link
-            const preferSessionDraft = !props?.id
-              ? allDrafts.find((d) => d.id === sessionId)
-              : undefined;
-            const latest = preferSessionDraft ?? allDrafts[0];
-
-            const draftId = latest?.id ?? sessionId;
-
-            // Rescue QR design from any draft that has it
-            const qrToPersist = latestQrDesignFromDrafts();
-
-            if (DEBUG_RESTORE) {
-              console.log("onClose - draftId:", draftId);
-              console.log("onClose - rescued qrDesign:", !!qrToPersist);
-            }
-
-            saveDraft(draftId, link, qrToPersist);
-          }
-        },
-      };
-    },
-    [
-      sessionId,
-      isDirty,
-      allDrafts,
+    const {
+      watch,
       getValues,
+      setValue,
+      formState: { isDirty },
+    } = useFormContext<LinkFormData>();
+
+    const [sessionId, setSessionId] = useState(() => nanoid());
+    const [isSavePending, setIsSavePending] = useState(false);
+    const [hasSaved, setHasSaved] = useState(false);
+    const [openPopover, setOpenPopover] = useState(false);
+    const [selectedDraftId, setSelectedDraftId] = useState<string | null>(null);
+
+    const {
+      drafts: allDrafts,
       saveDraft,
       removeDraft,
-      props?.id,
-      saveDraftDebounced,
-      latestQrDesignFromDrafts,
-    ],
-  );
+    } = useLinkDrafts({
+      linkId: props?.id,
+      workspaceId,
+    });
 
-  return (isDirty && hasSaved) || drafts.length > 0 ? (
-    <Popover
-      content={
-        <div className="w-full min-w-36 px-1 py-1 sm:w-auto">
-          {drafts.length > 0 ? (
-            <span className="block pb-2 pl-2.5 pt-2 text-xs font-medium text-neutral-500">
-              Restore drafts
-            </span>
-          ) : (
-            <span className="flex gap-1 px-2.5 pb-2 pt-2 text-xs text-neutral-500">
-              <CircleInfo className="size-3.5" />
-              Your drafts will appear here
-            </span>
-          )}
-          {drafts.length > 0 && (
-            <AnimatedSizeContainer width={!isMobile} height>
-              <ul className="scrollbar-hide grid max-h-40 overflow-y-auto">
-                {drafts.map((draft) => (
-                  <DraftOption
-                    key={draft.id}
-                    draft={draft}
-                    onSelect={() => {
-                      setSessionId(draft.id);
-                      setOpenPopover(false);
-                      Object.entries(draft.link).forEach(([key, value]) => {
-                        setValue(key as any, value, { shouldDirty: true });
-                      });
-                      toast.success("Draft restored!");
-                    }}
-                    onDelete={() => removeDraft(draft.id)}
-                  />
-                ))}
-              </ul>
-            </AnimatedSizeContainer>
-          )}
-        </div>
+    const getActiveDraftId = (): string => {
+      if (selectedDraftId) return selectedDraftId;
+      if (props?.id) {
+        return allDrafts[0]?.id ?? sessionId;
       }
-      align="end"
-      onWheel={(e) => {
-        // Allows scrolling to work when the popover's in a modal
-        e.stopPropagation();
-      }}
-      openPopover={openPopover}
-      setOpenPopover={setOpenPopover}
-    >
-      <Button
-        type="button"
-        variant="outline"
-        className={cn(
-          "animate-fade-in group h-7 w-fit text-sm transition-colors data-[state=open]:bg-neutral-100",
-          isDirty && hasSaved
-            ? "pl-3 pr-4 text-neutral-400 hover:text-neutral-600"
-            : "pl-4 pr-3 text-neutral-500 hover:text-neutral-700",
-        )}
-        text={
-          isDirty && hasSaved ? (
-            <div className="flex items-center justify-end gap-2">
-              {isSavePending ? (
-                <LoadingCircle className="size-3.5" />
-              ) : (
-                <CircleCheck className="size-3.5" />
-              )}
-              {isSavePending ? "Saving..." : "Draft saved"}
-            </div>
-          ) : drafts.length > 0 ? (
-            <div className="flex items-center justify-end gap-1">
-              Drafts
-              <ChevronDown className="size-3.5 transition-transform duration-75 group-data-[state=open]:rotate-180" />
-            </div>
-          ) : null
+      return sessionId;
+    };
+
+    const drafts = useMemo(() => {
+      return allDrafts.filter((draft) => draft.id !== sessionId);
+    }, [allDrafts, sessionId]);
+
+    const saveDraftDebounced = useDebouncedCallback(
+      (
+        draftId: string,
+        link: Partial<LinkFormData>,
+        qrDesign?: QRCodeDesign,
+      ) => {
+        saveDraft(draftId, link, qrDesign);
+        setIsSavePending(false);
+        setHasSaved(true);
+      },
+      1000,
+    );
+
+    const prevQrRef = useRef<QRCodeDesign | undefined>(undefined);
+    const isRestoringRef = useRef(false);
+    const qrDesignRef = useRef<QRCodeDesign | undefined>(qrDesignFromModal);
+
+    // Keep a ref of the latest QR design to avoid resubscribing the watch effect
+    useEffect(() => {
+      qrDesignRef.current = qrDesignFromModal;
+    }, [qrDesignFromModal]);
+
+    // Watch for form changes and save draft
+    useEffect(() => {
+      const { unsubscribe } = watch(() => {
+        const [url, key] = getValues(["url", "key"]);
+        if ((url || key) && isDirty) {
+          setIsSavePending(true);
+          const link = getValues();
+
+          const draftId = getActiveDraftId();
+          saveDraftDebounced(draftId, link, qrDesignRef.current);
         }
-      />
-    </Popover>
-  ) : null;
-});
+      });
+      return () => unsubscribe();
+    }, [
+      watch,
+      isDirty,
+      getValues,
+      sessionId,
+      saveDraftDebounced,
+      props?.id,
+      selectedDraftId,
+    ]);
+
+    // Auto-save when QR design changes, even if form is unchanged
+    useEffect(() => {
+      // Skip one cycle if a draft is being restored
+      if (isRestoringRef.current) {
+        isRestoringRef.current = false;
+        return;
+      }
+
+      const current = qrDesignFromModal;
+      const prev = prevQrRef.current;
+
+      if (shallowEqualQr(prev, current)) return;
+
+      prevQrRef.current = current;
+
+      const [url, key] = getValues(["url", "key"]);
+      if (!(url || key)) return;
+
+      setIsSavePending(true);
+      const draftId = getActiveDraftId();
+      const link = getValues();
+      saveDraftDebounced(draftId, link, current);
+    }, [qrDesignFromModal, getValues, selectedDraftId, saveDraftDebounced]);
+
+    // Debug: watch form changes to trace potential clears/resets
+    useEffect(() => {
+      if (!DEBUG_RESTORE) return;
+      const { unsubscribe } = watch((_, meta) => {
+        try {
+          console.log("[watch]", meta?.name, {
+            url: getValues("url"),
+            key: getValues("key"),
+            isDirty,
+          });
+        } catch {}
+      });
+      return () => unsubscribe();
+    }, [watch, getValues, isDirty]);
+
+    useImperativeHandle(
+      ref,
+      () => {
+        return {
+          onSubmitSuccessful() {
+            // Remove the current draft when it's submitted
+            removeDraft(getActiveDraftId());
+          },
+          onClose() {
+            // Save draft instantly when the link builder is closed
+            const [url, key] = getValues(["url", "key"]);
+            if ((url || key) && isDirty) {
+              // Flush any pending debounced saves first
+              saveDraftDebounced.flush?.();
+
+              const link = getValues();
+
+              const draftId = getActiveDraftId();
+
+              // Rescue QR design from any draft that has it
+              if (DEBUG_RESTORE) {
+                console.log("onClose - draftId:", draftId);
+              }
+
+              isRestoringRef.current = true;
+              saveDraft(draftId, link, qrDesignFromModal);
+            }
+          },
+        };
+      },
+      [
+        sessionId,
+        isDirty,
+        allDrafts,
+        getValues,
+        saveDraft,
+        removeDraft,
+        props?.id,
+        saveDraftDebounced,
+        qrDesignFromModal,
+        selectedDraftId,
+      ],
+    );
+
+    return (isDirty && hasSaved) || drafts.length > 0 ? (
+      <Popover
+        content={
+          <div className="w-full min-w-36 px-1 py-1 sm:w-auto">
+            {drafts.length > 0 ? (
+              <span className="block pb-2 pl-2.5 pt-2 text-xs font-medium text-neutral-500">
+                Restore drafts
+              </span>
+            ) : (
+              <span className="flex gap-1 px-2.5 pb-2 pt-2 text-xs text-neutral-500">
+                <CircleInfo className="size-3.5" />
+                Your drafts will appear here
+              </span>
+            )}
+            {drafts.length > 0 && (
+              <AnimatedSizeContainer width={!isMobile} height>
+                <ul className="scrollbar-hide grid max-h-40 overflow-y-auto">
+                  {drafts.map((draft) => (
+                    <DraftOption
+                      key={draft.id}
+                      draft={draft}
+                      onSelect={() => {
+                        // Flush any pending debounced saves before switching
+                        saveDraftDebounced.flush?.();
+                        setSelectedDraftId(draft.id);
+                        setSessionId(draft.id);
+                        setOpenPopover(false);
+                        Object.entries(draft.link).forEach(([key, value]) => {
+                          setValue(key as any, value, { shouldDirty: true });
+                        });
+                        // Prevent auto-save race during restoration
+                        isRestoringRef.current = true;
+                        // Propagate restored QR to parent/shared state
+                        onRestoreQrDesignFromDraft?.(draft.qrDesign);
+                        toast.success("Draft restored!");
+                      }}
+                      onDelete={() => removeDraft(draft.id)}
+                    />
+                  ))}
+                </ul>
+              </AnimatedSizeContainer>
+            )}
+          </div>
+        }
+        align="end"
+        onWheel={(e) => {
+          // Allows scrolling to work when the popover's in a modal
+          e.stopPropagation();
+        }}
+        openPopover={openPopover}
+        setOpenPopover={setOpenPopover}
+      >
+        <Button
+          type="button"
+          variant="outline"
+          className={cn(
+            "animate-fade-in group h-7 w-fit text-sm transition-colors data-[state=open]:bg-neutral-100",
+            isDirty && hasSaved
+              ? "pl-3 pr-4 text-neutral-400 hover:text-neutral-600"
+              : "pl-4 pr-3 text-neutral-500 hover:text-neutral-700",
+          )}
+          text={
+            isDirty && hasSaved ? (
+              <div className="flex items-center justify-end gap-2">
+                {isSavePending ? (
+                  <LoadingCircle className="size-3.5" />
+                ) : (
+                  <CircleCheck className="size-3.5" />
+                )}
+                {isSavePending ? "Saving..." : "Draft saved"}
+              </div>
+            ) : drafts.length > 0 ? (
+              <div className="flex items-center justify-end gap-1">
+                Drafts
+                <ChevronDown className="size-3.5 transition-transform duration-75 group-data-[state=open]:rotate-180" />
+              </div>
+            ) : null
+          }
+        />
+      </Popover>
+    ) : null;
+  },
+);
 
 function DraftOption({
   draft,

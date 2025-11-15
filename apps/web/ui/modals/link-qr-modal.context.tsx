@@ -1,21 +1,9 @@
-import { createContext, useContext } from "react";
-import type { Dispatch, SetStateAction } from "react";
-import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
-import type { QRLinkProps } from "@/lib/types";
-import { frameStyleToFrameType } from "@/lib/qr/types";
 import { getQRData } from "@/lib/qr";
-
-/**
- * Debounced function type helper that models the control methods
- * commonly exposed by debounce utilities (flush/cancel/pending).
- */
-export type DebouncedFn<T extends (...args: any[]) => any> = ((
-  ...args: Parameters<T>
-) => void) & {
-  flush?: () => void;
-  cancel?: () => void;
-  pending?: () => boolean;
-};
+import { frameStyleToFrameType } from "@/lib/qr/types";
+import type { QRLinkProps } from "@/lib/types";
+import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
+import type { Dispatch, SetStateAction } from "react";
+import { createContext, useContext } from "react";
 
 /**
  * Consolidated context value for the Link QR Modal.
@@ -45,9 +33,6 @@ export interface LinkQRContextValue {
   linkProps: QRLinkProps;
 
   // actions
-  onColorChange: DebouncedFn<(color: string) => void>;
-  onFrameColorChange: DebouncedFn<(color: string) => void>;
-  flushAll: () => void;
   save: () => void;
   close: () => void;
 }

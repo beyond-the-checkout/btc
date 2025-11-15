@@ -1,6 +1,9 @@
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
-import { LinkFormData } from "@/ui/links/link-builder/link-builder-provider";
+import {
+  LinkFormData,
+  useLinkBuilderContext,
+} from "@/ui/links/link-builder/link-builder-provider";
 import { useLinkDrafts } from "@/ui/modals/link-builder/use-link-drafts";
 import {
   DEFAULT_QR_CODE_DESIGN,
@@ -32,6 +35,8 @@ export function QRCodePreview() {
     plan: workspacePlan,
   } = useWorkspace();
 
+  const { qrDraftDesign, setQrDraftDesign } = useLinkBuilderContext();
+
   const { control } = useFormContext<LinkFormData>();
   const [rawKey, rawDomain] = useWatch({ control, name: ["key", "domain"] });
   const [key] = useDebounce(rawKey, 500);
@@ -51,10 +56,15 @@ export function QRCodePreview() {
     workspaceId: workspaceId || "",
   });
   const latestLinkDraft = drafts[0];
+  const isEditingExistingLink = Boolean(id);
   const data = useMemo(
     () =>
-      migrateQRCodeDesign(latestLinkDraft?.qrDesign ?? DEFAULT_QR_CODE_DESIGN),
-    [latestLinkDraft?.qrDesign],
+      migrateQRCodeDesign(
+        qrDraftDesign ??
+          (isEditingExistingLink ? latestLinkDraft?.qrDesign : undefined) ??
+          DEFAULT_QR_CODE_DESIGN,
+      ),
+    [qrDraftDesign, latestLinkDraft?.qrDesign, isEditingExistingLink],
   );
 
   const shortLinkUrl = useMemo(() => {
@@ -87,6 +97,8 @@ export function QRCodePreview() {
       domain: rawDomain,
       key: rawKey,
     },
+    draftQrDesign: qrDraftDesign,
+    onDraftQrDesignChange: setQrDraftDesign,
   });
 
   useLinkBuilderKeyboardShortcut("q", () => setShowLinkQRModal(true), {

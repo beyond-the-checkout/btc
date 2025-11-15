@@ -7,8 +7,8 @@ import {
 } from "@dub/ui";
 import { Copy, Download } from "@dub/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
-import { useLinkQRContext } from "../link-qr-modal.context";
 import { CopyPopover, DownloadPopover } from "../link-qr-modal";
+import { useLinkQRContext } from "../link-qr-modal.context";
 
 export function QRPreviewSection(): JSX.Element {
   const {
@@ -81,7 +81,10 @@ export function QRPreviewSection(): JSX.Element {
                 draft.qrShape +
                 draft.hasFrame +
                 (draft.qrFrameStyle || "") +
-                (draft.qrFrameColor || "")
+                (draft.qrFrameColor || "") +
+                (draft.qrDotsColor || "") +
+                (draft.qrCornerSquareColor || "") +
+                (draft.qrCornerDotColor || "")
               }
               initial={{ filter: "blur(2px)", opacity: 0.4 }}
               animate={{ filter: "blur(0px)", opacity: 1 }}
@@ -91,23 +94,23 @@ export function QRPreviewSection(): JSX.Element {
             >
               <QRCode
                 url={url}
-                fgColor={draft.fgColor}
+                fgColor={draft.qrDotsColor || draft.fgColor}
                 hideLogo={draft.qrHideLogo}
                 logo={logo}
                 scale={1}
                 qrShape={draft.qrShape}
                 dotsOptions={{
                   type: draft.qrDotType,
-                  color: draft.fgColor,
+                  color: draft.qrDotsColor || draft.fgColor,
                 }}
                 eyeOptions={{
                   cornerSquare: {
                     type: draft.qrCornerSquareType,
-                    color: draft.fgColor,
+                    color: draft.qrCornerSquareColor || draft.fgColor,
                   },
                   cornerDot: {
                     type: draft.qrCornerDotType,
-                    color: draft.fgColor,
+                    color: draft.qrCornerDotColor || draft.fgColor,
                   },
                 }}
                 frameOptions={frameOptions}

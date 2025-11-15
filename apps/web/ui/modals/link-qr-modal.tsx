@@ -3,8 +3,8 @@ import { frameStyleToFrameType } from "@/lib/qr/types";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
-import { useLocalStorage } from "@/ui/hooks/use-local-storage";
 import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
+import { DEFAULT_QR_CODE_DESIGN } from "@/ui/modals/link-qr-modal.types";
 import {
   Button,
   IconMenu,
@@ -29,10 +29,8 @@ import {
   useState,
 } from "react";
 import { toast } from "sonner";
-import { useDebouncedCallback } from "use-debounce";
 import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";
 import { CONTENT_MAX_HEIGHT_OFFSET } from "./link-qr-modal.constants";
-import type { DebouncedFn } from "./link-qr-modal.context";
 import { LinkQRModalProvider } from "./link-qr-modal.context";
 import { QRColorSection } from "./link-qr-modal/QRColorSection";
 import { QRCustomizationSection } from "./link-qr-modal/QRCustomizationSection";
@@ -44,6 +42,9 @@ export type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 type LinkQRModalProps = {
   props: QRLinkProps;
   onSave?: (data: QRCodeDesign) => void;
+  // Controlled mode (optional)
+  draftQrDesign?: QRCodeDesign;
+  onDraftQrDesignChange?: (d: QRCodeDesign) => void;
 };
 
 function LinkQRModal(
@@ -147,6 +148,8 @@ function QRModalFooter({ onCancel }: QRModalFooterProps): JSX.Element {
 function LinkQRModalInner({
   props,
   onSave,
+  draftQrDesign,
+  onDraftQrDesignChange,
   showLinkQRModal,
   setShowLinkQRModal,
 }: {
@@ -167,66 +170,31 @@ function LinkQRModalInner({
       : undefined;
   }, [props.key, props.domain]);
 
-  // Use per-link localStorage key instead of workspace-level
-  // This ensures each link has its own QR customization
-  const localStorageKey =
-    props.domain && props.key
-      ? `qr-code-design-${props.domain}-${props.key}`
-      : `qr-code-design-new-link`; // Fallback for links being created
-
-  const [rawData, setData] = useLocalStorage<QRCodeDesign>(localStorageKey, {
-    fgColor: "#000000",
-    qrHideLogo: false,
-    qrDotType: "square",
-    qrCornerSquareType: "square",
-    qrCornerDotType: "square",
-    qrShape: "square",
-    hasFrame: false,
-    qrFrameStyle: undefined,
-    qrFrameColor: undefined,
-    qrDotsColor: undefined,
-    qrCornerSquareColor: undefined,
-    qrCornerDotColor: undefined,
-  });
-
-  // Migrate any legacy keys and provide defaults for missing fields
+  // Use parent's draft design or fall back to defaults
   const baseDesign = useMemo(() => {
-    const d = rawData || ({} as Partial<QRCodeDesign>);
-    const migrated: QRCodeDesign = {
-      fgColor: d.fgColor ?? "#000000",
-      qrHideLogo: d.qrHideLogo ?? (d as any).hideLogo ?? false,
-      qrDotType: d.qrDotType ?? (d as any).dotType ?? "square",
-      qrCornerSquareType:
-        d.qrCornerSquareType ?? (d as any).cornerSquareType ?? "square",
-      qrCornerDotType:
-        d.qrCornerDotType ?? (d as any).cornerDotType ?? "square",
-      qrShape: d.qrShape ?? "square",
-      hasFrame: Boolean(d.qrFrameStyle ?? (d as any).frameStyle),
-      qrFrameStyle:
-        d.qrFrameStyle ??
-        ((d as any).frameStyle === "none"
-          ? undefined
-          : (d as any).frameStyle) ??
-        undefined,
-      qrFrameColor: d.qrFrameColor ?? (d as any).frameColor ?? undefined,
-      qrDotsColor: d.qrDotsColor ?? (d as any).dotsColor ?? undefined,
-      qrCornerSquareColor:
-        d.qrCornerSquareColor ?? (d as any).cornerSquareColor ?? undefined,
-      qrCornerDotColor:
-        d.qrCornerDotColor ?? (d as any).cornerDotColor ?? undefined,
-    };
-    return migrated;
-  }, [rawData]);
+    return draftQrDesign ?? DEFAULT_QR_CODE_DESIGN;
+  }, [draftQrDesign]);
 
   // Local draft state: edits apply here and only persist on Save
   const [draft, setDraft] = useState<QRCodeDesign>(baseDesign);
 
-  // Reset draft when opening the modal to the latest persisted design
+  // Wrapped setDraft that propagates all changes to parent
+  const wrappedSetDraft = useCallback(
+    (updater: SetStateAction<QRCodeDesign>) => {
+      setDraft((prev) => {
+        const next = typeof updater === "function" ? updater(prev) : updater;
+        onDraftQrDesignChange?.(next);
+        return next;
+      });
+    },
+    [onDraftQrDesignChange],
+  );
+
+  // Always sync local draft with latest baseDesign to prevent stale state
+  // This keeps preview in sync even when restoring drafts while closed
   useEffect(() => {
-    if (showLinkQRModal) {
-      setDraft(baseDesign);
-    }
-  }, [showLinkQRModal, baseDesign]);
+    setDraft(baseDesign);
+  }, [baseDesign]);
 
   const frameOptions = useMemo(() => {
     const type = frameStyleToFrameType(draft.qrFrameStyle as any);
@@ -289,33 +257,11 @@ function LinkQRModalInner({
     [qrData, frameOptions],
   );
 
-  const onColorChange = useDebouncedCallback(
-    (color: string) =>
-      setDraft((d) => ({
-        ...d,
-        fgColor: color,
-        qrDotsColor: color,
-        qrCornerSquareColor: color,
-        qrCornerDotColor: color,
-      })),
-    500,
-  ) as DebouncedFn<(color: string) => void>;
-
-  const onFrameColorChange = useDebouncedCallback(
-    (color: string) => setDraft((d) => ({ ...d, qrFrameColor: color })),
-    500,
-  ) as DebouncedFn<(color: string) => void>;
-
-  const flushAll = () => {
-    onColorChange.flush?.();
-    onFrameColorChange.flush?.();
-  };
-
   const close = () => setShowLinkQRModal(false);
 
   const save = () => {
-    flushAll();
-    setData(draft);
+    // Final sync before closing (wrappedSetDraft already propagated changes)
+    onDraftQrDesignChange?.(draft);
     setShowLinkQRModal(false);
     onSave?.(draft);
   };
@@ -327,7 +273,7 @@ function LinkQRModalInner({
     plan,
     slug,
     draft,
-    setDraft,
+    setDraft: wrappedSetDraft,
     // derived
     url,
     logo,
@@ -338,9 +284,6 @@ function LinkQRModalInner({
     // external
     linkProps: props,
     // actions
-    onColorChange,
-    onFrameColorChange,
-    flushAll,
     save,
     close,
   };
@@ -351,10 +294,8 @@ function LinkQRModalInner({
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        // Flush any pending debounced updates before closing
-        flushAll();
-        // Persist final draft state to localStorage
-        setData(draft);
+        // Final sync before closing (wrappedSetDraft already propagated changes)
+        onDraftQrDesignChange?.(draft);
         setShowLinkQRModal(false);
         onSave?.(draft);
       }}

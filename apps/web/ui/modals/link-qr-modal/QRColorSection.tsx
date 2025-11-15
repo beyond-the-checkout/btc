@@ -1,13 +1,12 @@
-import { HexColorInput, HexColorPicker } from "react-colorful";
-import { Check2 } from "@dub/ui/icons";
 import { Tooltip } from "@dub/ui";
+import { Check2 } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { DEFAULT_COLORS } from "../link-qr-modal.constants";
 import { useLinkQRContext } from "../link-qr-modal.context";
 
 export function QRColorSection(): JSX.Element {
-  const { draft, setDraft, onColorChange, onFrameColorChange } =
-    useLinkQRContext();
+  const { draft, setDraft } = useLinkQRContext();
 
   return (
     <>
@@ -34,7 +33,9 @@ export function QRColorSection(): JSX.Element {
                   <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
                     <HexColorPicker
                       color={draft.qrFrameColor || draft.fgColor}
-                      onChange={onFrameColorChange}
+                      onChange={(color) =>
+                        setDraft((d) => ({ ...d, qrFrameColor: color }))
+                      }
                     />
                   </div>
                 ) : (
@@ -52,7 +53,9 @@ export function QRColorSection(): JSX.Element {
             </Tooltip>
             <HexColorInput
               color={draft.qrFrameColor || draft.fgColor}
-              onChange={onFrameColorChange}
+              onChange={(color) =>
+                setDraft((d) => ({ ...d, qrFrameColor: color }))
+              }
               prefixed
               disabled={!draft.qrFrameStyle}
               style={{ borderColor: draft.qrFrameColor || draft.fgColor }}
@@ -72,7 +75,18 @@ export function QRColorSection(): JSX.Element {
             <Tooltip
               content={
                 <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
-                  <HexColorPicker color={draft.fgColor} onChange={onColorChange} />
+                  <HexColorPicker
+                    color={draft.fgColor}
+                    onChange={(color) =>
+                      setDraft((d) => ({
+                        ...d,
+                        fgColor: color,
+                        qrDotsColor: color,
+                        qrCornerSquareColor: color,
+                        qrCornerDotColor: color,
+                      }))
+                    }
+                  />
                 </div>
               }
             >
@@ -88,7 +102,15 @@ export function QRColorSection(): JSX.Element {
               id="color"
               name="color"
               color={draft.fgColor}
-              onChange={onColorChange}
+              onChange={(color) =>
+                setDraft((d) => ({
+                  ...d,
+                  fgColor: color,
+                  qrDotsColor: color,
+                  qrCornerSquareColor: color,
+                  qrCornerDotColor: color,
+                }))
+              }
               prefixed
               style={{ borderColor: draft.fgColor }}
               className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm"
@@ -102,7 +124,15 @@ export function QRColorSection(): JSX.Element {
                   key={color}
                   type="button"
                   aria-pressed={isSelected}
-                  onClick={() => setDraft((d) => ({ ...d, fgColor: color }))}
+                  onClick={() =>
+                    setDraft((d) => ({
+                      ...d,
+                      fgColor: color,
+                      qrDotsColor: color,
+                      qrCornerSquareColor: color,
+                      qrCornerDotColor: color,
+                    }))
+                  }
                   className={cn(
                     "flex size-7 items-center justify-center rounded-full transition-all",
                     isSelected
