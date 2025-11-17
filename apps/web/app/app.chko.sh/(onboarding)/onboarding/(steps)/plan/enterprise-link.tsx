@@ -2,6 +2,7 @@
 
 import { cn } from "@dub/utils";
 import { useSearchParams } from "next/navigation";
+import { BRAND } from "../../../../../../lib/branding";
 
 export function EnterpriseLink() {
   const searchParams = useSearchParams();
@@ -9,7 +10,7 @@ export function EnterpriseLink() {
 
   return (
     <a
-      href="https://dub.co/enterprise"
+      href={BRAND.enterprise}
       target="_blank"
       rel="noopener noreferrer"
       className={cn(

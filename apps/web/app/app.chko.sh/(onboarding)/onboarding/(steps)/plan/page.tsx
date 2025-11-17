@@ -1,3 +1,4 @@
+import { BRAND } from "../../../../../../lib/branding";
 import { LaterButton } from "../../later-button";
 import { StepPage } from "../step-page";
 import { EnterpriseLink } from "./enterprise-link";
@@ -30,8 +31,9 @@ export default function Plan() {
           Start for free, pick a plan later
         </LaterButton>
         <a
-          href="https://dub.co/pricing"
+          href={BRAND.pricing}
           target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center text-neutral-500 underline-offset-4 transition-colors hover:text-neutral-800 hover:underline"
         >
           Compare all plans ↗

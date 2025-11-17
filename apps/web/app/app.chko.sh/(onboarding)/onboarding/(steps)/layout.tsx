@@ -1,7 +1,8 @@
-import { Grid, Wordmark } from "@dub/ui";
+import { Grid } from "@dub/ui";
 import { cn } from "@dub/utils";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
+import { BRAND, brandName } from "../../../../../lib/branding";
 
 export default function Layout({ children }: PropsWithChildren) {
   return (
@@ -46,8 +47,15 @@ export default function Layout({ children }: PropsWithChildren) {
       <div className="relative flex min-h-screen w-full flex-col items-center justify-between">
         <div className="grow basis-0">
           <div className="pt-4">
-            <Link href="https://dub.co/home" target="_blank" className="block">
-              <Wordmark className="h-8" />
+            <Link
+              href={BRAND.home}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+            >
+              <span className="block h-8 text-2xl font-semibold leading-8 tracking-tight">
+                {brandName(false)}
+              </span>
             </Link>
           </div>
         </div>

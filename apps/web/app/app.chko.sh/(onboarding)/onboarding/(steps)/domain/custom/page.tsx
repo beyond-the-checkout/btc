@@ -1,3 +1,4 @@
+import { helpArticle } from "../../../../../../../lib/branding";
 import { StepPage } from "../../step-page";
 import { Form } from "./form";
 
@@ -7,8 +8,9 @@ export default function Custom() {
       title="Connect a custom domain"
       description={
         <a
-          href="https://dub.co/help/article/choosing-a-custom-domain"
+          href={helpArticle("choosing-a-custom-domain")}
           target="_blank"
+          rel="noopener noreferrer"
           className="underline transition-colors hover:text-neutral-700"
         >
           Read our guide for best practices

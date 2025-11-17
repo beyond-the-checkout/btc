@@ -4,6 +4,7 @@ import { Button, Crown } from "@dub/ui";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
+import { asset, brandName } from "../../../../../../lib/branding";
 import { LaterButton } from "../../later-button";
 
 export function DefaultDomainSelector() {
@@ -15,14 +16,14 @@ export function DefaultDomainSelector() {
       <div className="animate-fade-in mx-auto grid w-full max-w-[312px] gap-4 sm:max-w-[600px] sm:grid-cols-2">
         <DomainOption
           path="domain/custom"
-          icon="https://assets.dub.co/icons/link.webp"
+          icon={asset("/icons/link.webp")}
           title="Connect a custom domain"
-          description="Already have a domain? Connect it to Dub in just a few clicks"
+          description={`Already have a domain? Connect it to ${brandName(false)} in just a few clicks`}
           cta="Connect domain"
         />
         <DomainOption
           path="domain/register"
-          icon="https://assets.dub.co/icons/crown.webp"
+          icon={asset("/icons/crown.webp")}
           title={
             <>
               Claim a free{" "}

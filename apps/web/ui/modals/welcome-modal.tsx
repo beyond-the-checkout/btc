@@ -12,6 +12,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { brandName } from "../../lib/branding";
 import { ModalHero } from "../shared/modal-hero";
 import { PlanFeatures } from "../workspaces/plan-features";
 
@@ -81,8 +82,8 @@ function WelcomeModal({
                 )}
               >
                 {plan
-                  ? `Dub ${plan.name} looks good on you!`
-                  : "Welcome to Dub!"}
+                  ? `${brandName(true)} ${plan.name} looks good on you!`
+                  : `Welcome to ${brandName(false)}!`}
               </h1>
               <p
                 className={cn(

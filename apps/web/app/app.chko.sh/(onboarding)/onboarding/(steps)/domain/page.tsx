@@ -1,3 +1,4 @@
+import { brandUrl } from "../../../../../../lib/branding";
 import { StepPage } from "../step-page";
 import { DefaultDomainSelector } from "./default-domain-selector";
 
@@ -10,8 +11,9 @@ export default function Domain() {
           Make your links stand out and
           <br />
           <a
-            href="https://dub.co/blog/custom-domains"
+            href={brandUrl("/blog/custom-domains")}
             target="_blank"
+            rel="noopener noreferrer"
             className="cursor-help font-medium underline decoration-dotted underline-offset-2 transition-colors hover:text-neutral-700"
           >
             boost click-through rates by 30%

@@ -15,6 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { helpArticle } from "../../lib/branding";
 import { CheckCircleFill } from "../shared/icons";
 import { ModalHero } from "../shared/modal-hero";
 
@@ -37,11 +38,11 @@ function ProgramWelcomeModal({
     },
     {
       text: "Set up a bank account for partner payouts",
-      href: "https://dub.co/help/article/how-to-set-up-bank-account",
+      href: helpArticle("how-to-set-up-bank-account"),
     },
     {
       text: "Invite more partners to your program",
-      href: "https://dub.co/help/article/inviting-partners",
+      href: helpArticle("inviting-partners"),
     },
     {
       text: "Set up click, lead, and sale-based rewards",
