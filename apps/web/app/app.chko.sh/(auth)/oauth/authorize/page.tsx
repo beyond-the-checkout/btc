@@ -1,5 +1,6 @@
 import { vaidateAuthorizeRequest } from "@/lib/api/oauth/actions";
 import { getSession } from "@/lib/auth";
+import { BRAND, brandName } from "@/lib/branding";
 import z from "@/lib/zod";
 import { authorizeRequestSchema } from "@/lib/zod/schemas/oauth";
 import EmptyState from "@/ui/shared/empty-state";
@@ -13,16 +14,14 @@ import { AuthorizeForm } from "./authorize-form";
 import { ScopesRequested } from "./scopes-requested";
 
 export const metadata = constructMetadata({
-  title: "Authorize API access | Dub",
+  title: `Authorize API access | ${brandName()}`,
   noIndex: true,
 });
 
 // OAuth app consent page
-export default async function Authorize(
-  props: {
-    searchParams?: Promise<z.infer<typeof authorizeRequestSchema>>;
-  }
-) {
+export default async function Authorize(props: {
+  searchParams?: Promise<z.infer<typeof authorizeRequestSchema>>;
+}) {
   const searchParams = await props.searchParams;
   const session = await getSession();
 
@@ -61,14 +60,14 @@ export default async function Authorize(
             )}
           </a>
           <ArrowLeftRight className="size-5 text-neutral-500" />
-          <a href="https://dub.co" target="_blank" rel="noreferrer">
+          <a href={BRAND.home} target="_blank" rel="noreferrer">
             <Logo className="size-12" />
           </a>
         </div>
 
         <p className="text-md">
           <span className="font-bold">{integration.name}</span> is requesting
-          API access to a workspace on Dub.
+          API access to a workspace on {brandName()}.
         </p>
         <span className="text-xs text-neutral-500">
           Built by{" "}
@@ -85,7 +84,7 @@ export default async function Authorize(
         {!integration.verified && (
           <div className="flex items-center gap-2 rounded-md bg-yellow-50 p-2 text-sm text-yellow-700">
             <CircleWarning className="size-4" />
-            <span>Dub hasn't verified this app</span>
+            <span>{brandName()} hasn't verified this app</span>
           </div>
         )}
       </div>

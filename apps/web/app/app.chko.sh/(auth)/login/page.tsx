@@ -1,11 +1,11 @@
-import { AuthAlternativeBanner } from "@/ui/auth/auth-alternative-banner";
+import { brandName } from "@/lib/branding";
 import LoginForm from "@/ui/auth/login/login-form";
 import { AuthLayout } from "@/ui/layout/auth-layout";
 import { APP_DOMAIN, constructMetadata } from "@dub/utils";
 import Link from "next/link";
 
 export const metadata = constructMetadata({
-  title: `Sign in to ${process.env.NEXT_PUBLIC_APP_NAME}`,
+  title: `Sign in to ${brandName()}`,
   canonicalUrl: `${APP_DOMAIN}/login`,
 });
 
@@ -14,7 +14,7 @@ export default function LoginPage() {
     <AuthLayout showTerms="app">
       <div className="w-full max-w-sm">
         <h3 className="text-center text-xl font-semibold">
-          Log in to your Dub account
+          Log in to your {brandName()} account
         </h3>
         <div className="mt-8">
           <LoginForm />
@@ -28,14 +28,6 @@ export default function LoginPage() {
             Sign up
           </Link>
         </p>
-
-        <div className="mt-12 w-full">
-          <AuthAlternativeBanner
-            text="Looking for your Dub partner account?"
-            cta="Log in at partners.dub.co"
-            href="https://partners.dub.co/login"
-          />
-        </div>
       </div>
     </AuthLayout>
   );

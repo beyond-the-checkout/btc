@@ -1,6 +1,6 @@
 import Toolbar from "@/ui/layout/toolbar/toolbar";
-import { Grid, Wordmark } from "@dub/ui";
-import { cn } from "@dub/utils";
+import { Grid } from "@dub/ui";
+import { CHECKOUT_WORDMARK, cn } from "@dub/utils";
 import { ReactNode } from "react";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
@@ -51,7 +51,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           target="_blank"
           className="absolute left-1/2 top-4 z-10 -translate-x-1/2"
         >
-          <Wordmark className="h-8" />
+          <img
+            src={CHECKOUT_WORDMARK}
+            alt="Beyond the Checkout"
+            className="w-32 h-auto"
+          />
         </a>
         {children}
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { brandName } from "@/lib/branding";
 import { Button, InfoTooltip, useMediaQuery } from "@dub/ui";
 import { Lock } from "lucide-react";
 import { signIn } from "next-auth/react";
@@ -37,7 +38,7 @@ export const SSOSignIn = () => {
           setLastUsedAuthMethod("saml");
           await signIn("saml", undefined, {
             tenant: data.workspaceId,
-            product: "Dub",
+            product: brandName(),
           });
         });
       }}
@@ -53,7 +54,7 @@ export const SSOSignIn = () => {
               Workspace Slug
             </h2>
             <InfoTooltip
-              content={`This is your workspace's unique identifier on ${process.env.NEXT_PUBLIC_APP_NAME}. E.g. app.dub.co/acme is "acme".`}
+              content={`This is your workspace's unique identifier on ${brandName()}. E.g. https://${process.env.NEXT_PUBLIC_APP_DOMAIN}/acme is "acme".`}
             />
           </div>
           <input

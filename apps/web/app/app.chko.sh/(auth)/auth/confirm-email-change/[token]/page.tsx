@@ -1,4 +1,5 @@
 import { getSession, hashToken } from "@/lib/auth";
+import { BRAND } from "@/lib/branding";
 import { redis } from "@/lib/upstash";
 import EmptyState from "@/ui/shared/empty-state";
 import { sendEmail } from "@dub/email";
@@ -107,8 +108,8 @@ const VerifyEmailChange = async ({ params, searchParams }: PageProps) => {
       return (
         <EmptyState
           icon={InputPassword}
-          title="No Partner Profile Found"
-          description="We couldn’t find a partner profile for your account. Please make sure you’re logged in with the correct account at https://partners.dub.co"
+          title="No Profile Found"
+          description={`We couldn’t find a profile for your account. Please make sure you’re logged in with the correct account at ${BRAND.home}.`}
         />
       );
     }

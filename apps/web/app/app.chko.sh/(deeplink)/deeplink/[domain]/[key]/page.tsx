@@ -1,8 +1,8 @@
 import { deepViewDataSchema } from "@/lib/zod/schemas/deep-links";
 import { prisma } from "@dub/prisma";
-import { Grid, Wordmark } from "@dub/ui";
+import { Grid } from "@dub/ui";
 import { ArrowRight, Copy, IOSAppStore, MobilePhone } from "@dub/ui/icons";
-import { cn } from "@dub/utils";
+import { cn, CHECKOUT_WORDMARK } from "@dub/utils";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DeepLinkActionButtons } from "./action-buttons";
@@ -94,7 +94,7 @@ export default async function DeepLinkPreviewPage(
             target="_blank"
             className="flex items-center gap-1 whitespace-nowrap text-sm font-medium text-neutral-900"
           >
-            Powered by <Wordmark className="text-content-emphasis h-3.5" />
+            Powered by <img src={CHECKOUT_WORDMARK} alt="Beyond the Checkout" className="text-content-emphasis w-14 h-auto" />
           </Link>
         </div>
 

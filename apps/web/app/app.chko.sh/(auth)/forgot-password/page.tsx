@@ -1,9 +1,10 @@
 import { ForgotPasswordForm } from "@/ui/auth/forgot-password-form";
 import { AuthLayout } from "@/ui/layout/auth-layout";
+import { brandName } from "@/lib/branding";
 import { constructMetadata } from "@dub/utils";
 
 export const metadata = constructMetadata({
-  title: `Forgot Password for ${process.env.NEXT_PUBLIC_APP_NAME}`,
+  title: `Forgot Password for ${brandName()}`,
 });
 
 export default function ForgotPasswordPage() {
