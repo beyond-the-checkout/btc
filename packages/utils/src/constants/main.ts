@@ -70,7 +70,7 @@ export const DUB_WORDMARK = "https://assets.dub.co/wordmark.png";
 export const DUB_THUMBNAIL = "https://assets.dub.co/thumbnail.jpg";
 
 // Checkout brand assets
-export const CHECKOUT_WORDMARK = "https://assets.chko.sh/wordmark.png";
+export const CHECKOUT_WORDMARK = "https://assets.chko.sh/assets/wordmark.png";
 
 // Checkout domain constants
 export const CHECKOUT_DOMAIN = "chko.sh";
