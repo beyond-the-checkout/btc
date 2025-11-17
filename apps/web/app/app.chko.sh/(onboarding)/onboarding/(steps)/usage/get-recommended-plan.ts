@@ -1,23 +1,40 @@
 import { OnboardingUsageSchema } from "@/lib/zod/schemas/workspaces";
 import { z } from "zod";
-import { PLAN_SELECTOR_PLANS } from "../plan/plan-selector";
+
+export const PLAN_THRESHOLDS = {
+  FREE: { maxScans: 50_000, maxQrCodes: 1_000 },
+  PRO: { maxScans: 250_000, maxQrCodes: 10_000 },
+} as const;
+
+export const PLAN_NAMES = {
+  FREE: "free",
+  PRO: "pro",
+  BUSINESS: "business",
+} as const;
 
 export function getRecommendedPlan({
-  links,
-  clicks,
-  conversions,
-  partners,
+  qrCodes,
+  scans,
+  packaging,
 }: z.infer<typeof OnboardingUsageSchema>) {
-  const hasConversions = (plan: string) => plan !== "free" && plan !== "pro";
-  const hasPartners = (plan: string) => plan !== "free" && plan !== "pro";
+  if (
+    scans <= PLAN_THRESHOLDS.FREE.maxScans &&
+    qrCodes <= PLAN_THRESHOLDS.FREE.maxQrCodes &&
+    packaging !== "full"
+  ) {
+    return PLAN_NAMES.FREE;
+  }
 
-  const plans = PLAN_SELECTOR_PLANS.filter(
-    (plan) =>
-      (!conversions || hasConversions(plan.name.toLowerCase())) &&
-      (!partners || hasPartners(plan.name.toLowerCase())) &&
-      links <= plan.limits.links &&
-      clicks <= plan.limits.clicks,
-  ).sort((a, b) => (a.price.monthly ?? 0) - (b.price.monthly ?? 0));
+  if (
+    scans <= PLAN_THRESHOLDS.PRO.maxScans &&
+    qrCodes <= PLAN_THRESHOLDS.PRO.maxQrCodes
+  ) {
+    return PLAN_NAMES.PRO;
+  }
 
-  return plans?.[0]?.name?.toLowerCase() ?? "enterprise";
+  if (packaging === "full") {
+    return PLAN_NAMES.BUSINESS;
+  }
+
+  return PLAN_NAMES.BUSINESS;
 }

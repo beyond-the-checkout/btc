@@ -7,8 +7,8 @@ export default function Workspace() {
       title="Create your workspace"
       description={
         <>
-          Set up a shared space to manage your post-purchase experiences with
-          your team.{" "}
+          Set up a shared space to manage your QR codes and packaging engagement
+          campaigns with your team.{" "}
           <a
             href="https://beyondthecheckout.com/help/workspaces"
             target="_blank"

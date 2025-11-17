@@ -26,10 +26,9 @@ export function Form() {
     formState: { isSubmitting, isSubmitSuccessful },
   } = useForm<FormData>({
     defaultValues: {
-      links: 1_000,
-      clicks: 50_000,
-      conversions: false,
-      partners: false,
+      qrCodes: 1_000,
+      scans: 50_000,
+      packaging: "partial",
     },
   });
 
@@ -56,14 +55,14 @@ export function Form() {
       >
         <Controller
           control={control}
-          name="links"
+          name="qrCodes"
           render={({ field }) => (
             <RadioGroup
-              label="How many [links](https://dub.co/help/article/how-to-create-link) do you create per month?"
+              label="How many QR codes do you plan to manage?"
               options={[
-                { id: 1_000, label: "1K or less" },
-                { id: 10_000, label: "10K" },
-                { id: 50_000, label: "50K" },
+                { id: 100, label: "Up to 100" },
+                { id: 1_000, label: "Up to 1K" },
+                { id: 10_000, label: "Up to 10K" },
               ]}
               selectedId={field.value}
               onSelect={field.onChange}
@@ -73,14 +72,14 @@ export function Form() {
 
         <Controller
           control={control}
-          name="clicks"
+          name="scans"
           render={({ field }) => (
             <RadioGroup
-              label="How many [clicks](https://dub.co/help/article/dub-analytics) do your links get per month?"
+              label="How many scans do you expect per month?"
               options={[
-                { id: 50_000, label: "50K or less" },
-                { id: 250_000, label: "250K" },
-                { id: 1_000_000, label: "1M" },
+                { id: 50_000, label: "Up to 50K" },
+                { id: 250_000, label: "Up to 250K" },
+                { id: 1_000_000, label: "Up to 1M" },
               ]}
               selectedId={field.value}
               onSelect={field.onChange}
@@ -90,29 +89,14 @@ export function Form() {
 
         <Controller
           control={control}
-          name="conversions"
+          name="packaging"
           render={({ field }) => (
             <RadioGroup
-              label="Do you want to [track conversions](https://dub.co/help/article/dub-conversions) on your links?"
+              label="How integrated are QR codes into your packaging?"
               options={[
-                { id: false, label: "No" },
-                { id: true, label: "Yes" },
-              ]}
-              selectedId={field.value}
-              onSelect={field.onChange}
-            />
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="partners"
-          render={({ field }) => (
-            <RadioGroup
-              label="Do you want to create a [partner program](https://dub.co/help/article/dub-partners)?"
-              options={[
-                { id: false, label: "No" },
-                { id: true, label: "Yes" },
+                { id: "none", label: "Not yet - planning phase" },
+                { id: "partial", label: "Some SKUs or campaigns" },
+                { id: "full", label: "Most or all products" },
               ]}
               selectedId={field.value}
               onSelect={field.onChange}

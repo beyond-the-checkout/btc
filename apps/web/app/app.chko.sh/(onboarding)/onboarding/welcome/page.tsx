@@ -17,11 +17,13 @@ export default function Welcome() {
             <Gradient className="opacity-50 mix-blend-hard-light" />
           </div>
           <h1 className="animate-slide-up-fade mt-14 text-xl font-semibold text-neutral-900 [--offset:10px] [animation-delay:250ms] [animation-duration:1s] [animation-fill-mode:both]">
-            Welcome to Dub
+            Welcome to Beyond The Checkout
           </h1>
           <p className="animate-slide-up-fade mt-2 text-balance text-base text-neutral-500 [--offset:10px] [animation-delay:500ms] [animation-duration:1s] [animation-fill-mode:both]">
-            Dub gives you superpowers to track how your marketing efforts
-            convert to revenue.
+            Your QR codes. Your data. Your control. Create dynamic QR codes that
+            never expire, built for packaging engagement. Transparent pricing
+            and guaranteed longevity — so every scan continues to work for as
+            long as your product is in market.
           </p>
           <div className="animate-slide-up-fade mt-8 w-full [--offset:10px] [animation-delay:750ms] [animation-duration:1s] [animation-fill-mode:both]">
             <NextButton text="Get started" step="workspace" />

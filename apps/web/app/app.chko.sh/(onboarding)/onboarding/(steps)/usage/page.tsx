@@ -11,7 +11,7 @@ export default function Usage() {
       <p className="mt-8 text-center text-sm font-medium text-neutral-500">
         Need more usage?{" "}
         <a
-          href="https://dub.co/contact/sales"
+          href="https://beyondthecheckout.com/contact/sales"
           target="_blank"
           className="text-neutral-800 transition-colors hover:text-neutral-950"
         >

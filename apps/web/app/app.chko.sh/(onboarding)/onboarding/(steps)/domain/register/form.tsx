@@ -12,10 +12,10 @@ export function Form() {
       <RegisterDomainForm
         saveOnly
         onSuccess={() => {
-          continueTo("invite");
+          continueTo("completed");
         }}
       />
-      <LaterButton next="invite" className="mt-4" />
+      <LaterButton next="completed" className="mt-4" />
     </div>
   );
 }
