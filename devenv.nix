@@ -7,6 +7,12 @@ let
     config.allowUnfree = true;
   };
 
+  # Pin codex to version 0.55.0
+  pkgs-codex = import inputs.nixpkgs-codex {
+    system = pkgs.stdenv.system;
+    config.allowUnfree = true;
+  };
+
   # Import custom packages with unfree allowed
   customPkgs = import ./nix/pkgs {
     pkgs = pkgs.extend (final: prev: {
@@ -24,10 +30,11 @@ in
   pkgs.git
   pkgs.gh
   pkgs.curl
+  pkgs.caddy
   pkgs.jwt-cli
   pkgs.nodejs_20
   pkgs-unstable.claude-code
-  pkgs-unstable.codex
+  pkgs-codex.codex
   pkgs.mysql84
   pkgs.nodePackages.typescript
   pkgs.nodePackages.ts-node
