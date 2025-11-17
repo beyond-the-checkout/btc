@@ -1,18 +1,19 @@
 "use client";
 
-import { ClientOnly, Switch } from "@dub/ui";
-import { DUB_QR_LOGO, CHECKOUT_BASE_URL, cn } from "@dub/utils";
-import { useState, useCallback, useMemo } from "react";
+import { useDebounce } from "@/lib/hooks/use-debounce";
+import { DEFAULT_MARGIN } from "@/lib/qr/constants";
+import { DotType, frameStyleToFrameType } from "@/lib/qr/types";
+import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 import { QRCode } from "@/ui/shared/qr-code";
 import {
-  PatternSelector,
-  QRShapeToggle,
   ColorPicker,
   FrameSelector,
+  PatternSelector,
+  QRShapeToggle,
 } from "@/ui/shared/qr-customization";
-import { DotType, frameStyleToFrameType } from "@/lib/qr/types";
-import { DEFAULT_MARGIN } from "@/lib/qr/constants";
-import { useDebounce } from "@/lib/hooks/use-debounce";
+import { Button, ClientOnly, Switch } from "@dub/ui";
+import { CHECKOUT_BASE_URL, DUB_QR_LOGO } from "@dub/utils";
+import { useCallback, useMemo, useState } from "react";
 
 /**
  * QR Creator Design Constants
@@ -43,7 +44,12 @@ const QR_PREVIEW_SCALE = 1.3;
  */
 const COLOR_DEBOUNCE_MS = 300;
 
-export function QRCreator() {
+export function QRCreator(props: {
+  onOpenFullEditor?: (seed: {
+    url?: string;
+    draft?: Partial<QRCodeDesign>;
+  }) => void;
+}) {
   // URL state
   const [url, setUrl] = useState("");
 
@@ -61,8 +67,6 @@ export function QRCreator() {
    */
   const [dotPattern, setDotPattern] = useState<DotType>("rounded");
 
-
-
   /**
    * Frame state - defaults to undefined (no frame)
    *
@@ -73,9 +77,9 @@ export function QRCreator() {
    * Frame is automatically reset when switching between square/circle shapes
    * to prevent invalid combinations.
    */
-  const [frameStyle, setFrameStyle] = useState<"square" | "rounded" | "solid-circle" | "dotted-circle" | undefined>(
-    undefined,
-  );
+  const [frameStyle, setFrameStyle] = useState<
+    "square" | "rounded" | "solid-circle" | "dotted-circle" | undefined
+  >(undefined);
 
   /**
    * Color state - defaults to black (#000000)
@@ -137,9 +141,27 @@ export function QRCreator() {
   }, [frameStyle, debouncedFgColor]);
 
   // Handler for URL change
-  const handleUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setUrl(e.target.value);
-  }, []);
+  const handleUrlChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setUrl(e.target.value);
+    },
+    [],
+  );
+
+  function toQRCodeDesign(): Partial<QRCodeDesign> {
+    return {
+      fgColor,
+      qrDotsColor: fgColor,
+      qrDotType: dotPattern,
+      qrCornerSquareType: "square",
+      qrCornerSquareColor: fgColor,
+      qrCornerDotType: "square",
+      qrCornerDotColor: fgColor,
+      qrFrameStyle: frameStyle,
+      qrFrameColor: fgColor,
+      qrHideLogo: hideLogo,
+    };
+  }
 
   return (
     <div className="size-full [mask-image:linear-gradient(black_70%,transparent)]">
@@ -147,10 +169,12 @@ export function QRCreator() {
         className="mx-3.5 flex origin-top scale-95 cursor-default flex-col gap-6 rounded-xl border border-neutral-200 bg-white p-4 shadow-[0_20px_20px_0_#00000017]"
         aria-label="QR Code Creator"
       >
-
         {/* URL Input */}
         <div>
-          <label htmlFor="qr-url-input" className="mb-2 block text-sm font-medium text-neutral-700">
+          <label
+            htmlFor="qr-url-input"
+            className="mb-2 block text-sm font-medium text-neutral-700"
+          >
             URL
           </label>
           <input
@@ -166,10 +190,10 @@ export function QRCreator() {
 
         {/* QR Code Preview */}
         <div>
-          <span className="mb-2 block text-sm font-medium text-neutral-700">Preview</span>
-          <div
-            className="relative flex h-72 items-center justify-center overflow-hidden rounded-md border border-neutral-300 bg-white p-8"
-          >
+          <span className="mb-2 block text-sm font-medium text-neutral-700">
+            Preview
+          </span>
+          <div className="relative flex h-72 items-center justify-center overflow-hidden rounded-md border border-neutral-300 bg-white p-8">
             <ClientOnly>
               <div className="relative flex size-full items-center justify-center">
                 <QRCode
@@ -191,7 +215,9 @@ export function QRCreator() {
 
         {/* Logo Toggle */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-neutral-700">Show Logo</span>
+          <span className="text-sm font-medium text-neutral-700">
+            Show Logo
+          </span>
           <Switch
             checked={!hideLogo}
             fn={(checked) => {
@@ -211,13 +237,36 @@ export function QRCreator() {
         />
 
         {/* Dot Pattern Selector */}
-        <PatternSelector value={dotPattern} onChange={setDotPattern} color={debouncedFgColor} />
+        <PatternSelector
+          value={dotPattern}
+          onChange={setDotPattern}
+          color={debouncedFgColor}
+        />
 
         {/* Frame Selector */}
-        <FrameSelector value={frameStyle} onChange={setFrameStyle} qrShape={qrShape} />
+        <FrameSelector
+          value={frameStyle}
+          onChange={setFrameStyle}
+          qrShape={qrShape}
+        />
 
         {/* Color Picker */}
         <ColorPicker value={fgColor} onChange={setFgColor} label="Color" />
+
+        {/* CTA: open full QR editor modal */}
+        <div className="flex items-center justify-end">
+          <Button
+            variant="primary"
+            className="h-9 w-full sm:w-auto"
+            text="Create your QR code"
+            onClick={() =>
+              props.onOpenFullEditor?.({
+                url,
+                draft: toQRCodeDesign(),
+              })
+            }
+          />
+        </div>
       </div>
     </div>
   );

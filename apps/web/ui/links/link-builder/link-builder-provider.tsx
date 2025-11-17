@@ -30,6 +30,8 @@ export type LinkBuilderProps = {
     defaultProgramId?: string | null;
   };
   modal: boolean;
+  initialValues?: Partial<LinkFormData>;
+  initialQrDraftDesign?: QRCodeDesign;
 };
 
 const LinkBuilderContext = createContext<
@@ -64,7 +66,7 @@ export function LinkBuilderProvider({
 
   // Shared QR draft design state
   const [qrDraftDesign, setQrDraftDesign] = useState<QRCodeDesign | undefined>(
-    undefined,
+    rest.initialQrDraftDesign ?? undefined,
   );
 
   // Legacy migration: migrate per-link QR design from localStorage when editing an existing link
@@ -102,10 +104,10 @@ export function LinkBuilderProvider({
   // Reset QR design for new sessions (no existing link id)
   useEffect(() => {
     if (!rest.props?.id) {
-      setQrDraftDesign(undefined);
+      setQrDraftDesign(rest.initialQrDraftDesign ?? undefined);
       migratedStorageKeyRef.current = null; // allow fresh migration on next edit session
     }
-  }, [rest.props?.id]);
+  }, [rest.props?.id, rest.initialQrDraftDesign]);
 
   const form = useForm<LinkFormData>({
     defaultValues: rest.props ||
@@ -114,6 +116,7 @@ export function LinkBuilderProvider({
         trackConversion:
           (plan && plan !== "free" && plan !== "pro" && conversionEnabled) ||
           false,
+        ...(rest.initialValues ?? {}),
       },
   });
 

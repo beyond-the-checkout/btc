@@ -7,6 +7,7 @@ export default defineConfig({
   test: {
     dir: "./tests",
     reporters: ["verbose"],
+    watch: false,
     globals: true,
     testTimeout: 50000,
     env: loadEnv("", process.cwd(), ""),
