@@ -70,7 +70,7 @@ export const LoginFormContext = createContext<{
 });
 
 export default function LoginForm({
-  methods = [...authMethods],
+  methods = [...authMethods.filter((m) => m !== "saml")],
   next,
 }: {
   methods?: AuthMethod[];
@@ -122,13 +122,13 @@ export default function LoginForm({
       component: GitHubButton,
     },
     {
+      method: "saml",
+      component: SSOSignIn,
+    },
+    {
       method: "email",
       component: EmailSignIn,
       props: { next },
-    },
-    {
-      method: "saml",
-      component: SSOSignIn,
     },
   ];
 
