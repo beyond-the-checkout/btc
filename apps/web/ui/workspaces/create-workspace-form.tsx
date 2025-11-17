@@ -1,6 +1,7 @@
 "use client";
 
 import { isGenericEmail } from "@/lib/is-generic-email";
+import { generateRandomName } from "@/lib/names";
 import { AlertCircleFill } from "@/ui/shared/icons";
 import { Button, buttonVariants, FileUpload, useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
@@ -8,7 +9,7 @@ import slugify from "@sindresorhus/slugify";
 import { useSession } from "next-auth/react";
 import { usePlausible } from "next-plausible";
 import posthog from "posthog-js";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
@@ -29,6 +30,7 @@ export function CreateWorkspaceForm({
   const { data: session, update } = useSession();
   const plausible = usePlausible();
 
+  const generatedName = useMemo(() => generateRandomName(), []);
   const {
     register,
     handleSubmit,
@@ -38,7 +40,12 @@ export function CreateWorkspaceForm({
     clearErrors,
     control,
     formState: { isSubmitting, isSubmitSuccessful, errors },
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      name: generatedName,
+      slug: slugify(generatedName),
+    },
+  });
 
   const slug = watch("slug");
 
@@ -113,27 +120,7 @@ export function CreateWorkspaceForm({
       })}
       className={cn("flex flex-col space-y-6 text-left", className)}
     >
-      <div>
-        <label htmlFor="name" className="flex items-center space-x-2">
-          <p className="block text-sm font-medium text-neutral-700">
-            Workspace name
-          </p>
-        </label>
-        <div className="mt-2 flex rounded-md shadow-sm">
-          <input
-            id="name"
-            type="text"
-            autoFocus={!isMobile}
-            autoComplete="off"
-            className="block w-full rounded-md border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
-            placeholder="Acme, Inc."
-            {...register("name", {
-              required: true,
-              onChange: (e) => setValue("slug", slugify(e.target.value)),
-            })}
-          />
-        </div>
-      </div>
+      <input type="hidden" {...register("name", { required: true })} />
 
       <div>
         <label htmlFor="slug" className="flex items-center space-x-2">
@@ -150,6 +137,7 @@ export function CreateWorkspaceForm({
             type="text"
             required
             autoComplete="off"
+            autoFocus={!isMobile}
             className={`${
               errors.slug
                 ? "border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500"
