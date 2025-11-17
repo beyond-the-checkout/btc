@@ -160,7 +160,6 @@ export function CreateWorkspaceForm({
                 pattern: /^[a-zA-Z0-9\-]+$/,
               })}
               onBlur={() => {
-                slugEditedRef.current = true;
                 setIsSlugChecking(true);
                 fetch(`/api/misc/check-workspace-slug?slug=${slug}`)
                   .then(async (res) => {
@@ -202,10 +201,9 @@ export function CreateWorkspaceForm({
                 shouldDirty: true,
                 shouldValidate: true,
               });
-              if (!slugEditedRef.current) {
-                setValue("slug", slugify(next));
-                clearErrors("slug");
-              }
+              setValue("slug", slugify(next));
+              clearErrors("slug");
+              slugEditedRef.current = false;
             }}
           >
             <Shuffle className="size-4" />

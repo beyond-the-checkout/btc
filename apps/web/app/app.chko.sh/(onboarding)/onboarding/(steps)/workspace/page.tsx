@@ -12,6 +12,7 @@ export default function Workspace() {
           <a
             href="https://beyondthecheckout.com/help/workspaces"
             target="_blank"
+            rel="noopener noreferrer"
             className="cursor-help font-medium underline decoration-dotted underline-offset-2 transition-colors hover:text-neutral-700"
           >
             Learn more.
