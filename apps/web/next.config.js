@@ -25,6 +25,7 @@ module.exports = withAxiom({
     "shiki",
     "@dub/prisma",
     "@dub/email",
+    "@dub/utils",
     "@boxyhq/saml-jackson",
   ],
   outputFileTracingIncludes: {

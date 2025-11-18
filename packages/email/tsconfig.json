@@ -4,8 +4,7 @@
     "src/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "../utils/**/*"
+    "node_modules"
   ],
   "compilerOptions": {
     "baseUrl": ".",
