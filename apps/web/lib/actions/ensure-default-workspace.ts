@@ -1,12 +1,12 @@
 "use server";
 
-import { z } from "zod";
+import { authUserActionClient } from "@/lib/actions/safe-action";
+import { generateRandomString } from "@/lib/api/utils/generate-random-string";
+import { createWorkspaceId } from "@/lib/api/workspaces/create-workspace-id";
 import { prisma } from "@dub/prisma";
 import { Prisma } from "@dub/prisma/client";
 import { FREE_WORKSPACES_LIMIT, nanoid } from "@dub/utils";
-import { authUserActionClient } from "./safe-action";
-import { createWorkspaceId } from "@/lib/api/workspaces/create-workspace-id";
-import { generateRandomString } from "@/lib/api/utils/generate-random-string";
+import { z } from "zod";
 
 /**
  * Minimal slugify for workspace names.

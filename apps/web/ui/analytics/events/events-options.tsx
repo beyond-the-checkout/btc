@@ -1,8 +1,8 @@
 import { Button, Popover } from "@dub/ui";
 import { useContext, useState } from "react";
 import { ThreeDots } from "../../shared/icons";
+import ExportButton from "../export-button";
 import { EventsContext } from "./events-provider";
-import ExportButton from "./export-button";
 
 export default function EventsOptions() {
   const [openPopover, setOpenPopover] = useState(false);
@@ -13,7 +13,7 @@ export default function EventsOptions() {
       align="end"
       content={
         <div className="grid w-screen gap-px p-2 sm:w-48">
-          <ExportButton onClick={() => setOpenPopover(false)} />
+          <ExportButton setOpenPopover={setOpenPopover} />
         </div>
       }
       openPopover={openPopover}
