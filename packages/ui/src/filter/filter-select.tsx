@@ -255,14 +255,14 @@ export function FilterSelect({
                         );
                       }) ?? (
                       // Filter options loading state
-                      (<Command.Loading>
+                      <Command.Loading>
                         <div
                           className="-m-1 flex items-center justify-center"
                           style={listDimensions.current}
                         >
                           <LoadingSpinner />
                         </div>
-                      </Command.Loading>)
+                      </Command.Loading>
                     )}
 
                 {/* Only render CommandEmpty if not loading */}
@@ -319,11 +319,12 @@ function isEmptyStateObject(
   );
 }
 
-const CommandInput = (
-  props: React.ComponentProps<typeof Command.Input> & {
-    emptySubmit?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  },
-) => {
+const CommandInput = ({
+  emptySubmit,
+  ...props
+}: React.ComponentProps<typeof Command.Input> & {
+  emptySubmit?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}) => {
   const isEmpty = useCommandState((state) => state.filtered.count === 0);
   return (
     <Command.Input
@@ -334,7 +335,7 @@ const CommandInput = (
         props.onKeyDown?.(e);
 
         if (e.key === "Enter" && isEmpty) {
-          props.emptySubmit?.(e);
+          emptySubmit?.(e);
         }
       }}
       autoCapitalize="none"
