@@ -1,3 +1,5 @@
+import type { QROnboardingSeedDetail } from "@/lib/onboarding/qr/events";
+import { QROnboardingSeedEvent } from "@/lib/onboarding/qr/events";
 import { ExpandedLinkProps } from "@/lib/types";
 import {
   migrateQRCodeDesign,
@@ -14,7 +16,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
 
 export type LinkFormData = ExpandedLinkProps;
 
@@ -30,6 +32,7 @@ export type LinkBuilderProps = {
     defaultProgramId?: string | null;
   };
   modal: boolean;
+  listenForSeedEvents?: boolean;
   initialValues?: Partial<LinkFormData>;
   initialQrDraftDesign?: QRCodeDesign;
 };
@@ -120,6 +123,33 @@ export function LinkBuilderProvider({
       },
   });
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (rest.modal) return;
+    if (rest.listenForSeedEvents === false) return;
+
+    const handler = (evt: Event) => {
+      const { detail } = evt as CustomEvent<QROnboardingSeedDetail>;
+      if (!detail) return;
+      const { url, qrDesign } = detail;
+
+      if (typeof url === "string" && url.length > 0) {
+        form.setValue("url", url, { shouldDirty: true, shouldValidate: true });
+      }
+      if (qrDesign) {
+        setQrDraftDesign(qrDesign);
+      }
+    };
+
+    window.addEventListener(QROnboardingSeedEvent, handler as EventListener);
+    return () => {
+      window.removeEventListener(
+        QROnboardingSeedEvent,
+        handler as EventListener,
+      );
+    };
+  }, [form, rest.modal, rest.listenForSeedEvents, setQrDraftDesign]);
+
   return (
     <LinkBuilderContext.Provider
       value={{
@@ -133,4 +163,24 @@ export function LinkBuilderProvider({
       <FormProvider {...form}>{children}</FormProvider>
     </LinkBuilderContext.Provider>
   );
+}
+
+/**
+ * Controls for seeding the link builder from external components.
+ * - openWithSeed(url, design) sets the URL field and QR design draft.
+ */
+export function useLinkBuilderControls() {
+  const form = useFormContext<LinkFormData>();
+  const { setQrDraftDesign } = useLinkBuilderContext();
+
+  const openWithSeed = (url?: string, qrDesign?: QRCodeDesign) => {
+    if (typeof url === "string" && url.length > 0) {
+      form.setValue("url", url, { shouldDirty: true, shouldValidate: true });
+    }
+    if (qrDesign) {
+      setQrDraftDesign(qrDesign);
+    }
+  };
+
+  return { openWithSeed };
 }

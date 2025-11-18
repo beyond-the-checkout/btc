@@ -1,14 +1,10 @@
 "use client";
 
+import { QR_ONBOARDING_SOURCE_PARAM } from "@/lib/onboarding/qr";
 import { PlanFeatures } from "@/ui/workspaces/plan-features";
 import { UpgradePlanButton } from "@/ui/workspaces/upgrade-plan-button";
 import { Badge, ToggleGroup } from "@dub/ui";
-import {
-  ADVANCED_PLAN,
-  BASE_PLAN,
-  BUSINESS_PLAN,
-  cn,
-} from "@dub/utils";
+import { ADVANCED_PLAN, BASE_PLAN, BUSINESS_PLAN, cn } from "@dub/utils";
 import NumberFlow from "@number-flow/react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -22,6 +18,7 @@ export function PlanSelector() {
 
   const searchParams = useSearchParams();
   const recommendedPlan = searchParams.get("plan");
+  const source = searchParams.get(QR_ONBOARDING_SOURCE_PARAM) ?? undefined;
 
   return (
     <div>
@@ -110,6 +107,7 @@ export function PlanSelector() {
                 <UpgradePlanButton
                   plan={plan.name.toLowerCase()}
                   period={period}
+                  source={source}
                   text="Get started"
                   className="h-10 rounded-lg shadow-sm"
                 />

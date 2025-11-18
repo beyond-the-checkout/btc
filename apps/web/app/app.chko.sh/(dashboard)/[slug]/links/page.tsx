@@ -7,7 +7,9 @@
  * navigation and deep links stay in sync.
  */
 import { isFeatureEnabled } from "@/lib/feature-flags";
+import { QROnboardingBanner } from "@/ui/workspaces/qr-onboarding-banner";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import WorkspaceLinksClient from "./page-client";
 
 export default function WorkspaceLinks() {
@@ -16,5 +18,12 @@ export default function WorkspaceLinks() {
     notFound();
   }
 
-  return <WorkspaceLinksClient />;
+  return (
+    <>
+      <Suspense>
+        <QROnboardingBanner />
+      </Suspense>
+      <WorkspaceLinksClient />
+    </>
+  );
 }

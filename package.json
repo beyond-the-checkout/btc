@@ -30,7 +30,8 @@
     "turbo": "^1.12.5"
   },
   "resolutions": {
-    "chrono-node": "2.7.5"
+    "chrono-node": "2.7.5",
+    "zod-to-json-schema": "^3.23.0"
   },
   "packageManager": "pnpm@8.6.10"
 }

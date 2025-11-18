@@ -12,10 +12,12 @@ import { useState } from "react";
 export function UpgradePlanButton({
   plan,
   period,
+  source,
   ...rest
 }: {
   plan: string;
   period: "monthly" | "yearly";
+  source?: string;
 } & Partial<ButtonProps>) {
   const router = useRouter();
   const pathname = usePathname();
@@ -32,6 +34,7 @@ export function UpgradePlanButton({
   const [clicked, setClicked] = useState(false);
 
   const queryString = searchParams.toString();
+  const sourceParam = source ?? searchParams.get("source") ?? undefined;
 
   const isCurrentPlan = currentPlan === selectedPlan.name.toLowerCase();
 
@@ -58,12 +61,15 @@ export function UpgradePlanButton({
             period,
             baseUrl: `${APP_DOMAIN}${pathname}${queryString.length > 0 ? `?${queryString}` : ""}`,
             onboarding: searchParams.get("workspace"),
+            source: sourceParam,
           }),
         })
           .then(async (res) => {
             if (!res.ok) {
               const error = await res.json();
-              throw new Error(error.error?.message || "Failed to create checkout session");
+              throw new Error(
+                error.error?.message || "Failed to create checkout session",
+              );
             }
 
             plausible("Opened Checkout");

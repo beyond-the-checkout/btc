@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 
 // POST /api/workspaces/[idOrSlug]/billing/upgrade
 export const POST = withWorkspace(async ({ req, workspace, session }) => {
-  let { plan, period, baseUrl, onboarding } = await req.json();
+  let { plan, period, baseUrl, onboarding, source } = await req.json();
 
   if (!baseUrl.startsWith(APP_DOMAIN)) {
     throw new DubApiError({
@@ -26,13 +26,10 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
   plan = plan.replace(" ", "+").toLowerCase();
 
   const lookupKey = `${plan}_${period}`;
-  console.log("🔍 Looking up Stripe price with key:", lookupKey);
 
   const prices = await stripe.prices.list({
     lookup_keys: [lookupKey],
   });
-
-  console.log("✅ Found prices:", prices.data.length, prices.data.map(p => ({ id: p.id, lookup_key: p.lookup_key })));
 
   const activeSubscription = workspace.stripeId
     ? await stripe.subscriptions
@@ -55,9 +52,13 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
 
   // if the user has an active subscription, create billing portal to upgrade
   if (workspace.stripeId && activeSubscription) {
+    const baseReturnUrl = new URL(baseUrl);
+    if (source && !baseReturnUrl.searchParams.get("source")) {
+      baseReturnUrl.searchParams.set("source", source);
+    }
     const { url } = await stripe.billingPortal.sessions.create({
       customer: workspace.stripeId,
-      return_url: baseUrl,
+      return_url: baseReturnUrl.toString(),
       flow_data: {
         type: "subscription_update_confirm",
         subscription_update_confirm: {
@@ -76,6 +77,15 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
   } else {
     const customer = await getDubCustomer(session.user.id).catch(() => null);
 
+    const successUrl = new URL(`/${workspace.slug}/links`, APP_DOMAIN);
+    const params = new URLSearchParams({
+      [onboarding ? "onboarded" : "upgraded"]: "true",
+      plan,
+      period,
+    });
+    if (source) params.set("source", source);
+    successUrl.search = params.toString();
+
     // For both new users and users with canceled subscriptions
     const stripeSession = await stripe.checkout.sessions.create({
       ...(workspace.stripeId
@@ -91,7 +101,7 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
             customer_email: session.user.email,
           }),
       billing_address_collection: "required",
-      success_url: `${APP_DOMAIN}/${workspace.slug}?${onboarding ? "onboarded" : "upgraded"}=true&plan=${plan}&period=${period}`,
+      success_url: successUrl.toString(),
       cancel_url: baseUrl,
       line_items: [{ price: prices.data[0].id, quantity: 1 }],
       ...(customer?.discount?.couponId

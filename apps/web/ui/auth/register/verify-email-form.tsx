@@ -1,12 +1,19 @@
 "use client";
 
 import { createUserAccountAction } from "@/lib/actions/create-user-account";
+import { ensureDefaultWorkspace } from "@/lib/actions/ensure-default-workspace";
+import { setOnboardingProgress } from "@/lib/actions/set-onboarding-progress";
+import { logOnboardingError } from "@/lib/onboarding/logging";
+import {
+  QR_ONBOARDING_SOURCE_PARAM,
+  QR_ONBOARDING_SOURCE_VALUE,
+} from "@/lib/onboarding/qr";
 import { AnimatedSizeContainer, Button, useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { OTPInput } from "input-otp";
 import { signIn } from "next-auth/react";
 import { useAction } from "next-safe-action/hooks";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRegisterContext } from "./context";
@@ -14,15 +21,19 @@ import { ResendOtp } from "./resend-otp";
 
 export const VerifyEmailForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isMobile } = useMediaQuery();
   const [code, setCode] = useState("");
   const { email, password } = useRegisterContext();
   const [isInvalidCode, setIsInvalidCode] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
 
+  const { executeAsync: ensureWorkspace } = useAction(ensureDefaultWorkspace);
+  const { executeAsync: setProgress } = useAction(setOnboardingProgress);
+
   const { executeAsync, isPending } = useAction(createUserAccountAction, {
     async onSuccess() {
-      toast.success("Account created! Redirecting to dashboard...");
+      toast.success("Account created! Redirecting...");
       setIsRedirecting(true);
 
       const response = await signIn("credentials", {
@@ -32,6 +43,33 @@ export const VerifyEmailForm = () => {
       });
 
       if (response?.ok) {
+        const source = searchParams.get(QR_ONBOARDING_SOURCE_PARAM);
+        const _next = searchParams.get("next");
+
+        if (source === QR_ONBOARDING_SOURCE_VALUE) {
+          try {
+            const wsRes = await ensureWorkspace({});
+            const ws = wsRes?.data;
+            if (ws?.slug) {
+              await setProgress({ onboardingStep: "plan" });
+              router.push(
+                `/onboarding/plan?workspace=${ws.slug}&${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`,
+              );
+              return;
+            }
+          } catch (err) {
+            logOnboardingError(
+              "ensure-workspace-or-progress-failed",
+              { source, email },
+              err,
+            );
+            toast(
+              "Continuing without QR setup. You can set this up later in Links.",
+            );
+            // Fall back to standard onboarding if workspace creation/progress fails
+          }
+        }
+
         router.push("/onboarding");
       } else {
         toast.error(
