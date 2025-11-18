@@ -406,7 +406,7 @@ const NAV_AREAS: SidebarNavAreas<SidebarNavData> = {
           {
             name: "Billing",
             icon: Receipt2,
-            href: `/${slug}/settings/billing`,
+            href: `/${slug}/settings/billing-lf`,
           },
           {
             name: "People",
@@ -484,20 +484,33 @@ export function AppSidebarNav({
   const { data: session } = useSession();
   const { plan, defaultProgramId } = useWorkspace();
 
+  const slugFromPath = slug ?? pathname.split("/")[1] ?? "";
+
   const currentArea = useMemo(() => {
-    const area = pathname.startsWith("/account/settings")
+    const isUserSettings = pathname.startsWith("/account/settings");
+    const isWorkspaceSettings = /^\/[^/]+\/settings(\/|$)/.test(pathname);
+    const isProgramOverlay =
+      pathname.includes("/program/messages/") ||
+      pathname.endsWith("/program/payouts/success");
+    const isProgram = /^\/[^/]+\/program(\/|$)/.test(pathname);
+
+    const area = isUserSettings
       ? "userSettings"
-      : pathname.startsWith(`/${slug}/settings`)
+      : isWorkspaceSettings
         ? "workspaceSettings"
-        : pathname.includes("/program/messages/") ||
-            pathname.endsWith("/program/payouts/success")
+        : isProgramOverlay
           ? null
-          : pathname.startsWith(`/${slug}/program`)
+          : isProgram
             ? "program"
             : "default";
 
     // Deployment flags trump client-side heuristics so nav collapses gracefully.
-    if (area === "default" && !isFeatureEnabled("links")) {
+    // Avoid collapsing on settings paths to keep settings navigable.
+    if (
+      area === "default" &&
+      !isWorkspaceSettings &&
+      !isFeatureEnabled("links")
+    ) {
       return null;
     }
 
@@ -506,7 +519,7 @@ export function AppSidebarNav({
     }
 
     return area;
-  }, [slug, pathname]);
+  }, [pathname]);
 
   const { program } = useProgram({
     enabled: Boolean(currentArea === "program" && defaultProgramId),
@@ -551,13 +564,15 @@ export function AppSidebarNav({
       areas={NAV_AREAS}
       currentArea={currentArea}
       data={{
-        slug: slug || "",
+        slug: slugFromPath,
         pathname,
         queryString: getQueryString(undefined, {
           include: ["folderId", "tagIds"],
         }),
         session: session || undefined,
-        showNews: pathname.startsWith(`/${slug}/program`) ? false : true,
+        showNews: pathname.startsWith(`/${slugFromPath}/program`)
+          ? false
+          : true,
         defaultProgramId: defaultProgramId || undefined,
         pendingPayoutsCount,
         applicationsCount,
