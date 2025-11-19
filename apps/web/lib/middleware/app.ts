@@ -19,6 +19,7 @@ export default async function AppMiddleware(req: NextRequest) {
   const user = await getUserViaToken(req);
   const isWorkspaceInvite =
     req.nextUrl.searchParams.get("invite") || path.startsWith("/invites/");
+  const isSafeMethod = req.method === "GET" || req.method === "HEAD";
 
   // if there's no user and the path isn't /login or /register, redirect to /login
   if (
@@ -52,6 +53,7 @@ export default async function AppMiddleware(req: NextRequest) {
         - The user has not completed the onboarding step
       */
     } else if (
+      isSafeMethod &&
       new Date(user.createdAt).getTime() > Date.now() - 60 * 60 * 24 * 1000 &&
       !isWorkspaceInvite &&
       !["/onboarding", "/account"].some((p) => path.startsWith(p)) &&
@@ -79,7 +81,8 @@ export default async function AppMiddleware(req: NextRequest) {
 
       // if the path is / or /login or /register, redirect to the default workspace
     } else if (
-      [
+      isSafeMethod &&
+      ([
         "/",
         "/login",
         "/register",
@@ -95,15 +98,15 @@ export default async function AppMiddleware(req: NextRequest) {
         "/guides",
         "/wrapped",
       ].includes(path) ||
-      path.startsWith("/program/") ||
-      path.startsWith("/settings/") ||
-      isTopLevelSettingsRedirect(path)
+        path.startsWith("/program/") ||
+        path.startsWith("/settings/") ||
+        isTopLevelSettingsRedirect(path))
     ) {
       return WorkspacesMiddleware(req, user);
     }
 
     const appRedirectPath = await appRedirect(path);
-    if (appRedirectPath) {
+    if (isSafeMethod && appRedirectPath) {
       return NextResponse.redirect(
         new URL(`${appRedirectPath}${searchParamsString}`, req.url),
       );

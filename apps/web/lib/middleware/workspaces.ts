@@ -11,12 +11,35 @@ export default async function WorkspacesMiddleware(
 ) {
   const { path, searchParamsObj, searchParamsString } = parse(req);
 
+  const isSafeMethod = req.method === "GET" || req.method === "HEAD";
+
   // Handle ?next= query param with proper validation to prevent open redirects
+  // Apply only on safe methods to avoid method-preserving redirects of POST/RSC
   if (
+    isSafeMethod &&
     searchParamsObj.next &&
     isValidInternalRedirect(searchParamsObj.next, req.url)
   ) {
-    return NextResponse.redirect(new URL(searchParamsObj.next, req.url));
+    const current = new URL(req.url);
+    const resolvedNext = new URL(searchParamsObj.next, current);
+
+    // Build final URL:
+    // - Keep current non-'next' params (e.g., source)
+    // - Merge any params present inside the 'next' value (do not overwrite existing)
+    const finalUrl = new URL(current);
+    finalUrl.pathname = resolvedNext.pathname;
+
+    // Remove the control param
+    finalUrl.searchParams.delete("next");
+
+    // Merge query params from the next destination without overwriting
+    for (const [k, v] of resolvedNext.searchParams.entries()) {
+      if (!finalUrl.searchParams.has(k)) {
+        finalUrl.searchParams.set(k, v);
+      }
+    }
+
+    return NextResponse.redirect(finalUrl);
   }
 
   const defaultWorkspace = await getDefaultWorkspace(user);
