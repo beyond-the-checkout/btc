@@ -337,6 +337,7 @@ export function useLinkBuilder({
         duplicateProps={duplicateProps}
         homepageDemo={homepageDemo}
         workspace={workspace}
+        listenForSeedEvents={true}
         modal={true}
       />
     );

@@ -4,6 +4,7 @@ import {
   QR_ONBOARDING_SOURCE_PARAM,
   QR_ONBOARDING_SOURCE_VALUE,
 } from "@/lib/onboarding/qr";
+import { setQROnboardingSeedCookie } from "@/lib/onboarding/qr/cookie";
 import { getQRData } from "@/lib/qr";
 import { frameStyleToFrameType } from "@/lib/qr/types";
 import type { QRLinkProps } from "@/lib/types";
@@ -185,6 +186,15 @@ function LinkLandingQRModalInner({
     // Use full URL to ensure cross-domain navigation from custom domains
     // Flush any pending draft saves before navigation
     draftControlsRef.current?.onClose();
+
+    // Persist QR onboarding seed cookie for cross-subdomain handoff
+    setQROnboardingSeedCookie({
+      url: url ?? "",
+      qrDesign: draft,
+      timestamp: Date.now(),
+      id: "landing",
+    });
+
     window.location.href = `${APP_DOMAIN}/register?${params.toString()}`;
   };
 
@@ -321,7 +331,10 @@ function LinkLandingQRModalInner({
 
               {/* Main preview container - height matches customization card */}
               <div className="relative flex h-full min-h-[400px] flex-col rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg">
-                <div className="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border-2 border-neutral-100 bg-gradient-to-br from-neutral-50 to-white">
+                <div
+                  className="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border-2 border-neutral-100 bg-gradient-to-br from-neutral-50 to-white"
+                  suppressHydrationWarning
+                >
                   {!isMobile && (
                     <ShimmerDots className="opacity-20 [mask-image:radial-gradient(50%_50%,transparent_30%,black)]" />
                   )}

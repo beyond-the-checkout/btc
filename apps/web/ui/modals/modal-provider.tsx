@@ -22,6 +22,7 @@ import {
   createContext,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 import { toast } from "sonner";
 import { useAddEditTagModal } from "./add-edit-tag-modal";
@@ -115,20 +116,29 @@ function ModalProviderClient({ children }: { children: ReactNode }) {
     useImportRewardfulModal();
   const { setShowImportToltModal, ImportToltModal } = useImportToltModal();
 
+  const { id: workspaceId, error } = useWorkspace();
+
+  const hasConsumedWelcomeRef = useRef(false);
+
   useEffect(() => {
     setShowProgramWelcomeModal(searchParams.has("onboarded-program"));
-    setShowWelcomeModal(searchParams.has("onboarded"));
+
+    const onboarded = searchParams.get("onboarded") === "true";
+
+    if (onboarded && Boolean(workspaceId) && !hasConsumedWelcomeRef.current) {
+      hasConsumedWelcomeRef.current = true;
+      setShowWelcomeModal(true);
+    }
 
     if (searchParams.has("upgraded")) {
       setShowUpgradedModal(true);
     }
-  }, [searchParams]);
+  }, [searchParams, workspaceId]);
 
   const [hashes, setHashes] = useCookies<SimpleLinkProps[]>("hashes__dub", [], {
     domain: !!process.env.NEXT_PUBLIC_VERCEL_URL ? ".dub.co" : undefined,
   });
 
-  const { id: workspaceId, error } = useWorkspace();
   useEffect(() => {
     if (hashes.length > 0 && workspaceId) {
       toast.promise(

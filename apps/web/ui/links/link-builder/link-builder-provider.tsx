@@ -1,3 +1,5 @@
+import { getQROnboardingSource, isQROnboarding } from "@/lib/onboarding/qr";
+import { readQROnboardingSeedCookie } from "@/lib/onboarding/qr/cookie";
 import type { QROnboardingSeedDetail } from "@/lib/onboarding/qr/events";
 import { QROnboardingSeedEvent } from "@/lib/onboarding/qr/events";
 import { ExpandedLinkProps } from "@/lib/types";
@@ -6,6 +8,7 @@ import {
   QRCodeDesign,
 } from "@/ui/modals/link-qr-modal.types";
 import { DEFAULT_LINK_PROPS, PLANS } from "@dub/utils";
+import { useSearchParams } from "next/navigation";
 import {
   createContext,
   Dispatch,
@@ -123,22 +126,44 @@ export function LinkBuilderProvider({
       },
   });
 
+  const searchParams = useSearchParams();
+  const hasSeededRef = useRef(false);
+
+  function applySeed(detail: { url?: string; qrDesign?: QRCodeDesign }) {
+    const { url, qrDesign } = detail || {};
+    if (typeof url === "string" && url.length > 0) {
+      form.setValue("url", url, { shouldDirty: true, shouldValidate: true });
+    }
+    if (qrDesign) {
+      setQrDraftDesign(qrDesign);
+    }
+  }
+
+  // Seed from QR onboarding cookie on mount (QR flow, modal mode, explicit opt-in)
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (rest.modal) return;
-    if (rest.listenForSeedEvents === false) return;
+    if (!(rest.modal && rest.listenForSeedEvents === true)) return;
+
+    const source = getQROnboardingSource(searchParams);
+    if (!isQROnboarding(source)) return;
+
+    const seed = readQROnboardingSeedCookie();
+    if (seed && !hasSeededRef.current) {
+      applySeed({ url: seed.url, qrDesign: seed.qrDesign });
+      hasSeededRef.current = true;
+    }
+  }, [rest.modal, rest.listenForSeedEvents, searchParams]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const shouldListen = rest.listenForSeedEvents === true || !rest.modal;
+    if (!shouldListen) return;
 
     const handler = (evt: Event) => {
       const { detail } = evt as CustomEvent<QROnboardingSeedDetail>;
       if (!detail) return;
-      const { url, qrDesign } = detail;
-
-      if (typeof url === "string" && url.length > 0) {
-        form.setValue("url", url, { shouldDirty: true, shouldValidate: true });
-      }
-      if (qrDesign) {
-        setQrDraftDesign(qrDesign);
-      }
+      applySeed({ url: detail.url, qrDesign: detail.qrDesign });
+      hasSeededRef.current = true;
     };
 
     window.addEventListener(QROnboardingSeedEvent, handler as EventListener);
