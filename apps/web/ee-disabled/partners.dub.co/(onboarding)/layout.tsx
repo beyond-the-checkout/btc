@@ -1,4 +1,3 @@
-import Toolbar from "@/ui/layout/toolbar/toolbar";
 import { Grid, Wordmark } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { SignedInHint } from "app/app.chko.sh/(onboarding)/signed-in-hint";
@@ -66,7 +65,6 @@ export default function PartnerOnboardingLayout({
         <div className="grow basis-0" />
       </div>
 
-      <Toolbar show={["help"]} />
       <SignedInHint />
     </>
   );
