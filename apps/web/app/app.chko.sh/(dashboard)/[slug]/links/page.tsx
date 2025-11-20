@@ -7,8 +7,6 @@
  * navigation and deep links stay in sync.
  */
 import { isFeatureEnabled } from "@/lib/feature-flags";
-import { QR_ONBOARDING_SOURCE_VALUE } from "@/lib/onboarding/qr";
-import { QROnboardingBanner } from "@/ui/workspaces/qr-onboarding-banner";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import WorkspaceLinksClient from "./page-client";
@@ -23,19 +21,5 @@ export default async function WorkspaceLinks({
     notFound();
   }
 
-  const params = await searchParams;
-  const onboarded = params?.onboarded === "true";
-  const source = params?.source;
-  const suppressBanner = onboarded && source === QR_ONBOARDING_SOURCE_VALUE;
-
-  return (
-    <>
-      {!suppressBanner && (
-        <Suspense>
-          <QROnboardingBanner />
-        </Suspense>
-      )}
-      <WorkspaceLinksClient />
-    </>
-  );
+  return <WorkspaceLinksClient />;
 }

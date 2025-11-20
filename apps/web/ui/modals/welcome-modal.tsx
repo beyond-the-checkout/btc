@@ -33,6 +33,15 @@ import { brandName } from "../../lib/branding";
 import { ModalHero } from "../shared/modal-hero";
 import { PlanFeatures } from "../workspaces/plan-features";
 
+// Keys to clear from URL when dismissing/consuming WelcomeModal (module-scoped)
+const WELCOME_QUERY_KEYS_TO_CLEAR = [
+  "onboarded",
+  QR_ONBOARDING_SOURCE_PARAM,
+  "upgraded",
+  "plan",
+  "period",
+] as const;
+
 function WelcomeModal({
   showWelcomeModal,
   setShowWelcomeModal,
@@ -74,45 +83,49 @@ function WelcomeModal({
       ) ?? PRO_PLAN
     : undefined;
 
-  // QR flow detection and seed resolution
+  // QR flow detection
   const onboarded = searchParams.get("onboarded") === "true";
   const source = getQROnboardingSource(searchParams);
   const isQrFlow = isQROnboarding(source);
 
-  let latest:
+  // Memoized latest QR seed (cookie preferred, then localStorage drafts)
+  const latest:
     | { link?: { url?: string }; qrDesign?: QROnboardingSeed["qrDesign"] }
     | ReturnType<typeof readDraftsFromStorage>[number]
-    | undefined;
-  let fromCookie = false;
-
-  try {
-    if (typeof window !== "undefined") {
+    | undefined = useMemo(() => {
+    try {
+      if (typeof window === "undefined") return undefined;
       const seed = readQROnboardingSeedCookie();
-      if (seed) {
-        fromCookie = true;
-        latest = { link: { url: seed.url }, qrDesign: seed.qrDesign };
-      } else {
-        const drafts = readDraftsFromStorage(LANDING_DRAFT_STORAGE_KEY);
-        latest = drafts.length > 0 ? drafts[0] : undefined;
-      }
+      if (seed) return { link: { url: seed.url }, qrDesign: seed.qrDesign };
+      const drafts = readDraftsFromStorage(LANDING_DRAFT_STORAGE_KEY);
+      return drafts.length > 0 ? drafts[0] : undefined;
+    } catch {
+      return undefined;
     }
-  } catch {
-    latest = undefined;
-    fromCookie = false;
-  }
+  }, [showWelcomeModal, searchParams]);
+
+  // Whether the seed came from cookie (affects CTA text)
+  const fromCookie = useMemo(() => {
+    try {
+      if (typeof window === "undefined") return false;
+      return !!readQROnboardingSeedCookie();
+    } catch {
+      return false;
+    }
+  }, [showWelcomeModal, searchParams]);
 
   const shouldShowQrVariant = onboarded && isQrFlow && !!latest;
 
   const handleResumeQr = useCallback((): void => {
-    // 1) Clear URL gating params first to prevent ModalProvider from re-triggering
+    // Important: clear URL params BEFORE opening the builder to avoid ModalProvider re-triggering
     queryParams({
-      del: ["onboarded", QR_ONBOARDING_SOURCE_PARAM, "plan", "period"],
+      del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
     });
 
-    // 2) Close the welcome modal immediately
+    // Close the welcome modal immediately
     setShowWelcomeModal(false);
 
-    // 3) Next frames: open builder, then seed after it's mounted
+    // Open builder next frame; seed after it's mounted
     requestAnimationFrame(() => {
       setShowLinkBuilder(true);
       requestAnimationFrame(() => {
@@ -138,13 +151,7 @@ function WelcomeModal({
       setShowModal={setShowWelcomeModal}
       onClose={() =>
         queryParams({
-          del: [
-            "onboarded",
-            QR_ONBOARDING_SOURCE_PARAM,
-            "upgraded",
-            "plan",
-            "period",
-          ],
+          del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
         })
       }
     >
@@ -224,7 +231,7 @@ function WelcomeModal({
               className="mt-2"
               onClick={() =>
                 queryParams({
-                  del: ["onboarded"],
+                  del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
                 })
               }
             />

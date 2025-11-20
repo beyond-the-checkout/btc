@@ -118,6 +118,7 @@ function ModalProviderClient({ children }: { children: ReactNode }) {
 
   const { id: workspaceId, error } = useWorkspace();
 
+  // Guard to ensure WelcomeModal shows only once per provider lifecycle/session
   const hasConsumedWelcomeRef = useRef(false);
 
   useEffect(() => {

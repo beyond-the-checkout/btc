@@ -39,14 +39,15 @@ export const VerifyEmailForm = () => {
       if (response?.ok) {
         const source = searchParams.get(QR_ONBOARDING_SOURCE_PARAM);
 
+        // QR-first onboarding: start at workspace creation so users can name/confirm their workspace
         if (source === QR_ONBOARDING_SOURCE_VALUE) {
-          router.push(
+          router.replace(
             `/onboarding/workspace?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`,
           );
           return;
         }
 
-        router.push("/onboarding");
+        router.replace("/onboarding");
       } else {
         toast.error(
           "Failed to sign in with credentials. Please try again or contact support.",
@@ -65,9 +66,9 @@ export const VerifyEmailForm = () => {
   useEffect(() => {
     if ((!email || !password) && !hasRedirected.current) {
       hasRedirected.current = true;
-      router.push("/register");
+      router.replace("/register");
     }
-  }, [email, password]);
+  }, [email, password, router]);
 
   if (!email || !password) {
     return null;
