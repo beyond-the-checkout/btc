@@ -58,7 +58,6 @@ function EventsTableContainer() {
           icon={Menu3}
           title="Real-time Events Stream"
           description={`Want more data on your link ${getEventDisplayLabel(selectedTab, { case: "lower" })}? Upgrade to our Business Plan to get a detailed, real-time stream of events in your workspace.`}
-          learnMore="https://d.to/events"
           buttonText="Upgrade to Business"
           buttonLink={`/${slug}/upgrade`}
         />
