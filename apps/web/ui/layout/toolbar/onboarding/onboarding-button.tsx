@@ -44,7 +44,7 @@ function OnboardingButtonInner({
   const tasks = useMemo(() => {
     return [
       {
-        display: "Create your first short link",
+        display: "Create",
         cta: `/${slug}/links`,
         checked: totalLinks === 0 ? false : true,
         recommended: true,
@@ -75,7 +75,7 @@ function OnboardingButtonInner({
               <div>
                 <span className="text-base font-medium">Getting Started</span>
                 <p className="mt-1 text-sm text-neutral-300">
-                  Get familiar with Dub by completing the{" "}
+                  Get familiar with Checkout by completing the{" "}
                   <br className="hidden sm:block" />
                   following tasks
                 </p>
