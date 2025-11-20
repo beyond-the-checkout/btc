@@ -196,7 +196,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
           <div className="h-8 bg-gradient-to-b from-white" />
         </div>
         <div className="flex flex-col gap-8 pb-12">
-          {PLAN_COMPARE_FEATURES.map(({ category, href, features }) => {
+          {PLAN_COMPARE_FEATURES.map(({ category, features }) => {
             const Icon = COMPARE_FEATURE_ICONS[category];
 
             return (
@@ -204,17 +204,12 @@ export function WorkspaceBillingUpgradePageClientLF() {
                 key={category}
                 className="w-full overflow-x-hidden [container-type:inline-size]"
               >
-                <a
-                  href={href}
-                  target="_blank"
-                  className="flex items-center gap-2 border-b border-neutral-200 px-5 pb-4 pt-2"
-                >
+                <div className="flex items-center gap-2 border-b border-neutral-200 px-5 pb-4 pt-2">
                   {Icon && <Icon className="size-4 text-neutral-600" />}
                   <h3 className="text-base font-medium text-black">
                     {category}
                   </h3>
-                  <span className="text-xs text-neutral-500">↗</span>
-                </a>
+                </div>
                 <table
                   className={cn(
                     "grid grid-cols-4 overflow-hidden text-sm text-neutral-800 [&_strong]:font-medium",
@@ -236,9 +231,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
                     </tr>
                   </thead>
                   <tbody className="contents">
-                    {features.map(({ check, text, href }, idx) => {
-                      const As = href ? "a" : "span";
-
+                    {features.map(({ check, text }, idx) => {
                       return (
                         <tr key={idx} className="contents bg-white">
                           {plans.map((plan) => {
@@ -262,21 +255,14 @@ export function WorkspaceBillingUpgradePageClientLF() {
                                 ) : (
                                   <span className="w-3">&bull;</span>
                                 )}
-                                <As
-                                  href={href}
-                                  target="_blank"
-                                  {...(href && {
-                                    className:
-                                      "underline decoration-dotted underline-offset-2 cursor-help",
-                                  })}
-                                >
+                                <span>
                                   {typeof text === "function"
                                     ? (text({
                                         id,
                                         plan,
                                       }) as React.ReactNode)
                                     : text}
-                                </As>
+                                </span>
                               </td>
                             );
                           })}
