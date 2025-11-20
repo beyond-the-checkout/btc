@@ -4,6 +4,7 @@ import { mutatePrefix } from "@/lib/swr/mutate";
 import useWorkspace from "@/lib/swr/use-workspace";
 import useWorkspaces from "@/lib/swr/use-workspaces";
 import { SimpleLinkProps } from "@/lib/types";
+import { getQROnboardingSource, isQROnboarding } from "@/lib/onboarding/qr";
 import { useAcceptInviteModal } from "@/ui/modals/accept-invite-modal";
 import { useAddEditDomainModal } from "@/ui/modals/add-edit-domain-modal";
 import { useAddWorkspaceModal } from "@/ui/modals/add-workspace-modal";
@@ -117,7 +118,12 @@ function ModalProviderClient({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setShowProgramWelcomeModal(searchParams.has("onboarded-program"));
-    setShowWelcomeModal(searchParams.has("onboarded"));
+
+    // Only show WelcomeModal if onboarded AND NOT from QR flow
+    // QR flow users should see QROnboardingBanner instead
+    const source = getQROnboardingSource(searchParams);
+    const isQrFlow = isQROnboarding(source);
+    setShowWelcomeModal(searchParams.has("onboarded") && !isQrFlow);
 
     if (searchParams.has("upgraded")) {
       setShowUpgradedModal(true);
