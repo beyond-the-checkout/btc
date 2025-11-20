@@ -142,14 +142,7 @@ function ConversionTrackingPaywall() {
         </h2>
         <p className="mt-4 max-w-sm text-center text-sm text-neutral-500">
           Want to see how your scans are converting to revenue? Upgrade to our
-          Business Plan and start tracking conversion events with Dub.{" "}
-          <Link
-            href="https://d.to/conversions"
-            target="_blank"
-            className="underline transition-colors duration-75 hover:text-neutral-700"
-          >
-            Learn more
-          </Link>
+          Business Plan and start tracking conversion events with Dub.
         </p>
         <Link
           href={`/${slug}/upgrade`}

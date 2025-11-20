@@ -331,14 +331,7 @@ export function CustomerTable() {
                   <p className="mt-3 max-w-sm text-pretty text-sm text-neutral-500">
                     Want to see more details about your customers' LTV, country
                     breakdown etc.? Upgrade to our Business Plan to get deeper,
-                    real-time customer insights.{" "}
-                    <a
-                      href="https://dub.co/help/article/customer-insights"
-                      target="_blank"
-                      className="underline underline-offset-2 hover:text-neutral-800"
-                    >
-                      Learn more ↗
-                    </a>
+                    real-time customer insights.
                   </p>
                   <div className="mt-4">
                     <Link
