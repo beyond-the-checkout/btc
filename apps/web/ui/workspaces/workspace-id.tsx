@@ -1,7 +1,7 @@
 "use client";
 
 import useWorkspace from "@/lib/swr/use-workspace";
-import { CopyButton } from "@dub/ui";
+import { Badge, CopyButton } from "@dub/ui";
 
 export default function WorkspaceId() {
   const { id } = useWorkspace();
@@ -27,15 +27,8 @@ export default function WorkspaceId() {
         </div>
         <div className="flex items-center justify-between rounded-b-lg border-t border-neutral-200 bg-neutral-50 px-3 py-5 sm:px-10">
           <p className="text-sm text-neutral-500">
-            Used to identify your workspace when interacting with the{" "}
-            <a
-              href="https://dub.co/api"
-              target="_blank"
-              className="underline underline-offset-2 transition-colors hover:text-neutral-700"
-            >
-              Dub API
-            </a>
-            .
+            Used to identify your workspace when interacting with the API{" "}
+            <Badge variant="blueGradient">Coming soon</Badge>.
           </p>
         </div>
       </div>
