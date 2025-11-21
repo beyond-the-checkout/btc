@@ -2,8 +2,16 @@ import { logger } from "@/utils/logger";
 import { z } from "zod";
 
 export function handleError(error: unknown) {
-  if (error instanceof z.ZodError) {
-    error.issues.forEach((issue) => {
+  // Use structural check instead of instanceof to work across Zod versions
+  // See: https://github.com/colinhacks/zod/issues/3429
+  if (
+    error &&
+    typeof error === "object" &&
+    "issues" in error &&
+    Array.isArray((error as any).issues)
+  ) {
+    const zodError = error as z.ZodError;
+    zodError.issues.forEach((issue) => {
       logger.error(issue.message);
     });
 

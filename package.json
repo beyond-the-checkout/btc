@@ -30,8 +30,16 @@
     "turbo": "^1.12.5"
   },
   "resolutions": {
-    "chrono-node": "2.7.5",
-    "zod-to-json-schema": "^3.23.0"
+    "chrono-node": "2.7.5"
+  },
+  "pnpm": {
+    "_comment": "Force Zod 3.22.4 and zod-to-json-schema 3.22.0 across the workspace to avoid mixed versions; see zod_analysis.md for details.",
+    "overrides": {
+      "zod": "3.22.4",
+      "zod-to-json-schema": "3.22.0",
+      "@types/react": "19.1.14",
+      "@types/react-dom": "19.1.9"
+    }
   },
   "packageManager": "pnpm@8.6.10"
 }
