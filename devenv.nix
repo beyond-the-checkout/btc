@@ -13,6 +13,12 @@ let
     config.allowUnfree = true;
   };
 
+  # Pin pnpm to version 9.15.9
+  pkgs-pnpm = import inputs.nixpkgs-pnpm {
+    system = pkgs.stdenv.system;
+    config.allowUnfree = true;
+  };
+
   # Import custom packages with unfree allowed
   customPkgs = import ./nix/pkgs {
     pkgs = pkgs.extend (final: prev: {
@@ -40,7 +46,7 @@ in
   pkgs.nodePackages.ts-node
   pkgs.nodePackages.yarn
   pkgs.opentofu
-  pkgs.pnpm
+  pkgs-pnpm.pnpm_9
   pkgs.pscale
   pkgs.tenv
   pkgs.zsh

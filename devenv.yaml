@@ -7,6 +7,9 @@ inputs:
   # Pin codex to version 0.55.0
   nixpkgs-codex:
     url: github:nixos/nixpkgs/28eef4c1fe2a61c3bf6c4baee7ec69b4439a91a8
+  # Pin pnpm to version 9.15.9
+  nixpkgs-pnpm:
+    url: github:nixos/nixpkgs/88a9f6460b9894aecc740ae3dfbe35ce7e61fd60
 
 # If you're using non-OSS software, you can set allowUnfree to true.
 allowUnfree: true
