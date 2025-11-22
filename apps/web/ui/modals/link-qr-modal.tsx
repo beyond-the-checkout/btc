@@ -27,6 +27,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type JSX,
 } from "react";
 import { toast } from "sonner";
 import { BaseBadgeTooltip } from "../shared/pro-badge-tooltip";

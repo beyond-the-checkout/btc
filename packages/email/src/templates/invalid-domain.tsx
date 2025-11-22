@@ -12,6 +12,7 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
+import type { JSX } from "react";
 import { Footer } from "../components/footer";
 
 export default function InvalidDomain({

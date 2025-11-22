@@ -2,6 +2,7 @@ import { Tooltip } from "@dub/ui";
 import { Check2 } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
 import { HexColorInput, HexColorPicker } from "react-colorful";
+import type { JSX } from "react";
 import { DEFAULT_COLORS } from "../link-qr-modal.constants";
 import { useLinkQRContext } from "../link-qr-modal.context";
 

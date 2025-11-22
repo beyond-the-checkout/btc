@@ -7,6 +7,7 @@ import {
 } from "@/lib/qr/constants";
 import { Tooltip } from "@dub/ui";
 import { cn } from "@dub/utils";
+import type { JSX } from "react";
 import { useLinkQRContext } from "../link-qr-modal.context";
 import {
   CornerDotPreview,

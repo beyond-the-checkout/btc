@@ -7,6 +7,7 @@ import {
 } from "@dub/ui";
 import { Copy, Download } from "@dub/ui/icons";
 import { AnimatePresence, motion } from "motion/react";
+import type { JSX } from "react";
 import { CopyPopover, DownloadPopover } from "../link-qr-modal";
 import { useLinkQRContext } from "../link-qr-modal.context";
 
