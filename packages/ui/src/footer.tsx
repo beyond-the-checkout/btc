@@ -1,24 +1,12 @@
 "use client";
 
 import { cn, createHref } from "@dub/utils";
-import { ChevronDown } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
-import { COMPARE_PAGES, FEATURES_LIST, LEGAL_PAGES } from "./content";
-import {
-  DubProduct,
-  DubProductIcon,
-  Github,
-  LinkedIn,
-  ReferredVia,
-  Twitter,
-} from "./icons";
+import { LEGAL_PAGES } from "./content";
+import { Github, LinkedIn, Twitter } from "./icons";
 import { MaxWidthWrapper } from "./max-width-wrapper";
-import { menuItemVariants } from "./menu-item";
 import { NavWordmark } from "./nav-wordmark";
-import { Popover } from "./popover";
 
 const socials = [
   {
@@ -39,32 +27,14 @@ const socials = [
 ];
 
 const navigation = {
-  product: [
-    ...FEATURES_LIST.filter(({ id }) => id !== "integrations").map(
-      ({ id, title, href }) => ({
-        id,
-        name: title,
-        href,
-      }),
-    ),
-  ],
-  solutions: [
-    { name: "Physical packaging", href: "/solutions/physical-packaging" },
-  ],
-  resources: [
-    { name: "Docs", href: "/docs/introduction" },
-    { name: "Help Center", href: "/help" },
-    { name: "Pricing", href: "/pricing" },
-  ],
   company: [
     { name: "About", href: "/about" },
     { name: "Customers", href: "/customers" },
     { name: "Contact", href: "/contact" },
   ],
-  compare: COMPARE_PAGES.map(({ name, slug }) => ({
+  legal: LEGAL_PAGES.map(({ name, slug }) => ({
     name,
-    href: `/compare/${slug}`,
-    product: "links",
+    href: `/${slug}`,
   })),
 };
 
@@ -85,8 +55,6 @@ export function Footer({
     domain = staticDomain;
   }
 
-  const [openPopover, setOpenPopover] = useState(false);
-
   return (
     <MaxWidthWrapper
       className={cn(
@@ -95,19 +63,15 @@ export function Footer({
       )}
     >
       <footer>
-        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          <div className="flex flex-col gap-6">
-            <div className="grow">
-              <Link
-                href={createHref("/", domain)}
-                className="block max-w-fit"
-              >
-                <span className="sr-only">
-                  {process.env.NEXT_PUBLIC_APP_NAME} Logo
-                </span>
-                <NavWordmark className="h-8 text-neutral-800" />
-              </Link>
-            </div>
+        <div className="flex flex-col items-center gap-10">
+          {/* Logo and socials */}
+          <div className="flex flex-col items-center gap-6">
+            <Link href={createHref("/", domain)} className="block max-w-fit">
+              <span className="sr-only">
+                {process.env.NEXT_PUBLIC_APP_NAME} Logo
+              </span>
+              <NavWordmark className="h-8 text-neutral-800" />
+            </Link>
             <div className="flex items-center gap-3">
               {socials.map(({ name, icon: Icon, href }) => (
                 <a
@@ -123,129 +87,45 @@ export function Footer({
               ))}
             </div>
           </div>
-          <div className="mt-16 grid grid-cols-2 gap-4 xl:col-span-2 xl:mt-0">
-            <div className="md:grid md:grid-cols-2">
-              <div className="grid gap-8">
-                <div>
-                  <h3 className={linkListHeaderClassName}>Product</h3>
-                  <ul role="list" className={linkListClassName}>
-                    {navigation.product.map((item) => (
-                      <li key={item.name}>
-                        <Link
-                          href={createHref(item.href, domain)}
-                          className={linkListItemClassName}
-                        >
-                          {item.id && (
-                            <DubProductIcon product={item.id as DubProduct} />
-                          )}
-                          {item.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h3 className={linkListHeaderClassName}>Solutions</h3>
-                  <ul role="list" className={linkListClassName}>
-                    {navigation.solutions.map((item) => (
-                      <li key={item.name}>
-                        <Link
-                          href={createHref(item.href, domain)}
-                          className={linkListItemClassName}
-                        >
-                          {item.name}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-              <div className="mt-10 md:mt-0">
-                <h3 className={linkListHeaderClassName}>Resources</h3>
-                <ul role="list" className={linkListClassName}>
-                  {navigation.resources.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={createHref(item.href, domain)}
-                        className={linkListItemClassName}
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="md:grid md:grid-cols-2">
-              <div className="grid gap-8">
-                <div>
-                  <h3 className={linkListHeaderClassName}>Company</h3>
-                  <ul role="list" className={linkListClassName}>
-                    {navigation.company.map((item) => (
-                      <li key={item.name}>
-                        <Link
-                          href={createHref(item.href, domain)}
-                          className={cn(linkListItemClassName, "gap-1")}
-                        >
-                          {item.name}
-                        </Link>
-                      </li>
-                    ))}
-                    <li className="-mt-1">
-                      <Popover
-                        content={
-                          <div className="flex w-screen flex-col gap-1 p-1.5 text-sm focus-visible:outline-none sm:w-auto sm:min-w-[200px]">
-                            {LEGAL_PAGES.map((page) => (
-                              <Link
-                                key={page.name}
-                                href={createHref(`/${page.slug}`, domain)}
-                                className={cn(
-                                  menuItemVariants({ variant: "default" }),
-                                  linkListItemClassName,
-                                  "justify-start font-normal",
-                                )}
-                              >
-                                {page.name}
-                              </Link>
-                            ))}
-                          </div>
-                        }
-                        openPopover={openPopover}
-                        setOpenPopover={setOpenPopover}
-                      >
-                        <button className={linkListItemClassName}>
-                          Legal
-                          <ChevronDown className="size-3.5" />
-                        </button>
-                      </Popover>
-                    </li>
-                  </ul>
-                </div>
-              </div>
 
-              <div className="mt-10 md:mt-0">
-                <h3 className={linkListHeaderClassName}>Compare</h3>
-                <ul role="list" className={linkListClassName}>
-                  {navigation.compare.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={createHref(item.href, domain)}
-                        className={linkListItemClassName}
-                      >
-                        <DubProductIcon product={item.product as DubProduct} />
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          {/* Navigation columns */}
+          <div className="flex flex-wrap justify-center gap-16 sm:gap-24">
+            <div className="text-center">
+              <h3 className={linkListHeaderClassName}>Company</h3>
+              <ul role="list" className={cn(linkListClassName, "items-center")}>
+                {navigation.company.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={createHref(item.href, domain)}
+                      className={linkListItemClassName}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="text-center">
+              <h3 className={linkListHeaderClassName}>Legal</h3>
+              <ul role="list" className={cn(linkListClassName, "items-center")}>
+                {navigation.legal.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={createHref(item.href, domain)}
+                      className={linkListItemClassName}
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
 
         {/* Bottom row (copyright) */}
         <div className="mt-12">
-          <p className="text-xs text-neutral-500 sm:text-right">
+          <p className="text-center text-xs text-neutral-500">
             © {new Date().getFullYear()} Beyond The Checkout, Inc.
           </p>
         </div>
