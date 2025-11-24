@@ -1,24 +1,8 @@
 import { Grid } from "@dub/ui";
-import { APP_DOMAIN, cn, createHref, UTMTags } from "@dub/utils";
+import { APP_DOMAIN, cn, UTMTags } from "@dub/utils";
 import { ReactNode } from "react";
 import { ButtonLink } from "./button-link";
 import Logos from "./logos";
-
-// Stat highlights for social proof
-const STATS = [
-  {
-    value: "99.9%",
-    label: "Uptime SLA",
-  },
-  {
-    value: "1M+",
-    label: "QR Scans",
-  },
-  {
-    value: "500+",
-    label: "Brands",
-  },
-];
 
 export function CTA({
   domain,
@@ -49,20 +33,6 @@ export function CTA({
         <div className="size-full bg-[conic-gradient(from_-66deg,#855AFC_-32deg,#f00_63deg,#EAB308_158deg,#5CFF80_240deg,#855AFC_328deg,#f00_423deg)] [mask-image:radial-gradient(closest-side,black_100%,transparent_100%)]" />
       </div>
 
-      <div className="relative mx-auto my-8 flex w-fit gap-12 sm:gap-16">
-        {STATS.map(({ value, label }, idx) => (
-          <div
-            key={idx}
-            className="flex flex-col items-center"
-          >
-            <div className="text-3xl font-semibold text-neutral-900 sm:text-4xl">
-              {value}
-            </div>
-            <p className="mt-2 text-sm text-neutral-500">{label}</p>
-          </div>
-        ))}
-      </div>
-
       <div className="relative mx-auto mt-1.5 flex w-full max-w-xl flex-col items-center">
         <h2 className="font-display text-balance text-4xl font-medium text-neutral-900 sm:text-[2.5rem] sm:leading-[1.15]">
           {title}
@@ -72,20 +42,9 @@ export function CTA({
         </p>
       </div>
 
-      <div className="relative mx-auto mt-10 flex max-w-fit space-x-4">
+      <div className="relative mx-auto mt-10 flex max-w-fit">
         <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
           Get Started
-        </ButtonLink>
-        <ButtonLink
-          variant="secondary"
-          href={createHref("/tools/qr-code", domain, {
-            utm_source: "Custom Domain",
-            utm_medium: "Welcome Page",
-            utm_campaign: domain,
-            utm_content: "Try Free QR Generator",
-          })}
-        >
-          Try Free QR Generator
         </ButtonLink>
       </div>
 
