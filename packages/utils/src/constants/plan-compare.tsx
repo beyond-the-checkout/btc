@@ -6,6 +6,7 @@ import { PLANS } from "./pricing";
 export const PLAN_COMPARE_FEATURES: {
   category: string;
   href: string;
+  comingSoon?: boolean;
   features: {
     text:
       | string
@@ -106,14 +107,6 @@ export const PLAN_COMPARE_FEATURES: {
         text: "Deep links",
         href: "https://dub.co/docs/concepts/deep-links/quickstart",
       },
-      {
-        check: {
-          free: false,
-          default: true,
-        },
-        text: "Link cloaking",
-        href: "https://dub.co/help/article/link-cloaking",
-      },
 
       {
         check: {
@@ -171,7 +164,7 @@ export const PLAN_COMPARE_FEATURES: {
             <strong>
               {plan.name === "Enterprise"
                 ? "Unlimited"
-                : nFormatter(plan.limits.clicks)}
+                : nFormatter(plan.limits.scans)}
             </strong>{" "}
             tracked scans
             {plan.name === "Enterprise" ? "" : "/mo"}
@@ -218,54 +211,11 @@ export const PLAN_COMPARE_FEATURES: {
       },
     ],
   },
-  {
-    category: "Domains",
-    href: "https://dub.co/help/category/custom-domains",
-    features: [
-      {
-        text: ({ plan }) => (
-          <>
-            <strong>
-              {plan.name === "Enterprise"
-                ? "Unlimited"
-                : nFormatter(plan.limits.domains, { full: true })}
-            </strong>{" "}
-            custom domains
-          </>
-        ),
-      },
-      {
-        text: () => <>SSL certificates</>,
-      },
-      {
-        check: {
-          default: true,
-          free: false,
-        },
-        text: () => (
-          <>
-            Premium <strong>dub.link</strong> domain
-          </>
-        ),
-        href: "https://dub.co/help/article/default-dub-domains#premium-dublink-domain",
-      },
-      {
-        check: {
-          default: true,
-          free: false,
-        },
-        text: () => (
-          <>
-            Free <strong>.link</strong> domain
-          </>
-        ),
-        href: "https://dub.co/help/article/free-dot-link-domain",
-      },
-    ],
-  },
+
   {
     category: "API",
     href: "https://dub.co/docs/api-reference/introduction",
+    comingSoon: true,
     features: [
       {
         text: "API Access",
@@ -276,16 +226,7 @@ export const PLAN_COMPARE_FEATURES: {
         href: "https://dub.co/docs/sdks/overview",
       },
       {
-        text: ({ id, plan }) => (
-          <>
-            <strong>
-              {id === "enterprise"
-                ? "Custom"
-                : nFormatter(plan.limits.api, { full: true }) + "/min"}
-            </strong>{" "}
-            rate limit
-          </>
-        ),
+        text: "Decreased rate limits",
       },
       {
         check: {
@@ -324,14 +265,7 @@ export const PLAN_COMPARE_FEATURES: {
         },
         text: "Role-based access control",
       },
-      {
-        check: {
-          default: false,
-          enterprise: true,
-        },
-        text: "SAML/SSO",
-        href: "https://dub.co/help/category/saml-sso",
-      },
+
       {
         check: {
           default: false,

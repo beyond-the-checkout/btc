@@ -47,7 +47,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
 
   return (
     <div>
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div>
         <Link
           href={`/${slug}/settings/billing`}
           title="Back to billing"
@@ -61,6 +61,8 @@ export function WorkspaceBillingUpgradePageClientLF() {
             Plans
           </h1>
         </Link>
+      </div>
+      <div className="mt-6 flex justify-center">
         <ToggleGroup
           options={[
             { label: "Monthly", value: "monthly" },
@@ -79,7 +81,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
           <div className="overflow-x-hidden rounded-b-[12px] from-neutral-200 [container-type:inline-size] lg:bg-gradient-to-t lg:p-px">
             <div
               className={cn(
-                "grid grid-cols-4 gap-px overflow-hidden rounded-b-[11px] text-sm text-neutral-800 [&_strong]:font-medium",
+                "grid grid-cols-3 gap-px overflow-hidden rounded-b-[11px] text-sm text-neutral-800 [&_strong]:font-medium",
 
                 // Mobile
                 "max-lg:w-[calc(400cqw+3*32px)] max-lg:translate-x-[calc(-1*var(--index)*(100cqw+32px))] max-lg:gap-x-8 max-lg:transition-transform",
@@ -212,7 +214,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
           <div className="h-8 bg-gradient-to-b from-white" />
         </div>
         <div className="flex flex-col gap-8 pb-12">
-          {PLAN_COMPARE_FEATURES.map(({ category, features }) => {
+          {PLAN_COMPARE_FEATURES.map(({ category, features, comingSoon }) => {
             const Icon = COMPARE_FEATURE_ICONS[category];
 
             return (
@@ -221,14 +223,31 @@ export function WorkspaceBillingUpgradePageClientLF() {
                 className="w-full overflow-x-hidden [container-type:inline-size]"
               >
                 <div className="flex items-center gap-2 border-b border-neutral-200 px-5 pb-4 pt-2">
-                  {Icon && <Icon className="size-4 text-neutral-600" />}
-                  <h3 className="text-base font-medium text-black">
+                  {Icon && (
+                    <Icon
+                      className={cn(
+                        "size-4",
+                        comingSoon ? "text-neutral-300" : "text-neutral-600",
+                      )}
+                    />
+                  )}
+                  <h3
+                    className={cn(
+                      "text-base font-medium",
+                      comingSoon ? "text-neutral-300" : "text-black",
+                    )}
+                  >
                     {category}
                   </h3>
+                  {comingSoon && (
+                    <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">
+                      Coming Soon
+                    </span>
+                  )}
                 </div>
                 <table
                   className={cn(
-                    "grid grid-cols-4 overflow-hidden text-sm text-neutral-800 [&_strong]:font-medium",
+                    "grid grid-cols-3 overflow-hidden text-sm text-neutral-800 [&_strong]:font-medium",
 
                     // Mobile
                     "max-lg:w-[calc(400cqw+3*32px)] max-lg:translate-x-[calc(-1*var(--index)*(100cqw+32px))] max-lg:gap-x-8 max-lg:transition-transform",
@@ -252,8 +271,9 @@ export function WorkspaceBillingUpgradePageClientLF() {
                         <tr key={idx} className="contents bg-white">
                           {plans.map((plan) => {
                             const id = plan.name.toLowerCase();
-                            const isChecked =
-                              typeof check === "boolean"
+                            const isChecked = comingSoon
+                              ? false
+                              : typeof check === "boolean"
                                 ? check
                                 : check === undefined ||
                                   (check[id] ?? check.default ?? false);
@@ -263,10 +283,11 @@ export function WorkspaceBillingUpgradePageClientLF() {
                                 key={id}
                                 className={cn(
                                   "flex items-center gap-2 border-b border-neutral-200 bg-white px-5 py-4",
-                                  !isChecked && "text-neutral-300",
+                                  (!isChecked || comingSoon) &&
+                                    "text-neutral-300",
                                 )}
                               >
-                                {isChecked ? (
+                                {isChecked && !comingSoon ? (
                                   <Check className="size-3 text-neutral-500" />
                                 ) : (
                                   <span className="w-3">&bull;</span>
