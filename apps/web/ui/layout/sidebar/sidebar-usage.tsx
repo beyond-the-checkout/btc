@@ -91,7 +91,7 @@ function UsageInner() {
               usage={usage}
               limit={usageLimit}
               showNextPlan={hovered}
-              nextPlanLimit={nextPlan?.limits.clicks}
+              nextPlanLimit={nextPlan?.limits.scans}
               warning={warnings[0]}
             />
             <UsageRow
@@ -100,7 +100,7 @@ function UsageInner() {
               usage={linksUsage}
               limit={linksLimit}
               showNextPlan={hovered}
-              nextPlanLimit={nextPlan?.limits.links}
+              nextPlanLimit={nextPlan?.limits.codes}
               warning={warnings[1]}
             />
           </div>
