@@ -8,7 +8,6 @@ import {
   Crosshairs3,
   Flask,
   Icon,
-  Incognito,
   InfinityIcon,
   InputPassword,
   WindowSearch,
@@ -32,16 +31,6 @@ type MoreItem = {
 };
 
 export const MORE_ITEMS: MoreItem[] = [
-  {
-    key: "rewrite",
-    icon: Incognito,
-    label: "Link Cloaking",
-    description:
-      "Mask your destination URL so your users only see the short link in the browser address bar.",
-    learnMoreUrl: "https://dub.co/help/article/link-cloaking",
-    shortcutKey: "k",
-    type: "boolean",
-  },
   {
     key: "doIndex",
     icon: WindowSearch,

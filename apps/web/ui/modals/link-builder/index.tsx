@@ -6,7 +6,6 @@ import { LinkBuilderDestinationUrlInput } from "@/ui/links/link-builder/controls
 import { LinkBuilderFolderSelector } from "@/ui/links/link-builder/controls/link-builder-folder-selector";
 import { LinkBuilderShortLinkInput } from "@/ui/links/link-builder/controls/link-builder-short-link-input";
 import { LinkCommentsInput } from "@/ui/links/link-builder/controls/link-comments-input";
-import { ConversionTrackingToggle } from "@/ui/links/link-builder/conversion-tracking-toggle";
 import {
   DraftControls,
   DraftControlsHandle,
@@ -207,8 +206,6 @@ function LinkBuilderInner({
                 <TagSelect />
 
                 <LinkCommentsInput />
-
-                <ConversionTrackingToggle />
 
                 <div className="flex grow flex-col justify-end">
                   <OptionsList />
