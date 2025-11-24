@@ -49,6 +49,11 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
     return NextResponse.rewrite(new URL(`/${domain}${path}`, req.url));
   }
 
+  // for public marketing pages (pricing, customers, landing page)
+  if (path === "/pricing" || path === "/customers" || path === "/") {
+    return NextResponse.rewrite(new URL(`/${domain}${path}`, req.url));
+  }
+
   // for legal pages (TOS and Privacy Policy)
   if (path === "/tos" || path === "/privacy-policy") {
     return NextResponse.next();
