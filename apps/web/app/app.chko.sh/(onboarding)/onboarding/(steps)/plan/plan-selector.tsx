@@ -12,6 +12,9 @@ import { CSSProperties, useState } from "react";
 
 export const PLAN_SELECTOR_PLANS = [BASE_PLAN, BUSINESS_PLAN, ADVANCED_PLAN];
 
+// Plans that are coming soon and cannot be upgraded to yet
+const COMING_SOON_PLANS = ["business", "advanced"];
+
 export function PlanSelector() {
   const [period, setPeriod] = useState<"monthly" | "yearly">("monthly");
   const [mobilePlanIndex, setMobilePlanIndex] = useState(0);
@@ -104,13 +107,26 @@ export function PlanSelector() {
                 >
                   <ChevronLeft className="size-5 text-neutral-800" />
                 </button>
-                <UpgradePlanButton
-                  plan={plan.name.toLowerCase()}
-                  period={period}
-                  source={source}
-                  text="Get started"
-                  className="h-10 rounded-lg shadow-sm"
-                />
+                {COMING_SOON_PLANS.includes(plan.name.toLowerCase()) ? (
+                  <button
+                    type="button"
+                    disabled
+                    className={cn(
+                      "flex h-10 w-full items-center justify-center rounded-lg text-center text-sm font-semibold",
+                      "cursor-not-allowed bg-blue-100 text-blue-600",
+                    )}
+                  >
+                    Coming Soon
+                  </button>
+                ) : (
+                  <UpgradePlanButton
+                    plan={plan.name.toLowerCase()}
+                    period={period}
+                    source={source}
+                    text="Get started"
+                    className="h-10 rounded-lg shadow-sm"
+                  />
+                )}
                 <button
                   type="button"
                   className="h-full w-fit rounded-lg bg-neutral-100 px-2.5 transition-colors duration-75 hover:bg-neutral-200/80 active:bg-neutral-200 disabled:opacity-30 lg:hidden"

@@ -36,6 +36,9 @@ const plans = ["Base", "Business", "Advanced"].map(
   (p) => PLANS.find(({ name }) => name === p)!,
 );
 
+// Plans that are coming soon and cannot be upgraded to yet
+const COMING_SOON_PLANS = ["business", "advanced"];
+
 export function WorkspaceBillingUpgradePageClientLF() {
   const { slug, plan: currentPlan, stripeId, payoutsLimit } = useWorkspace();
 
@@ -163,6 +166,19 @@ export function WorkspaceBillingUpgradePageClientLF() {
                             ? "Contact us"
                             : "Get started"}
                         </Link>
+                      ) : COMING_SOON_PLANS.includes(
+                          plan.name.toLowerCase(),
+                        ) ? (
+                        <button
+                          type="button"
+                          disabled
+                          className={cn(
+                            "flex h-8 w-full items-center justify-center rounded-md text-center text-sm font-semibold",
+                            "cursor-not-allowed bg-blue-100 text-blue-600",
+                          )}
+                        >
+                          Coming Soon
+                        </button>
                       ) : (
                         <UpgradePlanButtonLF
                           plan={plan.name.toLowerCase()}
