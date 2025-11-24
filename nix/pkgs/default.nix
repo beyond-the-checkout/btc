@@ -22,4 +22,8 @@
   # Linearis - CLI tool for Linear.app with JSON output
   # Normally installed via: npm install -g --install-links czottmann/linearis
   linearis = pkgs.callPackage ./linearis.nix { };
+
+  # Claude Code - AI-powered coding assistant from Anthropic
+  # Normally installed via: npm install -g @anthropic-ai/claude-code
+  claude-code = pkgs.callPackage ./claude-code.nix { };
 }

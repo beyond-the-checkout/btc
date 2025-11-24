@@ -39,7 +39,6 @@ in
   pkgs.caddy
   pkgs.jwt-cli
   pkgs.nodejs_20
-  pkgs-unstable.claude-code
   pkgs-codex.codex
   pkgs.mysql84
   pkgs.nodePackages.typescript
@@ -63,6 +62,7 @@ in
 # customPkgs.droid  # ✓ Working - binary download
   customPkgs.beads  # Beads (bd) CLI - memory system for coding agents
   customPkgs.linearis  # Linearis CLI - Linear.app with JSON output for LLM agents
+  customPkgs.claude-code  # Claude Code v2.0.51 - AI coding assistant
   ];
   # graphql-scalars
   # type-graphql
@@ -114,6 +114,7 @@ in
     echo "  droid: $(droid --version 2>/dev/null || echo 'not available')"
     echo "  bd: $(bd --version 2>/dev/null || echo 'not available')"
     echo "  linearis: $(linearis --version 2>/dev/null || echo 'not available')"
+    echo "  claude: $(claude --version 2>/dev/null || echo 'not available')"
     # echo "  tb: $(tb --version 2>/dev/null || echo 'not available')"
 
     # Set DEVENV_PROFILE for Starship
