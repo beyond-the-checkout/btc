@@ -1,67 +1,93 @@
-export const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME;
+// Helper function to enforce required environment variables
+const requireEnv = (value: string | undefined, name: string): string => {
+  if (!value) {
+    throw new Error(`${name} environment variable is required but not set`);
+  }
+  return value;
+};
 
-export const SHORT_DOMAIN = process.env.NEXT_PUBLIC_APP_SHORT_DOMAIN!;
+export const APP_NAME = requireEnv(
+  process.env.NEXT_PUBLIC_APP_NAME,
+  "NEXT_PUBLIC_APP_NAME",
+);
+export const SHORT_DOMAIN = requireEnv(
+  process.env.NEXT_PUBLIC_APP_SHORT_DOMAIN,
+  "NEXT_PUBLIC_APP_SHORT_DOMAIN",
+);
+export const APP_DOMAIN_ENV = requireEnv(
+  process.env.NEXT_PUBLIC_APP_DOMAIN,
+  "NEXT_PUBLIC_APP_DOMAIN",
+);
+export const APP_PORT = requireEnv(
+  process.env.NEXT_PUBLIC_APP_PORT,
+  "NEXT_PUBLIC_APP_PORT",
+);
+
+const getLocalAppDomain = () => {
+  return `http://localhost:${APP_PORT}`;
+};
 
 export const APP_HOSTNAMES = new Set([
-  `app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-  `preview.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-  "localhost:8888",
+  `app.${APP_DOMAIN_ENV}`,
+  `preview.${APP_DOMAIN_ENV}`,
+  `localhost:${APP_PORT}`,
   "localhost",
 ]);
 
 export const APP_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ||
   process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-    ? `https://app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-    : "http://localhost:8888";
+    ? `https://app.${APP_DOMAIN_ENV}`
+    : getLocalAppDomain();
 
 export const APP_DOMAIN_WITH_NGROK =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ||
   process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-    ? `https://app.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-    : process.env.NEXT_PUBLIC_NGROK_URL || "http://localhost:8888";
+    ? `https://app.${APP_DOMAIN_ENV}`
+    : process.env.NEXT_PUBLIC_NGROK_URL ?? getLocalAppDomain();
 
 export const API_HOSTNAMES = new Set([
-  `api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-  `api-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
+  `api.${APP_DOMAIN_ENV}`,
+  `api-staging.${APP_DOMAIN_ENV}`,
   `api.${SHORT_DOMAIN}`,
-  "api.localhost:8888",
+  `api.localhost:${APP_PORT}`,
   "api.localhost",
 ]);
 
 export const API_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://api.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+    ? `https://api.${APP_DOMAIN_ENV}`
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://api-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : "http://api.localhost:8888";
+      ? `https://api-staging.${APP_DOMAIN_ENV}`
+      : `http://api.localhost:${APP_PORT}`;
 
 export const ADMIN_HOSTNAMES = new Set([
-  `admin.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-  "admin.localhost:8888",
+  `admin.${APP_DOMAIN_ENV}`,
+  `admin.localhost:${APP_PORT}`,
   "admin.localhost",
 ]);
 
 export const PARTNERS_HOSTNAMES = new Set([
-  `partners.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-  `partners-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`,
-  "partners.localhost:8888",
+  `partners.${APP_DOMAIN_ENV}`,
+  `partners-staging.${APP_DOMAIN_ENV}`,
+  `partners.localhost:${APP_PORT}`,
   "partners.localhost",
 ]);
 
 export const PARTNERS_DOMAIN =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://partners.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+    ? `https://partners.${APP_DOMAIN_ENV}`
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://partners-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : "http://partners.localhost:8888";
+      ? `https://partners-staging.${APP_DOMAIN_ENV}`
+      : `http://partners.localhost:${APP_PORT}`;
 
 export const PARTNERS_DOMAIN_WITH_NGROK =
   process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://partners.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
+    ? `https://partners.${APP_DOMAIN_ENV}`
     : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://partners-staging.${process.env.NEXT_PUBLIC_APP_DOMAIN}`
-      : process.env.NEXT_PUBLIC_NGROK_URL || "http://partners.localhost:8888";
+      ? `https://partners-staging.${APP_DOMAIN_ENV}`
+      : process.env.NEXT_PUBLIC_NGROK_URL ??
+        `http://partners.localhost:${APP_PORT}`;
 
 export const DUB_LOGO = "https://assets.dub.co/logo.png";
 export const DUB_LOGO_SQUARE = "https://assets.dub.co/logo-square.png";
@@ -88,4 +114,5 @@ export const ACME_PROGRAM_ID = "prog_CYCu7IMAapjkRpTnr8F1azjN";
 export const LEGAL_WORKSPACE_ID = "clrflia0j0000vs7sqfhz9c7q";
 export const LEGAL_USER_ID = "clqei1lgc0000vsnzi01pbf47";
 
-export const R2_URL = process.env.STORAGE_BASE_URL || "https://dubassets.com";
+// Note: Server-side only env var, not validated at build time
+export const R2_URL = process.env.STORAGE_BASE_URL ?? "";
