@@ -7,38 +7,38 @@ const common = {
   os: "Mac OS",
 };
 
-const dubLink = {
+const checkoutLink = {
   id: "1",
-  domain: "dub.link",
+  domain: "chko.sh",
   key: "uxUrVCz",
-  shortLink: "https://dub.co/uxUrVCz",
-  url: "https://dub.co/",
+  shortLink: "https://chko.sh/uxUrVCz",
+  url: "https://checkout.dev/",
 };
 
-const githubLink = {
+const docsLink = {
   id: "3",
-  domain: "git.new",
+  domain: "chko.sh",
   key: "9XyzIho",
-  shortLink: "https://git.new/9XyzIho",
-  url: "https://github.com/dubinc/dub",
+  shortLink: "https://chko.sh/9XyzIho",
+  url: "https://checkout.dev/docs",
 };
 
-const steven = {
-  name: "Steven Tey",
-  email: "steven@dub.co",
-  avatar: "https://avatar.vercel.sh/s.png?text=S",
+const alex = {
+  name: "Alex Chen",
+  email: "alex@checkout.dev",
+  avatar: "https://avatar.vercel.sh/a.png?text=A",
 };
 
-const tim = {
-  name: "Tim Wilson",
-  email: "tim@dub.co",
-  avatar: "https://avatar.vercel.sh/t.png?text=T",
+const jordan = {
+  name: "Jordan Smith",
+  email: "jordan@checkout.dev",
+  avatar: "https://avatar.vercel.sh/j.png?text=J",
 };
 
-const kiran = {
-  name: "Kiran Kuriya",
-  email: "kiran@dub.co",
-  avatar: "https://avatar.vercel.sh/k.png?text=K",
+const morgan = {
+  name: "Morgan Lee",
+  email: "morgan@checkout.dev",
+  avatar: "https://avatar.vercel.sh/m.png?text=M",
 };
 
 export const EXAMPLE_EVENTS_DATA = {
@@ -54,7 +54,7 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: dubLink,
+      link: checkoutLink,
     },
     {
       event: "click",
@@ -67,7 +67,7 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: dubLink,
+      link: checkoutLink,
     },
     {
       event: "click",
@@ -80,7 +80,7 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: githubLink,
+      link: docsLink,
     },
   ],
   leads: [
@@ -97,8 +97,8 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: dubLink,
-      customer: steven,
+      link: checkoutLink,
+      customer: alex,
     },
     {
       event: "lead",
@@ -113,8 +113,8 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "AS",
         ...common,
       },
-      link: dubLink,
-      customer: kiran,
+      link: checkoutLink,
+      customer: morgan,
     },
     {
       event: "lead",
@@ -129,8 +129,8 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: githubLink,
-      customer: tim,
+      link: docsLink,
+      customer: jordan,
     },
   ],
   sales: [
@@ -152,8 +152,8 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: dubLink,
-      customer: steven,
+      link: checkoutLink,
+      customer: alex,
     },
     {
       event: "sale",
@@ -173,8 +173,8 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "NA",
         ...common,
       },
-      link: dubLink,
-      customer: tim,
+      link: checkoutLink,
+      customer: jordan,
     },
     {
       event: "sale",
@@ -194,8 +194,8 @@ export const EXAMPLE_EVENTS_DATA = {
         continent: "AS",
         ...common,
       },
-      link: dubLink,
-      customer: kiran,
+      link: checkoutLink,
+      customer: morgan,
     },
   ],
 };
