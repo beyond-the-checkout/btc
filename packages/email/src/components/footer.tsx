@@ -25,10 +25,6 @@ export function Footer({
         </Text>
         <Text className="text-[12px] text-neutral-500">
           Beyond The Checkout
-          <br />
-          2261 Market Street STE 5906
-          <br />
-          San Francisco, CA 941114
         </Text>
       </Tailwind>
     );
@@ -55,13 +51,7 @@ export function Footer({
           </Link>
         </Text>
       )}
-      <Text className="text-[12px] text-neutral-500">
-        Beyond The Checkout
-        <br />
-        2261 Market Street STE 5906
-        <br />
-        San Francisco, CA 94114
-      </Text>
+      <Text className="text-[12px] text-neutral-500">Beyond The Checkout</Text>
     </Tailwind>
   );
 }

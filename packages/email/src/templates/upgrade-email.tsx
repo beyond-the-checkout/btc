@@ -37,23 +37,17 @@ export default function UpgradeEmail({
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
               Thank you for upgrading to Checkout {plan}!
             </Heading>
-            <Section className="my-8">
-              <Img
-                src="https://assets.chko.sh/misc/thank-you-thumbnail.jpg"
-                alt="Thank you"
-                className="max-w-[500px]"
-              />
-            </Section>
+
             <Text className="text-sm leading-6 text-black">
               Hey{name && ` ${name}`}!
             </Text>
             <Text className="text-sm leading-6 text-black">
-              My name is Steven, and I'm the founder of Checkout.
+              My name is Oliver, and I'm one of the co-founders of Checkout.
             </Text>
             <Text className="text-sm leading-6 text-black">
               I wanted to personally reach out to thank you for upgrading to{" "}
-              <strong>Checkout {plan}</strong>! Your support means the world to us
-              and helps us continue to build and improve Checkout.
+              <strong>Checkout {plan}</strong>! Your support means the world to
+              us and helps us continue to build and improve Checkout.
             </Text>
             <Text className="text-sm leading-6 text-black">
               On the {plan} plan, you now have access to:
@@ -73,7 +67,7 @@ export default function UpgradeEmail({
               hesitate to reach out – I'm always happy to help!
             </Text>
             <Text className="text-sm font-light leading-6 text-neutral-400">
-              Steven from Checkout
+              Oliver from Checkout
             </Text>
             <Footer email={email} marketing />
           </Container>

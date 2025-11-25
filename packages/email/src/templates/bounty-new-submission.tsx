@@ -25,7 +25,7 @@ export default function NewBountySubmission({
   partner = {
     name: "John Doe",
     image:
-      "https://dubassets.com/partners/pn_H4TB2V5hDIjpqB7PwrxESoY3/image_wCBZlIJ",
+      "https://assets.chko.sh/partners/pn_H4TB2V5hDIjpqB7PwrxESoY3/image_wCBZlIJ",
     email: "john.doe@example.com",
   },
   submission = {

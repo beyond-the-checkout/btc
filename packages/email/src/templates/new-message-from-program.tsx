@@ -27,7 +27,7 @@ export default function NewMessageFromProgram({
   program = {
     name: "Acme",
     slug: "acme",
-    logo: "https://assets.dub.co/misc/acme-logo.png",
+    logo: "https://assets.chko.sh/misc/acme-logo.png",
   },
   messages = [
     {

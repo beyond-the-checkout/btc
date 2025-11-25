@@ -1,4 +1,4 @@
-import { cn } from "@dub/utils";
+import { CHECKOUT_ASSETS_BASE, cn } from "@dub/utils";
 
 export function BountyThumbnailImage({
   type,
@@ -11,11 +11,11 @@ export function BountyThumbnailImage({
     <img
       {...(type === "performance"
         ? {
-            src: "https://assets.dub.co/icons/trophy.png",
+            src: `${CHECKOUT_ASSETS_BASE}/icons/trophy.png`,
             alt: "Trophy thumbnail",
           }
         : {
-            src: "https://assets.dub.co/icons/heart.png",
+            src: `${CHECKOUT_ASSETS_BASE}/icons/heart.png`,
             alt: "Heart thumbnail",
           })}
       width={118}

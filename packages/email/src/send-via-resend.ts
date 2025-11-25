@@ -23,7 +23,7 @@ const resendEmailForOptions = (opts: ResendEmailOptions) => {
     to,
     from: from || VARIANT_TO_FROM_MAP[variant],
     bcc: bcc,
-    replyTo: replyTo || `support@${APP_DOMAIN}`,
+    replyTo: replyTo || "team@chko.sh",
     subject,
     text,
     react,
@@ -33,7 +33,7 @@ const resendEmailForOptions = (opts: ResendEmailOptions) => {
       ? {
           headers: {
             ...(headers || {}),
-            "List-Unsubscribe": "https://app.dub.co/account/settings",
+            "List-Unsubscribe": `https://${APP_DOMAIN}/account/settings`,
           },
         }
       : {

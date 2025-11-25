@@ -4,7 +4,7 @@ import { RESEND_AUDIENCES } from "./constants";
 export async function subscribe({
   email,
   name,
-  audience = "app.dub.co",
+  audience = "app.chko.sh",
 }: {
   email: string;
   name?: string | null;
@@ -17,7 +17,7 @@ export async function subscribe({
     return;
   }
 
-  if (email.endsWith("@dub-internal-test.com")) {
+  if (email.endsWith("@checkout-internal-test.com")) {
     // don't subscribe internal test emails
     return;
   }

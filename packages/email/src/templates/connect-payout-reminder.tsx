@@ -28,13 +28,13 @@ export default function ConnectPayoutReminder({
     {
       id: "1",
       name: "Acme",
-      logo: "https://dubassets.com/programs/prog_CYCu7IMAapjkRpTnr8F1azjN/logo_ObfFYsM",
+      logo: "https://assets.chko.sh/programs/prog_CYCu7IMAapjkRpTnr8F1azjN/logo_ObfFYsM",
       amount: 120_00,
     },
     {
       id: "2",
       name: "Dub",
-      logo: "https://dubassets.com/programs/prog_d8pl69xXCv4AoHNT281pHQdo/logo_TMLMTHs",
+      logo: "https://assets.chko.sh/programs/prog_d8pl69xXCv4AoHNT281pHQdo/logo_TMLMTHs",
       amount: 40_24,
     },
   ],

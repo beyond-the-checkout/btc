@@ -38,8 +38,8 @@ export default function NewSaleAlertProgramOwner({
   },
   partner = {
     id: "pn_OfewI1Faaf5pV8QH3mha8L7S",
-    name: "Steven",
-    email: "steven@dub.co",
+    name: "Oliver",
+    email: "oliver@example.com",
   },
   commission = {
     amount: 1330,
