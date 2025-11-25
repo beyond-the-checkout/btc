@@ -54,6 +54,7 @@ in
   pkgs.railway
   pkgs.stripe-cli
   pkgs.starship
+  pkgs.nodePackages.vercel
   pkgs.uv
 
   # Custom packages
