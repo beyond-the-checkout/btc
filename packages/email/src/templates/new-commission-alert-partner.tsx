@@ -1,4 +1,10 @@
-import { currencyFormatter, DUB_WORDMARK, getPrettyUrl } from "@dub/utils";
+import {
+  CHECKOUT_LOGO,
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+  getPrettyUrl,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -19,7 +25,7 @@ export default function NewCommissionAlertPartner({
   program = {
     name: "Acme",
     slug: "acme",
-    logo: DUB_WORDMARK,
+    logo: CHECKOUT_WORDMARK,
     holdingPeriodDays: 30,
   },
   commission = {
@@ -44,7 +50,7 @@ export default function NewCommissionAlertPartner({
   shortLink?: string | null;
 }) {
   const earningsInDollars = currencyFormatter(commission.earnings / 100);
-  const linkToEarnings = `https://partners.dub.co/programs/${program.slug}/earnings`;
+  const linkToEarnings = `${CHECKOUT_PARTNERS_URL}/programs/${program.slug}/earnings`;
 
   return (
     <Html>
@@ -53,14 +59,14 @@ export default function NewCommissionAlertPartner({
         You just earned {earningsInDollars} in commissions via{" "}
         {shortLink
           ? `your referral link ${getPrettyUrl(shortLink)}`
-          : "Dub Partners"}
+          : "Checkout Partners"}
       </Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
               <Img
-                src={program.logo || "https://assets.dub.co/logo.png"}
+                src={program.logo || CHECKOUT_LOGO}
                 height="32"
                 alt={program.name}
               />
@@ -155,7 +161,7 @@ export default function NewCommissionAlertPartner({
             </Section>
             <Footer
               email={email}
-              notificationSettingsUrl="https://partners.dub.co/settings/notifications"
+              notificationSettingsUrl={`${CHECKOUT_PARTNERS_URL}/settings/notifications`}
             />
           </Container>
         </Body>

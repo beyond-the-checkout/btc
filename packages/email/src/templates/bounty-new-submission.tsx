@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, OG_AVATAR_URL } from "@dub/utils";
+import { CHECKOUT_APP_URL, CHECKOUT_WORDMARK, OG_AVATAR_URL } from "@dub/utils";
 import {
   Body,
   Container,
@@ -58,7 +58,7 @@ export default function NewBountySubmission({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="mx-0 mb-5 mt-10 p-0 text-lg font-medium text-black">
@@ -94,7 +94,7 @@ export default function NewBountySubmission({
 
             <Section className="mt-6 text-center">
               <Link
-                href={`https://app.dub.co/${workspace.slug}/program/bounties/${bounty.id}?submissionId=${submission.id}`}
+                href={`${CHECKOUT_APP_URL}/${workspace.slug}/program/bounties/${bounty.id}?submissionId=${submission.id}`}
                 className="box-border block w-full rounded-md bg-black px-2 py-4 text-center text-sm font-medium leading-none text-white no-underline"
               >
                 Review bounty

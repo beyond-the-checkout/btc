@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_BASE_URL, CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -25,15 +25,15 @@ export default function WelcomeEmailPartner({
   return (
     <Html>
       <Head />
-      <Preview>Welcome to Dub Partners</Preview>
+      <Preview>Welcome to Checkout Partners</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-semibold text-black">
-              Welcome {name || "to Dub Partners"}!
+              Welcome {name || "to Checkout Partners"}!
             </Heading>
             <Text className="mb-8 text-sm leading-6 text-gray-600">
               We're excited to have you onboard. Time to start earning rewards
@@ -52,7 +52,7 @@ export default function WelcomeEmailPartner({
               </strong>
               : Start by{" "}
               <Link
-                href="https://ship.dub.co/partner-profile"
+                href={`${CHECKOUT_BASE_URL}/partner-profile`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 completing your partner profile
@@ -67,7 +67,7 @@ export default function WelcomeEmailPartner({
               </strong>
               :{" "}
               <Link
-                href="https://ship.dub.co/connect-payouts"
+                href={`${CHECKOUT_BASE_URL}/connect-payouts`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 Connect a payout method
@@ -77,7 +77,7 @@ export default function WelcomeEmailPartner({
               based in the UK, you will need to connect a GBP bank account to
               receive payouts.{" "}
               <Link
-                href="https://ship.dub.co/payouts-guide"
+                href={`${CHECKOUT_BASE_URL}/payouts-guide`}
                 className="font-semibold text-black underline underline-offset-4"
               >
                 Learn more ↗
@@ -110,7 +110,7 @@ export default function WelcomeEmailPartner({
             <Section className="mb-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href="https://ship.dub.co/partners-dashboard"
+                href={`${CHECKOUT_BASE_URL}/partners-dashboard`}
               >
                 Go to your dashboard
               </Link>

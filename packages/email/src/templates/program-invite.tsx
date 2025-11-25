@@ -1,4 +1,9 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import {
+  CHECKOUT_BASE_URL,
+  CHECKOUT_LOGO,
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -19,7 +24,7 @@ export default function PartnerInvite({
   program = {
     name: "Acme",
     slug: "acme",
-    logo: DUB_WORDMARK,
+    logo: CHECKOUT_WORDMARK,
   },
 }: {
   email: string;
@@ -38,24 +43,24 @@ export default function PartnerInvite({
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mb-8 mt-6">
               <Img
-                src={program.logo || "https://assets.dub.co/logo.png"}
+                src={program.logo || CHECKOUT_LOGO}
                 height="32"
                 alt={program.name}
               />
             </Section>
 
             <Heading className="mx-0 p-0 text-lg font-medium text-black">
-              {program.name} invited you to join Dub Partners
+              {program.name} invited you to join Checkout Partners
             </Heading>
 
             <Text className="text-sm leading-6 text-neutral-600">
               {program.name} uses{" "}
               <Link
-                href="https://dub.co/partners"
+                href={`${CHECKOUT_BASE_URL}/partners`}
                 target="_blank"
                 className="font-semibold text-neutral-800 underline underline-offset-2"
               >
-                Dub Partners
+                Checkout Partners
               </Link>{" "}
               to power their affiliate program and wants to partner with great
               people like yourself!
@@ -64,7 +69,7 @@ export default function PartnerInvite({
             <Section className="mb-12 mt-8">
               <Link
                 className="rounded-lg bg-neutral-900 px-4 py-3 text-[12px] font-semibold text-white no-underline"
-                href={`https://partners.dub.co/${program.slug}/register?email=${encodeURIComponent(email)}&next=/programs/${program.slug}`}
+                href={`${CHECKOUT_PARTNERS_URL}/${program.slug}/register?email=${encodeURIComponent(email)}&next=/programs/${program.slug}`}
               >
                 Accept Invite
               </Link>

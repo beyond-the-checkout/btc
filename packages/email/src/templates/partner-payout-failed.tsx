@@ -1,4 +1,8 @@
-import { currencyFormatter, DUB_WORDMARK } from "@dub/utils";
+import {
+  CHECKOUT_APP_URL,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -57,7 +61,7 @@ export default function PartnerPayoutFailed({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="mx-0 my-8 p-0 text-lg font-medium text-black">
@@ -109,14 +113,14 @@ export default function PartnerPayoutFailed({
             <Text className="text-sm leading-6 text-neutral-600">
               Please{" "}
               <Link
-                href={`https://app.dub.co/${workspace.slug}/settings/billing`}
+                href={`${CHECKOUT_APP_URL}/${workspace.slug}/settings/billing`}
                 className="font-medium text-black underline"
               >
                 update your {payoutMethod} details
               </Link>{" "}
               at your earliest convenience and retry the payout from your{" "}
               <Link
-                href="https://app.dub.co/program/payouts?status=pending&sortBy=amount"
+                href={`${CHECKOUT_APP_URL}/program/payouts?status=pending&sortBy=amount`}
                 className="font-medium text-black underline"
               >
                 payouts tab
@@ -127,7 +131,7 @@ export default function PartnerPayoutFailed({
             <Section className="my-8">
               <Link
                 className="rounded-lg bg-neutral-900 px-6 py-3 text-[13px] font-medium text-white no-underline"
-                href="https://app.dub.co/program/payouts?status=pending&sortBy=amount"
+                href={`${CHECKOUT_APP_URL}/program/payouts?status=pending&sortBy=amount`}
               >
                 Retry payout
               </Link>

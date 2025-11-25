@@ -1,4 +1,12 @@
-import { COUNTRIES, DUB_WORDMARK, smartTruncate } from "@dub/utils";
+import {
+  CHECKOUT_APP_URL,
+  CHECKOUT_ASSETS_BASE,
+  CHECKOUT_BASE_URL,
+  CHECKOUT_LOGO,
+  CHECKOUT_WORDMARK,
+  COUNTRIES,
+  smartTruncate,
+} from "@dub/utils";
 import { nFormatter } from "@dub/utils/src/functions";
 import {
   Body,
@@ -21,9 +29,9 @@ import { Footer } from "../components/footer";
 export default function DubWrapped({
   email = "panic@thedis.co",
   workspace = {
-    name: "Dub",
-    slug: "dub",
-    logo: "https://assets.dub.co/logo.png",
+    name: "Checkout",
+    slug: "checkout",
+    logo: CHECKOUT_LOGO,
   },
   stats = {
     "Total Links": 1429,
@@ -116,31 +124,31 @@ export default function DubWrapped({
     {
       title: "Free .LINK domains on all paid plans",
       description:
-        "We partnered with Nova Registry to offer a <b>1-year free .link custom domain</b> to all paying Dub customers. By using a custom domain, you get <b>30% higher click-through rates</b> and better brand recognition.",
-      image: "https://assets.dub.co/blog/free-dot-link.jpg",
+        "We partnered with Nova Registry to offer a <b>1-year free .link custom domain</b> to all paying Checkout customers. By using a custom domain, you get <b>30% higher click-through rates</b> and better brand recognition.",
+      image: `${CHECKOUT_ASSETS_BASE}/blog/free-dot-link.jpg`,
       cta: {
         text: "Read the announcement",
-        href: "https://ship.dub.co/free-domains",
+        href: `${CHECKOUT_BASE_URL}/free-domains`,
       },
     },
     {
       title: "New link builder + dashboard",
       description:
         "We launched a new link builder, rebuilt from the ground up, to help you manage your links better. We also gave our dashboard a makeover as well.",
-      image: "https://assets.dub.co/changelog/new-dashboard.jpg",
+      image: `${CHECKOUT_ASSETS_BASE}/changelog/new-dashboard.jpg`,
       cta: {
         text: "Read the announcement",
-        href: "https://ship.dub.co/builder",
+        href: `${CHECKOUT_BASE_URL}/builder`,
       },
     },
     {
-      title: "Dub API General Availability",
+      title: "Checkout API General Availability",
       description:
-        "Our Dub API went GA, allowing you to build your powerful integrations with Dub. We also launched <b>native SDKs in 5 different languages</b>: TypeScript, Python, Ruby, PHP, and Go.",
-      image: "https://assets.dub.co/blog/dub-api.jpg",
+        "Our Checkout API went GA, allowing you to build your powerful integrations with Checkout. We also launched <b>native SDKs in 5 different languages</b>: TypeScript, Python, Ruby, PHP, and Go.",
+      image: `${CHECKOUT_ASSETS_BASE}/blog/dub-api.jpg`,
       cta: {
         text: "Read the announcement",
-        href: "https://dub.co/blog/announcing-dub-api",
+        href: `${CHECKOUT_BASE_URL}/blog/announcing-checkout-api`,
       },
     },
   ];
@@ -150,17 +158,22 @@ export default function DubWrapped({
       <Head />
       <Preview>
         In 2024, you created {nFormatter(stats["Total Links"], { full: true })}{" "}
-        links on Dub and got {nFormatter(stats["Total Clicks"], { full: true })}{" "}
-        clicks.
+        links on Checkout and got{" "}
+        {nFormatter(stats["Total Clicks"], { full: true })} clicks.
       </Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" className="my-0" />
+              <Img
+                src={CHECKOUT_WORDMARK}
+                height="32"
+                alt="Checkout"
+                className="my-0"
+              />
             </Section>
             <Heading className="mx-0 mb-4 mt-8 p-0 text-xl font-semibold text-black">
-              Dub Year in Review 🎊
+              Checkout Year in Review 🎊
             </Heading>
             <Text className="text-sm leading-6 text-black">
               As we put a wrap on 2024, we wanted to say thank you for your
@@ -170,7 +183,7 @@ export default function DubWrapped({
             <Section className="my-8 rounded-lg border border-solid border-neutral-200 p-2">
               <div>
                 <Img
-                  src="https://assets.dub.co/misc/year-in-review-header.jpg"
+                  src={`${CHECKOUT_ASSETS_BASE}/misc/year-in-review-header.jpg`}
                   alt="header"
                   className="max-w-[500px] rounded-lg"
                 />
@@ -226,7 +239,7 @@ export default function DubWrapped({
               </Text>
             ))}
             <Img
-              src="https://assets.dub.co/misc/year-in-review-2024.jpg"
+              src={`${CHECKOUT_ASSETS_BASE}/misc/year-in-review-2024.jpg`}
               alt="Thank you"
               className="max-w-[500px] rounded-lg"
             />
@@ -268,14 +281,14 @@ export default function DubWrapped({
             <Text className="text-sm leading-6 text-black">
               You can also check out more updates on our{" "}
               <Link
-                href="https://ship.dub.co/blog"
+                href={`${CHECKOUT_BASE_URL}/blog`}
                 className="text-black underline underline-offset-2"
               >
                 blog
               </Link>{" "}
               and{" "}
               <Link
-                href="https://ship.dub.co/changelog"
+                href={`${CHECKOUT_BASE_URL}/changelog`}
                 className="text-black underline underline-offset-2"
               >
                 changelog
@@ -286,12 +299,12 @@ export default function DubWrapped({
               Thank you again, and happy holidays!
             </Text>
             <Img
-              src="https://assets.dub.co/misc/email-signature.png"
+              src={`${CHECKOUT_ASSETS_BASE}/misc/email-signature.png`}
               alt="Email signature"
               className="max-w-[200px]"
             />
             <Text className="text-sm leading-6 text-black">
-              and the Dub team 🎄
+              and the Checkout team 🎄
             </Text>
 
             <Footer email={email} marketing />
@@ -350,7 +363,7 @@ const StatTable = ({
                 {title === "Top Links" ? (
                   <div className="py-2">
                     <Link
-                      href={`https://app.dub.co/${workspaceSlug}/analytics?domain=${domain}&key=${path}&interval=1y`}
+                      href={`${CHECKOUT_APP_URL}/${workspaceSlug}/analytics?domain=${domain}&key=${path}&interval=1y`}
                       className="font-medium text-black underline underline-offset-2"
                     >
                       {smartTruncate(item, 33)} ↗

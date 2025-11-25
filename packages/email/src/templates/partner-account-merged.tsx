@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_SUPPORT_EMAIL, CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -26,21 +26,21 @@ export default function PartnerAccountMerged({
   return (
     <Html>
       <Head />
-      <Preview>Your Dub partner accounts are now merged</Preview>
+      <Preview>Your Checkout partner accounts are now merged</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-10 py-5">
             <Section className="mb-8 flex items-center">
               <Img
-                src={DUB_WORDMARK}
+                src={CHECKOUT_WORDMARK}
                 height="32"
-                alt="Dub"
+                alt="Checkout"
                 className="mr-auto"
               />
             </Section>
 
             <Heading className="p-0 text-xl font-semibold text-black">
-              Your Dub partner accounts are now merged
+              Your Checkout partner accounts are now merged
             </Heading>
 
             <Text className="text-base text-neutral-600">
@@ -49,13 +49,14 @@ export default function PartnerAccountMerged({
             </Text>
 
             <Text className="text-base text-neutral-600">
-              The merged account ({sourceEmail}) has been deleted. To use Dub
-              with that email, a new account will need to be created.
+              The merged account ({sourceEmail}) has been deleted. To use
+              Checkout with that email, a new account will need to be created.
             </Text>
 
             <Text className="text-base text-neutral-600">
-              Contact <Link href="mailto:support@dub.co">support</Link> if you
-              have any questions.
+              Contact{" "}
+              <Link href={`mailto:${CHECKOUT_SUPPORT_EMAIL}`}>support</Link> if
+              you have any questions.
             </Text>
 
             <Footer email={email} />

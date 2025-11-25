@@ -1,4 +1,8 @@
-import { DUB_WORDMARK, formatDate } from "@dub/utils";
+import {
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+  formatDate,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -49,7 +53,7 @@ export default function NewBountyAvailable({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="bt-5 mx-0 mt-10 p-0 text-lg font-medium text-black">
@@ -88,7 +92,7 @@ export default function NewBountyAvailable({
 
               <Section className="px-6 pb-6 text-center">
                 <Link
-                  href={`https://partners.dub.co/programs/${program.slug}/bounties`}
+                  href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}/bounties`}
                   className="box-border block w-full rounded-md bg-black px-2 py-4 text-center text-sm font-medium leading-none text-white no-underline"
                 >
                   View bounty

@@ -56,11 +56,11 @@ export function Footer({
         </Text>
       )}
       <Text className="text-[12px] text-neutral-500">
-        Dub Technologies, Inc.
+        Beyond The Checkout
         <br />
         2261 Market Street STE 5906
         <br />
-        San Francisco, CA 941114
+        San Francisco, CA 94114
       </Text>
     </Tailwind>
   );

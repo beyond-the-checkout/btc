@@ -1,4 +1,9 @@
-import { currencyFormatter, DUB_WORDMARK, formatDate } from "@dub/utils";
+import {
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+  formatDate,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -18,7 +23,7 @@ export default function PartnerPayoutProcessed({
   email = "panic@thedis.co",
   program = {
     name: "Acme",
-    logo: DUB_WORDMARK,
+    logo: CHECKOUT_WORDMARK,
   },
   payout = {
     id: "po_8VuCr2i7WnG65d4TNgZO19fT",
@@ -69,7 +74,7 @@ export default function PartnerPayoutProcessed({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
@@ -101,7 +106,7 @@ export default function PartnerPayoutProcessed({
             <Section className="mb-12 mt-8">
               <Link
                 className="rounded-lg bg-neutral-900 px-4 py-3 text-[12px] font-semibold text-white no-underline"
-                href="https://partners.dub.co/payouts"
+                href={`${CHECKOUT_PARTNERS_URL}/payouts`}
               >
                 View payouts
               </Link>

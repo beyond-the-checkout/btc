@@ -1,4 +1,10 @@
-import { capitalize, currencyFormatter, DUB_WORDMARK } from "@dub/utils";
+import {
+  capitalize,
+  CHECKOUT_APP_URL,
+  CHECKOUT_LOGO,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+} from "@dub/utils";
 import {
   Body,
   Column,
@@ -27,7 +33,7 @@ export default function NewSaleAlertProgramOwner({
   },
   program = {
     name: "Acme",
-    logo: DUB_WORDMARK,
+    logo: CHECKOUT_WORDMARK,
     holdingPeriodDays: 30,
   },
   partner = {
@@ -63,8 +69,8 @@ export default function NewSaleAlertProgramOwner({
     earnings: number;
   };
 }) {
-  const salesLink = `https://app.dub.co/${workspace.slug}/program/commissions?partnerId=${partner.id}`;
-  const notificationPreferencesLink = `https://app.dub.co/${workspace.slug}/settings/notifications`;
+  const salesLink = `${CHECKOUT_APP_URL}/${workspace.slug}/program/commissions?partnerId=${partner.id}`;
+  const notificationPreferencesLink = `${CHECKOUT_APP_URL}/${workspace.slug}/settings/notifications`;
 
   const saleAmountInDollars = currencyFormatter(commission.amount / 100);
 
@@ -100,7 +106,7 @@ export default function NewSaleAlertProgramOwner({
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
               <Img
-                src={program.logo || "https://assets.dub.co/logo.png"}
+                src={program.logo || CHECKOUT_LOGO}
                 height="32"
                 alt={program.name}
               />

@@ -1,4 +1,9 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import {
+  CHECKOUT_HELP_BASE,
+  CHECKOUT_LOGO,
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -19,7 +24,7 @@ import { Footer } from "../components/footer";
 export default function PartnerApplicationApproved({
   program = {
     name: "Acme",
-    logo: DUB_WORDMARK,
+    logo: CHECKOUT_WORDMARK,
     slug: "acme",
   },
   partner = {
@@ -53,7 +58,7 @@ export default function PartnerApplicationApproved({
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
               <Img
-                src={program.logo || "https://assets.dub.co/logo.png"}
+                src={program.logo || CHECKOUT_LOGO}
                 height="32"
                 alt={program.name}
               />
@@ -82,7 +87,7 @@ export default function PartnerApplicationApproved({
             <Text className="ml-1 text-sm leading-5 text-black">
               1. Find your unique referral links in the{" "}
               <Link
-                href={`https://partners.dub.co/programs/${program.slug}/links`}
+                href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}/links`}
                 className="font-semibold text-black underline"
               >
                 Links
@@ -98,14 +103,14 @@ export default function PartnerApplicationApproved({
             <Text className="ml-1 text-sm leading-5 text-black">
               3. Track your{" "}
               <Link
-                href={`https://partners.dub.co/programs/${program.slug}`}
+                href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}`}
                 className="font-semibold text-black underline"
               >
                 link performance
               </Link>{" "}
               and{" "}
               <Link
-                href={`https://partners.dub.co/programs/${program.slug}/earnings`}
+                href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}/earnings`}
                 className="font-semibold text-black underline"
               >
                 earnings
@@ -116,7 +121,7 @@ export default function PartnerApplicationApproved({
             <Text className="ml-1 text-sm leading-5 text-black">
               4. Learn how to{" "}
               <Link
-                href="https://dub.co/help/article/navigating-partner-program"
+                href={`${CHECKOUT_HELP_BASE}/article/navigating-partner-program`}
                 className="font-semibold text-black underline"
               >
                 navigate the program dashboard
@@ -128,7 +133,7 @@ export default function PartnerApplicationApproved({
               <Text className="ml-1 text-sm leading-5 text-black">
                 5. Connect your Stripe account to{" "}
                 <Link
-                  href="https://dub.co/help/article/receiving-payouts"
+                  href={`${CHECKOUT_HELP_BASE}/article/receiving-payouts`}
                   className="font-semibold text-black underline"
                 >
                   enable payouts
@@ -142,7 +147,7 @@ export default function PartnerApplicationApproved({
             <Section className="mb-8 mt-8">
               <Link
                 className="rounded-lg bg-neutral-900 px-6 py-3 text-[13px] font-semibold text-white no-underline"
-                href={`https://partners.dub.co/programs/${program.slug}`}
+                href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}`}
               >
                 Go to your dashboard
               </Link>
@@ -152,7 +157,7 @@ export default function PartnerApplicationApproved({
               If you have any questions about the program please don't hesitate
               to{" "}
               <Link
-                href={`https://partners.dub.co/messages/${program.slug}`}
+                href={`${CHECKOUT_PARTNERS_URL}/messages/${program.slug}`}
                 className="font-semibold text-neutral-700 underline underline-offset-2"
               >
                 reach out to the {program.name} team ↗
@@ -167,7 +172,7 @@ export default function PartnerApplicationApproved({
 
             <Footer
               email={partner.email}
-              notificationSettingsUrl="https://partners.dub.co/settings/notifications"
+              notificationSettingsUrl={`${CHECKOUT_PARTNERS_URL}/settings/notifications`}
             />
           </Container>
         </Body>

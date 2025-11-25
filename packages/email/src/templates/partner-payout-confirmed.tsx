@@ -1,4 +1,10 @@
-import { currencyFormatter, DUB_WORDMARK, formatDate } from "@dub/utils";
+import {
+  CHECKOUT_LOGO,
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+  formatDate,
+} from "@dub/utils";
 import {
   Body,
   Container,
@@ -20,7 +26,7 @@ export default function PartnerPayoutConfirmed({
   program = {
     id: "prog_CYCu7IMAapjkRpTnr8F1azjN",
     name: "Acme",
-    logo: DUB_WORDMARK,
+    logo: CHECKOUT_WORDMARK,
   },
   payout = {
     id: "po_8VuCr2i7WnG65d4TNgZO19fT",
@@ -73,7 +79,7 @@ export default function PartnerPayoutConfirmed({
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
               <Img
-                src={program.logo || "https://assets.dub.co/logo.png"}
+                src={program.logo || CHECKOUT_LOGO}
                 height="32"
                 alt={program.name}
               />
@@ -114,7 +120,7 @@ export default function PartnerPayoutConfirmed({
             <Section className="mb-12 mt-8">
               <Link
                 className="rounded-lg bg-neutral-900 px-4 py-3 text-[12px] font-semibold text-white no-underline"
-                href={`https://partners.dub.co/settings/payouts?payoutId=${payout.id}`}
+                href={`${CHECKOUT_PARTNERS_URL}/settings/payouts?payoutId=${payout.id}`}
               >
                 View payout
               </Link>

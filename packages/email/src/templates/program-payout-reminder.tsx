@@ -1,4 +1,10 @@
-import { currencyFormatter, DUB_WORDMARK, pluralize } from "@dub/utils";
+import {
+  CHECKOUT_APP_URL,
+  CHECKOUT_ASSETS_BASE,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+  pluralize,
+} from "@dub/utils";
 import {
   Body,
   Column,
@@ -53,7 +59,12 @@ export default function ProgramPayoutReminder({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-10 py-5">
             <Section className="mb-8 mt-6">
-              <Img src={DUB_WORDMARK} width="61" height="32" alt="dub" />
+              <Img
+                src={CHECKOUT_WORDMARK}
+                width="61"
+                height="32"
+                alt="Checkout"
+              />
             </Section>
 
             <Heading className="mx-0 p-0 text-lg font-medium text-neutral-800">
@@ -73,7 +84,7 @@ export default function ProgramPayoutReminder({
                 <Column className="w-1/2">
                   <Stats
                     title="Total payout amount"
-                    icon="https://assets.dub.co/misc/icons/nucleo/money-bills.png"
+                    icon={`${CHECKOUT_ASSETS_BASE}/misc/icons/nucleo/money-bills.png`}
                     value={currencyFormatter(payout.amount / 100)}
                   />
                 </Column>
@@ -81,7 +92,7 @@ export default function ProgramPayoutReminder({
                 <Column className="w-1/2">
                   <Stats
                     title="Partners awaiting payout"
-                    icon="https://assets.dub.co/misc/icons/nucleo/users.png"
+                    icon={`${CHECKOUT_ASSETS_BASE}/misc/icons/nucleo/users.png`}
                     value={payout.partnersCount}
                   />
                 </Column>
@@ -89,7 +100,7 @@ export default function ProgramPayoutReminder({
 
               <Section className="mt-6 text-center">
                 <Link
-                  href={`https://app.dub.co/${workspace.slug}/program/payouts?status=pending&sortBy=amount&confirmPayouts=true`}
+                  href={`${CHECKOUT_APP_URL}/${workspace.slug}/program/payouts?status=pending&sortBy=amount&confirmPayouts=true`}
                   className="box-border block w-full rounded-lg bg-black px-0 py-4 text-center text-sm leading-none text-white no-underline"
                 >
                   Review and confirm payouts

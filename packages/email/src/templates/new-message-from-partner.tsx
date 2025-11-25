@@ -1,4 +1,4 @@
-import { DUB_WORDMARK, OG_AVATAR_URL } from "@dub/utils";
+import { CHECKOUT_APP_URL, CHECKOUT_WORDMARK, OG_AVATAR_URL } from "@dub/utils";
 import {
   Body,
   Column,
@@ -53,7 +53,7 @@ export default function NewMessageFromPartner({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Section className="my-8">
@@ -65,9 +65,9 @@ export default function NewMessageFromPartner({
               </Heading>
               <Link
                 className="text-[13px] font-medium text-neutral-500 underline"
-                href={`https://app.dub.co/${workspaceSlug}/program/partners/${partner.id}`}
+                href={`${CHECKOUT_APP_URL}/${workspaceSlug}/program/partners/${partner.id}`}
               >
-                View profile in Dub
+                View profile in Checkout
               </Link>
             </Section>
 
@@ -101,9 +101,9 @@ export default function NewMessageFromPartner({
               )}
               <Link
                 className="mt-4 block rounded-lg bg-neutral-900 px-6 py-3 text-center text-[13px] font-medium text-white no-underline"
-                href={`https://app.dub.co/${workspaceSlug}/program/messages/${partner.id}`}
+                href={`${CHECKOUT_APP_URL}/${workspaceSlug}/program/messages/${partner.id}`}
               >
-                View in Dub
+                View in Checkout
               </Link>
             </Section>
 

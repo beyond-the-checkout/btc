@@ -1,4 +1,10 @@
-import { currencyFormatter, DUB_WORDMARK, OG_AVATAR_URL } from "@dub/utils";
+import {
+  CHECKOUT_HELP_BASE,
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
+  currencyFormatter,
+  OG_AVATAR_URL,
+} from "@dub/utils";
 import {
   Body,
   Column,
@@ -52,7 +58,12 @@ export default function ConnectPayoutReminder({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mb-8 mt-6">
-              <Img src={DUB_WORDMARK} width="65" height="32" alt="dub" />
+              <Img
+                src={CHECKOUT_WORDMARK}
+                width="65"
+                height="32"
+                alt="Checkout"
+              />
             </Section>
 
             <Heading className="mx-0 p-0 text-lg font-medium text-neutral-800">
@@ -60,9 +71,9 @@ export default function ConnectPayoutReminder({
             </Heading>
 
             <Text className="text-sm leading-6 text-neutral-600">
-              You have pending rewards on Dub Partners, but you need to{" "}
+              You have pending rewards on Checkout Partners, but you need to{" "}
               <Link
-                href="https://dub.co/help/article/receiving-payouts"
+                href={`${CHECKOUT_HELP_BASE}/article/receiving-payouts`}
                 className="font-semibold text-black underline"
               >
                 connect your payout details (bank account)
@@ -103,14 +114,14 @@ export default function ConnectPayoutReminder({
             </Section>
 
             <Text className="text-sm leading-6 text-neutral-600">
-              If you haven't already, please create a partner account on Dub
-              with your <strong className="underline">{email}</strong> email and
-              set up your payout details.
+              If you haven't already, please create a partner account on
+              Checkout with your <strong className="underline">{email}</strong>{" "}
+              email and set up your payout details.
             </Text>
 
             <Section className="mt-8 text-center">
               <Link
-                href={`https://partners.dub.co/register?email=${email}&next=/settings/payouts`}
+                href={`${CHECKOUT_PARTNERS_URL}/register?email=${email}&next=/settings/payouts`}
                 className="box-border block w-full rounded-md bg-black px-0 py-4 text-center text-sm font-medium leading-none text-white no-underline"
               >
                 Connect payout details

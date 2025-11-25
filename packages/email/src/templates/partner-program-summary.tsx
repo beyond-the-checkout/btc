@@ -1,7 +1,9 @@
 import {
+  CHECKOUT_ASSETS_BASE,
+  CHECKOUT_LOGO,
+  CHECKOUT_PARTNERS_URL,
+  CHECKOUT_WORDMARK,
   currencyFormatter,
-  DUB_LOGO,
-  DUB_WORDMARK,
   formatDate,
   nFormatter,
 } from "@dub/utils";
@@ -24,10 +26,10 @@ import {
 import { Footer } from "../components/footer";
 
 const ICONS = {
-  clicks: "https://assets.dub.co/misc/icons/nucleo/cursor-rays.png",
-  leads: "https://assets.dub.co/misc/icons/nucleo/user-plus.png",
-  sales: "https://assets.dub.co/misc/icons/nucleo/invoice-dollar.png",
-  earnings: "https://assets.dub.co/misc/icons/nucleo/money-bills.png",
+  clicks: `${CHECKOUT_ASSETS_BASE}/misc/icons/nucleo/cursor-rays.png`,
+  leads: `${CHECKOUT_ASSETS_BASE}/misc/icons/nucleo/user-plus.png`,
+  sales: `${CHECKOUT_ASSETS_BASE}/misc/icons/nucleo/invoice-dollar.png`,
+  earnings: `${CHECKOUT_ASSETS_BASE}/misc/icons/nucleo/money-bills.png`,
 } as const;
 
 type Icon = keyof typeof ICONS;
@@ -74,7 +76,7 @@ function getPercentState(percent?: number) {
 export default function PartnerProgramSummary({
   program = {
     name: "Acme",
-    logo: DUB_LOGO,
+    logo: CHECKOUT_LOGO,
     slug: "acme",
   },
   partner = {
@@ -188,7 +190,7 @@ export default function PartnerProgramSummary({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] space-y-10 px-3 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt={program.name} />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt={program.name} />
             </Section>
 
             <Heading className="mx-0 mt-[40px] p-0 text-lg font-medium text-black">
@@ -200,7 +202,7 @@ export default function PartnerProgramSummary({
               <Section className="rounded-t-xl px-6 py-5">
                 <div className="flex items-center">
                   <Img
-                    src={program.logo || DUB_WORDMARK}
+                    src={program.logo || CHECKOUT_WORDMARK}
                     alt={program.name}
                     height="32"
                     width="32"
@@ -246,7 +248,7 @@ export default function PartnerProgramSummary({
 
                 <Section className="mt-8 text-center">
                   <Link
-                    href={`https://partners.dub.co/programs/${program.slug}?start=${reportingPeriod.start}&end=${reportingPeriod.end}`}
+                    href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}?start=${reportingPeriod.start}&end=${reportingPeriod.end}`}
                     className="box-border block w-full rounded-lg bg-black px-0 py-4 text-center text-sm font-semibold leading-none text-white no-underline"
                   >
                     View dashboard

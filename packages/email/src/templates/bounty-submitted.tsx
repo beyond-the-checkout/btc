@@ -1,4 +1,4 @@
-import { DUB_WORDMARK } from "@dub/utils";
+import { CHECKOUT_PARTNERS_URL, CHECKOUT_WORDMARK } from "@dub/utils";
 import {
   Body,
   Container,
@@ -42,7 +42,7 @@ export default function BountySubmitted({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
 
             <Heading className="mx-0 my-8 p-0 text-lg font-medium text-black">
@@ -67,7 +67,7 @@ export default function BountySubmitted({
               If you have any questions about the program please don’t hesitate
               to{" "}
               <Link
-                href={`https://partners.dub.co/messages/${program.slug}`}
+                href={`${CHECKOUT_PARTNERS_URL}/messages/${program.slug}`}
                 className="font-semibold text-neutral-700 underline underline-offset-2"
               >
                 reach out to the {program.name} team ↗
@@ -78,7 +78,7 @@ export default function BountySubmitted({
             <Section className="mb-10 mt-6">
               <Link
                 className="rounded-lg bg-neutral-900 px-6 py-3 text-[13px] font-medium text-white no-underline"
-                href={`https://partners.dub.co/programs/${program.slug}`}
+                href={`${CHECKOUT_PARTNERS_URL}/programs/${program.slug}`}
               >
                 Go to your dashboard
               </Link>

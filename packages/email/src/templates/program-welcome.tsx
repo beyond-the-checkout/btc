@@ -1,7 +1,10 @@
 import {
-  DUB_LOGO,
-  DUB_THUMBNAIL,
-  DUB_WORDMARK,
+  CHECKOUT_APP_URL,
+  CHECKOUT_DOCS_BASE,
+  CHECKOUT_HELP_BASE,
+  CHECKOUT_LOGO,
+  CHECKOUT_THUMBNAIL,
+  CHECKOUT_WORDMARK,
   getPrettyUrl,
 } from "@dub/utils";
 import {
@@ -29,7 +32,7 @@ export default function ProgramWelcome({
   program = {
     slug: "acme",
     name: "Acme",
-    logo: DUB_LOGO,
+    logo: CHECKOUT_LOGO,
   },
 }: {
   email: string;
@@ -42,7 +45,7 @@ export default function ProgramWelcome({
     logo: string | null;
   };
 }) {
-  const workspaceUrlPrefix = `https://app.dub.co/${workspace.slug}`;
+  const workspaceUrlPrefix = `${CHECKOUT_APP_URL}/${workspace.slug}`;
 
   return (
     <Html>
@@ -52,7 +55,7 @@ export default function ProgramWelcome({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-10 py-5">
             <Section className="mt-8">
-              <Img src={DUB_WORDMARK} height="32" alt="Dub" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
             </Section>
             <Heading
               className="mt-8 text-lg font-semibold leading-7 text-neutral-900"
@@ -71,7 +74,7 @@ export default function ProgramWelcome({
               <Row>
                 <Column width={10}>
                   <Img
-                    src={program.logo || DUB_THUMBNAIL}
+                    src={program.logo || CHECKOUT_THUMBNAIL}
                     alt={program.name}
                     height="32"
                     width="32"
@@ -117,7 +120,7 @@ export default function ProgramWelcome({
             <Text className="mb-4 text-sm leading-5 text-neutral-800">
               2. <span className="font-medium">Connect your bank account</span>:{" "}
               <Link
-                href="https://dub.co/help/article/how-to-set-up-bank-account"
+                href={`${CHECKOUT_HELP_BASE}/article/how-to-set-up-bank-account`}
                 className="font-semibold text-neutral-800 underline underline-offset-2"
               >
                 Set up a bank account
@@ -146,7 +149,7 @@ export default function ProgramWelcome({
               </Link>{" "}
               to your program, or{" "}
               <Link
-                href="https://dub.co/docs/partners/embedded-referrals"
+                href={`${CHECKOUT_DOCS_BASE}/partners/embedded-referrals`}
                 className="font-semibold text-neutral-800 underline underline-offset-2"
               >
                 enroll them automatically.
