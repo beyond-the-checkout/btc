@@ -166,7 +166,7 @@ export function PricingPlans() {
                 <a
                   href={
                     isEnterprise
-                      ? `${APP_DOMAIN}/contact/sales`
+                      ? "mailto:support@chko.sh"
                       : `${APP_DOMAIN}/register`
                   }
                   className={cn(
