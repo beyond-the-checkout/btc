@@ -237,7 +237,7 @@ export async function POST(req: Request) {
 
       unsubscribe({
         email: sourceEmail,
-        audience: "partners.dub.co",
+        audience: "partners.chko.sh",
       }),
     ]);
 

@@ -162,11 +162,11 @@ export const POST = withSession(async ({ req, session }) => {
               defaultWorkspace: workspace.slug,
             },
           }),
-        // Subscribe the user to the app.dub.co Resend audience
+        // Subscribe the user to the app.chko.sh Resend audience
         subscribe({
           email: session.user.email,
           name: session.user.name || undefined,
-          audience: "app.dub.co",
+          audience: "app.chko.sh",
         }),
         // Upload logo to R2 if uploaded
         logo &&

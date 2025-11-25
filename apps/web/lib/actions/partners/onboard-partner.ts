@@ -99,11 +99,11 @@ export const onboardPartnerAction = authUserActionClient
       Promise.allSettled([
         // Complete any outstanding program application
         completeProgramApplications(user.email),
-        // Subscribe the partner to the partners.dub.co Resend audience
+        // Subscribe the partner to the partners.chko.sh Resend audience
         subscribe({
           email: user.email,
           name: user.name || partner.name || undefined,
-          audience: "partners.dub.co",
+          audience: "partners.chko.sh",
         }),
       ]),
     );

@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       subscribe({
         email: user.email,
         name: user.name || undefined,
-        audience: isPartner ? "partners.dub.co" : "app.dub.co",
+        audience: isPartner ? "partners.chko.sh" : "app.chko.sh",
       }),
       sendEmail({
         to: user.email,
