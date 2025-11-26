@@ -35,6 +35,7 @@ import { CONTENT_MAX_HEIGHT_OFFSET } from "./link-qr-modal.constants";
 import { LinkQRModalProvider } from "./link-qr-modal.context";
 import { QRColorSection } from "./link-qr-modal/QRColorSection";
 import { QRCustomizationSection } from "./link-qr-modal/QRCustomizationSection";
+import { QRLogoSection } from "./link-qr-modal/QRLogoSection";
 import { QRPreviewSection } from "./link-qr-modal/QRPreviewSection";
 export type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 
@@ -118,6 +119,7 @@ function QRModalContent(): JSX.Element {
       >
         <div className="flex flex-col gap-6">
           <QRPreviewSection />
+          <QRLogoSection />
           <QRCustomizationSection />
           <QRColorSection />
         </div>

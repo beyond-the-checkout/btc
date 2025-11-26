@@ -28,6 +28,8 @@ export default async function AppMiddleware(req: NextRequest) {
     path !== "/forgot-password" &&
     path !== "/register" &&
     path !== "/auth/saml" &&
+    path !== "/tos" &&
+    path !== "/privacy-policy" &&
     !path.startsWith("/auth/reset-password/") &&
     !path.startsWith("/share/") &&
     !path.startsWith("/deeplink/")
