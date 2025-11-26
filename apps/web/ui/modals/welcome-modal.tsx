@@ -196,7 +196,7 @@ function WelcomeModal({
                   >
                     Thanks for signing up – your account is ready to go! Now you
                     have one central, organized place to build and manage all
-                    your short links.
+                    your QR codes.
                   </p>
                   {plan && (
                     <>
@@ -229,11 +229,12 @@ function WelcomeModal({
               variant="primary"
               text="Get started"
               className="mt-2"
-              onClick={() =>
+              onClick={() => {
                 queryParams({
                   del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
-                })
-              }
+                });
+                setShowWelcomeModal(false);
+              }}
             />
           )}
         </div>
