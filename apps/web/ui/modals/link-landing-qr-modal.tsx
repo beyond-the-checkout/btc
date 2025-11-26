@@ -22,7 +22,7 @@ import {
   readDraftsFromStorage,
   useLinkDrafts,
 } from "@/ui/modals/link-builder/use-link-drafts";
-import { CopyPopover, DownloadPopover } from "@/ui/modals/link-qr-modal";
+// DownloadPopover/CopyPopover removed - users go to account creation to download
 import { LinkQRModalProvider } from "@/ui/modals/link-qr-modal.context";
 import {
   DEFAULT_QR_CODE_DESIGN,
@@ -146,7 +146,7 @@ export function LinkLandingQRCreator({
       >
         <LinkLandingQRModalInner
           title="Create a QR code"
-          ctaText="Create Free Account"
+          ctaText="Click to download"
           onClose={() => {}}
         />
       </LinkBuilderProvider>
@@ -457,34 +457,20 @@ function LinkLandingQRModalInner({
                   onClick={handleContinue}
                   className="h-11 w-full text-sm font-medium"
                 />
-                <div className="grid grid-cols-2 gap-3">
-                  <DownloadPopover qrData={qrData} props={linkProps}>
-                    <Button
-                      variant="secondary"
-                      text="Download"
-                      className="h-10 w-full text-sm font-medium"
-                    />
-                  </DownloadPopover>
-                  <CopyPopover qrData={qrData} props={linkProps}>
-                    <Button
-                      variant="secondary"
-                      text="Copy"
-                      className="h-10 w-full text-sm font-medium"
-                    />
-                  </CopyPopover>
+                {/* DraftControls hidden but rendered to maintain autosave/restore functionality */}
+                <div className="hidden">
+                  <DraftControls
+                    ref={draftControlsRef}
+                    workspaceId="landing"
+                    persistenceOverride={landingDraftsAPI}
+                    qrDesignFromModal={draft}
+                    onRestoreQrDesignFromDraft={(d) =>
+                      setDraft(d ?? DEFAULT_QR_CODE_DESIGN)
+                    }
+                    pendingOnSwitch="flush"
+                    debounceMs={1000}
+                  />
                 </div>
-
-                <DraftControls
-                  ref={draftControlsRef}
-                  workspaceId="landing"
-                  persistenceOverride={landingDraftsAPI}
-                  qrDesignFromModal={draft}
-                  onRestoreQrDesignFromDraft={(d) =>
-                    setDraft(d ?? DEFAULT_QR_CODE_DESIGN)
-                  }
-                  pendingOnSwitch="flush"
-                  debounceMs={1000}
-                />
               </div>
             </div>
           )}

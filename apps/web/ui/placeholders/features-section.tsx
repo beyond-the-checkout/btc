@@ -1,5 +1,5 @@
 import { ExpandingArrow } from "@dub/ui";
-import { cn, createHref, UTMTags } from "@dub/utils";
+import { cn, UTMTags } from "@dub/utils";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
 import Markdown from "react-markdown";
@@ -26,7 +26,9 @@ export function FeaturesSection({
           Everything you need for reliable, dynamic QR codes
         </h2>
         <p className="mt-3 text-pretty text-lg text-neutral-500">
-          Checkout delivers guaranteed longevity, complete data ownership, and transparent pricing for QR codes at scale. Update anytime, manage thousands, and track every scan.
+          Checkout delivers guaranteed longevity, complete data ownership, and
+          transparent pricing for QR codes at scale. Update anytime, manage
+          thousands, and track every scan.
         </p>
       </div>
       <div className="mx-auto mt-14 grid w-full max-w-screen-lg grid-cols-1 px-4 sm:grid-cols-2">
@@ -54,7 +56,7 @@ export function FeaturesSection({
           description="Track every scan in real time with detailed analytics on QR code performance, geographic data, and device types. Monitor trends and optimize campaigns instantly."
         >
           <a
-            href="https://chko.sh/stats/demo"
+            href="https://app.chko.sh/share/dash_1KAYTMYPYVXD77ZPYQMPQ7VF6"
             target="_blank"
             className="group block size-full"
           >
@@ -63,16 +65,16 @@ export function FeaturesSection({
               <Analytics />
             </div>
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <span className="flex items-center text-sm font-medium text-content-emphasis">
+              <span className="text-content-emphasis flex items-center text-sm font-medium">
                 View live demo <ExpandingArrow className="size-4" />
               </span>
             </div>
           </a>
         </FeatureCard>
 
-        <div className="grid grid-cols-1 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3 border-t border-neutral-200">
+        <div className="grid grid-cols-1 border-t border-neutral-200 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
-            className="border-r-0 sm:border-r lg:border-r border-neutral-200"
+            className="border-r-0 border-neutral-200 sm:border-r lg:border-r"
             title="Transparent Pricing"
             description="No hidden fees or surprise charges. Clear, upfront pricing with no arbitrary limits. You know exactly what you're paying for."
           >
@@ -80,7 +82,7 @@ export function FeaturesSection({
             <Personalization />
           </FeatureCard>
           <FeatureCard
-            className="border-r-0 lg:border-r border-neutral-200"
+            className="border-r-0 border-neutral-200 lg:border-r"
             title="Dynamic QR at scale"
             description="Update anytime, manage thousands. Create, version, and update codes per SKU or campaign—no reprint required. Variable data printing support included."
           >
