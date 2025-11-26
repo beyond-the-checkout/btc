@@ -1,5 +1,4 @@
-import { INTERVAL_DATA } from "@/lib/analytics/constants";
-import { convertToCSV } from "@/lib/analytics/utils";
+import { convertToCSV, getIntervalData } from "@/lib/analytics/utils";
 import { getDomainOrThrow } from "@/lib/api/domains/get-domain-or-throw";
 import { throwIfClicksUsageExceeded } from "@/lib/api/links/usage-checks";
 import { withWorkspace } from "@/lib/auth";
@@ -70,7 +69,7 @@ export const GET = withWorkspace(
           gte:
             start ??
             (interval && interval !== "all"
-              ? INTERVAL_DATA[interval].startDate
+              ? getIntervalData(interval).startDate
               : undefined),
           lte: end ?? new Date(),
         },

@@ -20,12 +20,14 @@ export const GET = withWorkspace(async ({ workspace, searchParams }) => {
     start,
     end,
     interval,
+    timezone,
   } = getCommissionsCountQuerySchema.parse(searchParams);
 
   const { startDate, endDate } = getStartEndDates({
     interval,
     start,
     end,
+    timezone,
   });
 
   const commissionsCount = await prisma.commission.groupBy({

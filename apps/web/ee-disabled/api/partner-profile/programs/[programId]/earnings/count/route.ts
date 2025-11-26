@@ -27,12 +27,14 @@ export const GET = withPartnerProfile(
       interval,
       start,
       end,
+      timezone,
     } = getPartnerEarningsCountQuerySchema.parse(searchParams);
 
     const { startDate, endDate } = getStartEndDates({
       interval,
       start,
       end,
+      timezone,
     });
 
     const where: Prisma.CommissionWhereInput = {

@@ -83,7 +83,6 @@ export const GET = withWorkspace(
       workspaceId: workspace.id,
       folderIds,
       folderId: folderId || "",
-      isMegaFolder: workspace.totalLinks > 1_000_000,
     });
 
     return NextResponse.json(response);

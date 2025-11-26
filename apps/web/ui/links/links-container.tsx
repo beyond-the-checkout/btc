@@ -1,9 +1,9 @@
 "use client";
 
 import useCurrentFolderId from "@/lib/swr/use-current-folder-id";
-import { useIsMegaFolder } from "@/lib/swr/use-is-mega-folder";
 import useLinks from "@/lib/swr/use-links";
 import useLinksCount from "@/lib/swr/use-links-count";
+import useWorkspace from "@/lib/swr/use-workspace";
 import { ExpandedLinkProps, UserProps } from "@/lib/types";
 import { CardList } from "@dub/ui";
 import { CursorRays, QRCode } from "@dub/ui/icons";
@@ -85,7 +85,7 @@ function LinksList({
   compact: boolean;
 }) {
   const searchParams = useSearchParams();
-  const { isMegaFolder } = useIsMegaFolder();
+  const { isMegaWorkspace } = useWorkspace();
 
   const [openMenuLinkId, setOpenMenuLinkId] = useState<string | null>(null);
 
@@ -152,7 +152,9 @@ function LinksList({
           <LinksToolbar
             loading={!!loading}
             links={links}
-            linksCount={isMegaFolder ? Infinity : count ?? links?.length ?? 0}
+            linksCount={
+              isMegaWorkspace ? Infinity : count ?? links?.length ?? 0
+            }
           />
         )}
       </LinkSelectionProvider>

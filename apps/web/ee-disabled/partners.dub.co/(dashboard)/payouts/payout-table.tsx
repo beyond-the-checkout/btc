@@ -184,7 +184,7 @@ export function PayoutTable() {
         />
       )}
       <div className="flex flex-col gap-3">
-        <div>
+        <div className="flex flex-col gap-3">
           <Filter.Select
             className="w-full md:w-fit"
             filters={filters}
@@ -193,19 +193,15 @@ export function PayoutTable() {
             onRemove={onRemove}
           />
           <AnimatedSizeContainer height>
-            <div>
-              {activeFilters.length > 0 && (
-                <div className="pt-3">
-                  <Filter.List
-                    filters={filters}
-                    activeFilters={activeFilters}
-                    onSelect={onSelect}
-                    onRemove={onRemove}
-                    onRemoveAll={onRemoveAll}
-                  />
-                </div>
-              )}
-            </div>
+            {activeFilters.length > 0 && (
+              <Filter.List
+                filters={filters}
+                activeFilters={activeFilters}
+                onSelect={onSelect}
+                onRemove={onRemove}
+                onRemoveAll={onRemoveAll}
+              />
+            )}
           </AnimatedSizeContainer>
         </div>
         {payouts?.length !== 0 ? (
