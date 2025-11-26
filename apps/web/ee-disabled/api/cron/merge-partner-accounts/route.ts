@@ -1,5 +1,6 @@
 import { handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { linkCache } from "@/lib/api/links/cache";
+import { includeProgramEnrollment } from "@/lib/api/links/include-program-enrollment";
 import { includeTags } from "@/lib/api/links/include-tags";
 import { verifyQstashSignature } from "@/lib/cron/verify-qstash";
 import { storage } from "@/lib/storage";
@@ -178,7 +179,10 @@ export async function POST(req: Request) {
           },
           partnerId: targetPartnerId,
         },
-        include: includeTags,
+        include: {
+          ...includeTags,
+          ...includeProgramEnrollment,
+        },
       });
 
       await Promise.all([

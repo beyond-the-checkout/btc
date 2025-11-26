@@ -214,6 +214,10 @@ export const analyticsQuerySchema = z
       .describe(
         "The folder ID to retrieve analytics for. If not provided, return analytics for unsorted links.",
       ),
+    groupId: z
+      .string()
+      .optional()
+      .describe("The group ID to retrieve analytics for."),
     root: booleanQuerySchema
       .optional()
       .describe(
@@ -253,7 +257,7 @@ export const analyticsQuerySchema = z
   .merge(UTMTemplateSchema.omit({ id: true, name: true }));
 
 // Analytics filter params for Tinybird endpoints
-export const analyticsFilterTB = (z
+export const analyticsFilterTB = z
   .object({
     eventType: analyticsEvents,
     workspaceId: z.string().optional(),
@@ -306,8 +310,10 @@ export const analyticsFilterTB = (z
       partnerId: true,
       tenantId: true,
       folderId: true,
+      groupId: true,
+      sortBy: true,
     }),
-  ));
+  );
 
 export const eventsFilterTB = analyticsFilterTB
   .omit({ granularity: true, timezone: true })
@@ -340,9 +346,7 @@ export const eventsQuerySchema = analyticsQuerySchema
       .enum(["timestamp"])
       .optional()
       .default("timestamp")
-      .describe(
-        "The field to sort the events by. The default is `timestamp`.",
-      ),
+      .describe("The field to sort the events by. The default is `timestamp`."),
     order: sortOrder
       .describe("DEPRECATED. Use `sortOrder` instead.")
       .openapi({ deprecated: true }),

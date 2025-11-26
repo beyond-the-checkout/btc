@@ -6,6 +6,8 @@ import { Prisma } from "@dub/prisma/client";
 import { R2_URL, getParamsFromURL, nanoid, truncate } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
 import { combineTagIds } from "../tags/combine-tag-ids";
+import { includeProgramEnrollment } from "./include-program-enrollment";
+import { includeTags } from "./include-tags";
 import { propagateBulkLinkChanges } from "./propagate-bulk-link-changes";
 import { transformLink } from "./utils";
 
@@ -99,21 +101,8 @@ export async function bulkUpdateLinks(
           }),
         },
         include: {
-          tags: {
-            select: {
-              tagId: true,
-              tag: {
-                select: {
-                  id: true,
-                  name: true,
-                  color: true,
-                },
-              },
-            },
-            orderBy: {
-              createdAt: "asc",
-            },
-          },
+          ...includeTags,
+          ...includeProgramEnrollment,
           webhooks: webhookIds ? { select: { webhookId: true } } : false,
         },
       }),
