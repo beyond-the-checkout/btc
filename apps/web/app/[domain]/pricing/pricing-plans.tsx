@@ -16,10 +16,10 @@ import { APP_DOMAIN, cn, PLANS } from "@dub/utils";
 import { useState } from "react";
 
 const PLAN_DESCRIPTIONS: Record<string, string> = {
+  Free: "Get started with basic QR code creation and tracking",
   Base: "For individuals and small teams getting started with QR codes",
   Business: "For growing businesses needing advanced features and insights",
   Advanced: "For power users needing higher limits and priority support",
-  Enterprise: "For large organizations with custom needs",
 };
 
 // Plans that are coming soon and cannot be upgraded to yet
@@ -37,8 +37,10 @@ const HIDDEN_FEATURE_IDS = [
 ];
 
 const plans = PLANS.filter((p) =>
-  ["Base", "Business", "Advanced", "Enterprise"].includes(p.name),
+  ["Free", "Base", "Business", "Advanced"].includes(p.name),
 );
+
+const enterprisePlan = PLANS.find((p) => p.name === "Enterprise")!;
 
 export function PricingPlans() {
   const [period, setPeriod] = useState<"monthly" | "yearly">("yearly");
@@ -49,7 +51,7 @@ export function PricingPlans() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => {
           const isPopular = plan.name === "Business";
-          const isEnterprise = plan.name === "Enterprise";
+          const isFree = plan.name === "Free";
           const features = (plan.features || [])
             .filter((f) => !HIDDEN_FEATURE_IDS.includes(f.id || ""))
             .slice(0, 6);
@@ -82,24 +84,18 @@ export function PricingPlans() {
 
                 {/* Price */}
                 <div className="mt-2">
-                  {isEnterprise ? (
+                  <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-semibold text-neutral-900">
-                      Custom
+                      {isFree ? "$0" : `$${plan.price[period]?.toFixed(2)}`}
                     </span>
-                  ) : (
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-semibold text-neutral-900">
-                        ${plan.price[period]?.toFixed(2)}
-                      </span>
-                      <span className="text-sm text-neutral-500">
-                        per month
-                      </span>
-                    </div>
-                  )}
+                    <span className="text-sm text-neutral-500">
+                      {isFree ? "forever" : "per month"}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Billing Toggle */}
-                {!isEnterprise && (
+                {!isFree && (
                   <button
                     type="button"
                     onClick={() =>
@@ -133,17 +129,9 @@ export function PricingPlans() {
                   </button>
                 )}
 
-                {isEnterprise && (
-                  <p className="mt-2 flex items-center gap-1.5 text-sm text-neutral-500">
-                    <svg className="size-4" viewBox="0 0 16 16" fill="none">
-                      <path
-                        d="M8 1v14M1 8h14"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    Tailored pricing terms
+                {isFree && (
+                  <p className="mt-2 text-sm text-neutral-500">
+                    No credit card required
                   </p>
                 )}
               </div>
@@ -164,11 +152,7 @@ export function PricingPlans() {
                 </button>
               ) : (
                 <a
-                  href={
-                    isEnterprise
-                      ? "mailto:support@chko.sh"
-                      : `${APP_DOMAIN}/register`
-                  }
+                  href={`${APP_DOMAIN}/register`}
                   className={cn(
                     "mb-6 flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
                     isPopular
@@ -176,40 +160,62 @@ export function PricingPlans() {
                       : "border border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-50",
                   )}
                 >
-                  {isEnterprise ? "Contact us" : "Get started"}
+                  Get started
                 </a>
               )}
 
               {/* Features List */}
               <ul className="flex flex-col gap-3">
-                {isEnterprise ? (
-                  <>
-                    <FeatureItem icon={ChartLine}>
-                      Unlimited tracked scans
+                {features.map((feature, fidx) => {
+                  const IconComponent = getFeatureIcon(feature.id);
+                  return (
+                    <FeatureItem key={fidx} icon={IconComponent}>
+                      {feature.text}
                     </FeatureItem>
-                    <FeatureItem icon={Hyperlink}>
-                      Unlimited new codes
-                    </FeatureItem>
-                    <FeatureItem icon={CircleHalfDottedClock}>
-                      Unlimited analytics retention
-                    </FeatureItem>
-                    <FeatureItem icon={Folder}>Audit logs</FeatureItem>
-                    <FeatureItem icon={Users2}>Custom SLA</FeatureItem>
-                  </>
-                ) : (
-                  features.map((feature, fidx) => {
-                    const IconComponent = getFeatureIcon(feature.id);
-                    return (
-                      <FeatureItem key={fidx} icon={IconComponent}>
-                        {feature.text}
-                      </FeatureItem>
-                    );
-                  })
-                )}
+                  );
+                })}
               </ul>
             </div>
           );
         })}
+      </div>
+
+      {/* Enterprise Section */}
+      <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
+        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+          <div className="text-center md:text-left">
+            <h3 className="text-lg font-semibold text-neutral-900">
+              Enterprise
+            </h3>
+            <p className="mt-1 text-sm text-neutral-600">
+              For large organizations with custom needs
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-6 text-sm text-neutral-600">
+            <div className="flex items-center gap-2">
+              <ChartLine className="size-4 text-neutral-400" />
+              <span>Unlimited scans</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Hyperlink className="size-4 text-neutral-400" />
+              <span>Unlimited codes</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CircleHalfDottedClock className="size-4 text-neutral-400" />
+              <span>Unlimited retention</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users2 className="size-4 text-neutral-400" />
+              <span>Custom SLA</span>
+            </div>
+          </div>
+          <a
+            href="mailto:support@chko.sh"
+            className="flex items-center justify-center whitespace-nowrap rounded-lg border border-neutral-200 bg-white px-6 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
+          >
+            Contact us
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -240,6 +246,7 @@ function getFeatureIcon(
     messages: Users2,
     api: Webhook,
     slack: Users2,
+    qr: Gift,
   };
   return iconMap[featureId || ""] || Check;
 }

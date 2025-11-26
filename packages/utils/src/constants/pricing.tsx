@@ -68,6 +68,15 @@ export const PLANS = [
       api: 60,
       retention: "30-day",
     },
+    featureTitle: "Get started for free:",
+    features: [
+      { id: "scans", text: "100 tracked scans/mo" },
+      { id: "codes", text: "2 new codes/mo" },
+      { id: "retention", text: "30-day analytics retention" },
+      { id: "domains", text: "3 domains" },
+      { id: "users", text: "1 user" },
+      { id: "qr", text: "Basic QR customization" },
+    ] as PlanFeature[],
   },
   {
     name: "Base",
@@ -129,8 +138,7 @@ export const PLANS = [
         id: "folders",
         text: "QR code folders",
         tooltip: {
-          title:
-            "Organize and manage access to your QR codes using folders.",
+          title: "Organize and manage access to your QR codes using folders.",
           cta: "Learn more.",
           href: "https://chko.dev/help/article/qr-code-folders",
         },
@@ -400,7 +408,8 @@ export const getPlanDetails = (plan: string) => {
 export const getCurrentPlan = (plan: string) => {
   const normalizedPlan = normalizePlanId(plan);
   return (
-    PLANS.find((p) => p.name.toLowerCase() === normalizedPlan.toLowerCase()) || FREE_PLAN
+    PLANS.find((p) => p.name.toLowerCase() === normalizedPlan.toLowerCase()) ||
+    FREE_PLAN
   );
 };
 

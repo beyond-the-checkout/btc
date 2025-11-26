@@ -32,9 +32,11 @@ const COMPARE_FEATURE_ICONS: Record<
   API: Plug2,
 };
 
-const plans = ["Base", "Business", "Advanced"].map(
+const plans = ["Free", "Base", "Business", "Advanced"].map(
   (p) => PLANS.find(({ name }) => name === p)!,
 );
+
+const enterprisePlan = PLANS.find((p) => p.name === "Enterprise")!;
 
 // Plans that are coming soon and cannot be upgraded to yet
 const COMING_SOON_PLANS = ["business", "advanced"];
@@ -81,10 +83,10 @@ export function WorkspaceBillingUpgradePageClientLF() {
           <div className="overflow-x-hidden rounded-b-[12px] from-neutral-200 [container-type:inline-size] lg:bg-gradient-to-t lg:p-px">
             <div
               className={cn(
-                "grid grid-cols-3 gap-px overflow-hidden rounded-b-[11px] text-sm text-neutral-800 [&_strong]:font-medium",
+                "grid grid-cols-4 gap-px overflow-hidden rounded-b-[11px] text-sm text-neutral-800 [&_strong]:font-medium",
 
                 // Mobile
-                "max-lg:w-[calc(400cqw+3*32px)] max-lg:translate-x-[calc(-1*var(--index)*(100cqw+32px))] max-lg:gap-x-8 max-lg:transition-transform",
+                "max-lg:w-[calc(500cqw+4*32px)] max-lg:translate-x-[calc(-1*var(--index)*(100cqw+32px))] max-lg:gap-x-8 max-lg:transition-transform",
               )}
               style={
                 {
@@ -121,10 +123,15 @@ export function WorkspaceBillingUpgradePageClientLF() {
                         {plan.name}
                       </h3>
                       <div className="relative mt-0.5 flex items-center gap-1">
-                        {plan.name === "Enterprise" ? (
-                          <span className="text-sm font-medium text-neutral-900">
-                            Custom
-                          </span>
+                        {plan.name === "Free" ? (
+                          <>
+                            <span className="text-sm font-medium text-neutral-700">
+                              $0
+                            </span>
+                            <span className="text-sm font-medium text-neutral-400">
+                              forever
+                            </span>
+                          </>
                         ) : (
                           <>
                             <NumberFlow
@@ -155,19 +162,19 @@ export function WorkspaceBillingUpgradePageClientLF() {
                       >
                         <ChevronLeft className="size-5 text-neutral-800" />
                       </button>
-                      {plan.name === "Enterprise" ? (
-                        <Link
-                          href="https://dub.co/contact/sales"
-                          target="_blank"
+                      {plan.name === "Free" ? (
+                        <button
+                          type="button"
+                          disabled={disableCurrentPlan}
                           className={cn(
                             "flex h-8 w-full items-center justify-center rounded-md text-center text-sm ring-gray-200 transition-all duration-200 ease-in-out",
-                            "border border-neutral-200 bg-white text-neutral-900 shadow-sm hover:bg-neutral-50",
+                            disableCurrentPlan
+                              ? "cursor-not-allowed border border-neutral-200 bg-neutral-50 text-neutral-400"
+                              : "border border-neutral-200 bg-white text-neutral-900 shadow-sm hover:bg-neutral-50",
                           )}
                         >
-                          {plan.name === "Enterprise"
-                            ? "Contact us"
-                            : "Get started"}
-                        </Link>
+                          {disableCurrentPlan ? "Current plan" : "Free tier"}
+                        </button>
                       ) : COMING_SOON_PLANS.includes(
                           plan.name.toLowerCase(),
                         ) ? (
@@ -213,7 +220,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
           </div>
           <div className="h-8 bg-gradient-to-b from-white" />
         </div>
-        <div className="flex flex-col gap-8 pb-12">
+        <div className="flex flex-col gap-8 pb-8">
           {PLAN_COMPARE_FEATURES.map(({ category, features, comingSoon }) => {
             const Icon = COMPARE_FEATURE_ICONS[category];
 
@@ -247,10 +254,10 @@ export function WorkspaceBillingUpgradePageClientLF() {
                 </div>
                 <table
                   className={cn(
-                    "grid grid-cols-3 overflow-hidden text-sm text-neutral-800 [&_strong]:font-medium",
+                    "grid grid-cols-4 overflow-hidden text-sm text-neutral-800 [&_strong]:font-medium",
 
                     // Mobile
-                    "max-lg:w-[calc(400cqw+3*32px)] max-lg:translate-x-[calc(-1*var(--index)*(100cqw+32px))] max-lg:gap-x-8 max-lg:transition-transform",
+                    "max-lg:w-[calc(500cqw+4*32px)] max-lg:translate-x-[calc(-1*var(--index)*(100cqw+32px))] max-lg:gap-x-8 max-lg:transition-transform",
                   )}
                   style={
                     {
@@ -311,6 +318,40 @@ export function WorkspaceBillingUpgradePageClientLF() {
               </div>
             );
           })}
+        </div>
+
+        {/* Enterprise Section */}
+        <div className="mb-12 rounded-xl border border-neutral-200 bg-white p-6">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div className="text-center md:text-left">
+              <h3 className="text-base font-semibold text-neutral-800">
+                Enterprise
+              </h3>
+              <p className="mt-1 text-sm text-neutral-500">
+                For large organizations with custom needs
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-6 text-sm text-neutral-600">
+              <div className="flex items-center gap-2">
+                <ChartLine className="size-4 text-neutral-400" />
+                <span>Unlimited scans</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Hyperlink className="size-4 text-neutral-400" />
+                <span>Unlimited codes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users2 className="size-4 text-neutral-400" />
+                <span>Custom SLA</span>
+              </div>
+            </div>
+            <Link
+              href="mailto:support@chko.sh"
+              className="flex items-center justify-center whitespace-nowrap rounded-md border border-neutral-200 bg-white px-6 py-2 text-sm font-medium text-neutral-900 shadow-sm transition-colors hover:bg-neutral-50"
+            >
+              Contact us
+            </Link>
+          </div>
         </div>
       </div>
     </div>
