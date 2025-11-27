@@ -1,6 +1,7 @@
+TOKEN "v3_group_by_endpoint_read" READ
+
 DESCRIPTION >
 	Top countries
-
 
 TAGS "Dub Endpoints"
 
@@ -435,9 +436,9 @@ SQL >
     FROM
         {% if eventType == 'clicks' %} group_by_clicks
         {% elif eventType == 'leads' %} group_by_leads
-        {% elif eventType == 'sales' %}group_by_sales 
+        {% elif eventType == 'sales' %}group_by_sales
         {% elif eventType == 'composite' %}group_by_composite
         {% else %} group_by_clicks
         {% end %}
 
-
+TYPE endpoint

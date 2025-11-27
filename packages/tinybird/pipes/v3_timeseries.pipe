@@ -1,6 +1,7 @@
+TOKEN "v3_timeseries_endpoint_read" READ
+
 DESCRIPTION >
 	Timeseries data
-
 
 TAGS "Dub Endpoints"
 
@@ -373,4 +374,4 @@ SQL >
         {% else %} timeseries_clicks
         {% end %}
 
-
+TYPE endpoint

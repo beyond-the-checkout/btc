@@ -1,6 +1,7 @@
+TOKEN "v3_events_endpoint_read" READ
+
 DESCRIPTION >
 	Top countries
-
 
 TAGS "Dub Endpoints"
 
@@ -269,4 +270,4 @@ SQL >
         {% else %} click_events
         {% end %}
 
-
+TYPE endpoint

@@ -1,3 +1,10 @@
+TOKEN "v3_group_by_link_metadata_endpoint_read" READ
+
+DESCRIPTION >
+	Group by link metadata
+
+TAGS "Dub Endpoints"
+
 NODE workspace_links
 SQL >
 
@@ -245,9 +252,9 @@ SQL >
     FROM
         {% if eventType == 'clicks' %} group_by_link_metadata_clicks
         {% elif eventType == 'leads' %} group_by_link_metadata_leads
-        {% elif eventType == 'sales' %}group_by_link_metadata_sales 
+        {% elif eventType == 'sales' %}group_by_link_metadata_sales
         {% elif eventType == 'composite' %}group_by_link_metadata_composite
         {% else %} group_by_link_metadata_clicks
         {% end %}
 
-
+TYPE endpoint
