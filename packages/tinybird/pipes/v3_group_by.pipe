@@ -1,4 +1,4 @@
-TOKEN "v3_group_by_endpoint_read" READ
+TOKEN "dub_tinybird_token" READ
 
 DESCRIPTION >
 	Top countries
