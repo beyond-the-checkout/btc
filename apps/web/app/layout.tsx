@@ -1,3 +1,4 @@
+import { GoogleTag } from "@/lib/tracking-pixels";
 import { geistMono, inter, satoshi } from "@/styles/fonts";
 import "@/styles/globals.css";
 import { cn, constructMetadata } from "@dub/utils";
@@ -36,6 +37,9 @@ export default function RootLayout({
           })();
         `}
         </Script>
+
+        {/* Global tracking pixels */}
+        <GoogleTag />
       </body>
     </html>
   );
