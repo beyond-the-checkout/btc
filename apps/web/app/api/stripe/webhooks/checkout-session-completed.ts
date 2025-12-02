@@ -10,7 +10,7 @@ import { sendBatchEmail } from "@dub/email";
 import UpgradeEmail from "@dub/email/templates/upgrade-email";
 import { prisma } from "@dub/prisma";
 import { User } from "@dub/prisma/client";
-import { getPlanFromPriceId, log } from "@dub/utils";
+import { chkoLog, getPlanFromPriceId, log } from "@dub/utils";
 import Stripe from "stripe";
 
 export async function checkoutSessionCompleted(event: Stripe.Event) {
@@ -106,7 +106,15 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
     email: user.email,
   }));
 
+  // Get the owner (first user who created the workspace)
+  const owner = users[0];
+
   await Promise.allSettled([
+    // Send Slack notification for new paid signup
+    chkoLog({
+      message: `*New ${plan.name} signup!*\n• Name: ${owner?.name || "Unknown"}\n• Email: ${owner?.email || "Unknown"}`,
+      type: "signups",
+    }),
     completeOnboarding({ users, workspaceId }),
     sendBatchEmail(
       users.map((user) => ({

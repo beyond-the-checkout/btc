@@ -12,7 +12,7 @@ import {
 import { subscribe } from "@dub/email/resend/subscribe";
 import { prisma } from "@dub/prisma";
 import { Prisma } from "@dub/prisma/client";
-import { FREE_WORKSPACES_LIMIT, nanoid, R2_URL } from "@dub/utils";
+import { chkoLog, FREE_WORKSPACES_LIMIT, nanoid, R2_URL } from "@dub/utils";
 import { waitUntil } from "@vercel/functions";
 import { NextResponse } from "next/server";
 
@@ -152,6 +152,11 @@ export const POST = withSession(async ({ req, session }) => {
 
     waitUntil(
       Promise.allSettled([
+        // Send Slack notification for new free signup
+        chkoLog({
+          message: `*New Free signup!*\n• Name: ${session.user.name || "Unknown"}\n• Email: ${session.user.email || "Unknown"}`,
+          type: "signups",
+        }),
         // if the user has no default workspace, set the new workspace as the default
         session.user["defaultWorkspace"] === null &&
           prisma.user.update({
