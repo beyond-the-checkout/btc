@@ -2,7 +2,6 @@
 
 import { isGenericEmail } from "@/lib/is-generic-email";
 import { generateRandomName } from "@/lib/names";
-import { AlertCircleFill } from "@/ui/shared/icons";
 import {
   Button,
   ButtonTooltip,
@@ -16,7 +15,7 @@ import slugify from "@sindresorhus/slugify";
 import { useSession } from "next-auth/react";
 import { usePlausible } from "next-plausible";
 import posthog from "posthog-js";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { mutate } from "swr";
@@ -41,10 +40,8 @@ export function CreateWorkspaceForm({
   const {
     register,
     handleSubmit,
-    watch,
     setValue,
     setError,
-    clearErrors,
     control,
     formState: { isSubmitting, isSubmitSuccessful, errors },
   } = useForm<FormData>({
@@ -53,10 +50,6 @@ export function CreateWorkspaceForm({
       slug: slugify(generatedName),
     },
   });
-
-  const slug = watch("slug");
-  const slugEditedRef = useRef(false);
-  const [isSlugChecking, setIsSlugChecking] = useState(false);
 
   useEffect(() => {
     if (session?.user?.email && !isGenericEmail(session.user.email)) {
@@ -129,72 +122,30 @@ export function CreateWorkspaceForm({
       })}
       className={cn("flex flex-col space-y-6 text-left", className)}
     >
-      <input type="hidden" {...register("name", { required: true })} />
       <div>
-        <label htmlFor="slug" className="flex items-center space-x-2">
+        <label htmlFor="name" className="flex items-center space-x-2">
           <p className="block text-sm font-medium text-neutral-700">
-            Workspace slug
+            Workspace name
           </p>
         </label>
         <div className="mt-2 flex items-center gap-2">
-          <div className="relative flex w-full rounded-md shadow-sm">
-            <span className="inline-flex items-center rounded-l-md border border-r-0 border-neutral-300 bg-neutral-50 px-5 text-neutral-500 sm:text-sm">
-              app.{process.env.NEXT_PUBLIC_APP_DOMAIN}
-            </span>
-            <input
-              id="slug"
-              type="text"
-              required
-              autoComplete="off"
-              autoFocus={!isMobile}
-              className={`${
-                errors.slug
-                  ? "border-red-300 pr-10 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500"
-                  : "border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500 focus:ring-neutral-500"
-              } block w-full rounded-r-md focus:outline-none sm:text-sm`}
-              placeholder="acme"
-              {...register("slug", {
-                required: true,
-                minLength: 3,
-                maxLength: 48,
-                pattern: /^[a-zA-Z0-9\-]+$/,
-              })}
-              onBlur={() => {
-                setIsSlugChecking(true);
-                fetch(`/api/misc/check-workspace-slug?slug=${slug}`)
-                  .then(async (res) => {
-                    if (res.status === 200) {
-                      const exists = await res.json();
-                      if (exists === 1) {
-                        setError("slug", {
-                          message: `The slug "${slug}" is already in use.`,
-                        });
-                      } else {
-                        clearErrors("slug");
-                      }
-                    }
-                  })
-                  .finally(() => {
-                    setIsSlugChecking(false);
-                  });
-              }}
-              aria-invalid="true"
-            />
-            {errors.slug && (
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                <AlertCircleFill
-                  className="h-5 w-5 text-red-500"
-                  aria-hidden="true"
-                />
-              </div>
-            )}
-          </div>
+          <input
+            id="name"
+            type="text"
+            autoFocus={!isMobile}
+            autoComplete="off"
+            className="block w-full rounded-md border-neutral-300 text-neutral-900 placeholder-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-neutral-500 sm:text-sm"
+            placeholder={generatedName}
+            {...register("name", {
+              required: true,
+              onChange: (e) => setValue("slug", slugify(e.target.value)),
+            })}
+          />
           <ButtonTooltip
             tooltipProps={{
-              content: "Generate a new workspace name and slug",
+              content: "Generate a new workspace name",
             }}
-            aria-label="Generate new workspace name and slug"
-            disabled={isSlugChecking}
+            aria-label="Generate new workspace name"
             onClick={() => {
               const next = generateRandomName();
               setValue("name", next, {
@@ -202,27 +153,13 @@ export function CreateWorkspaceForm({
                 shouldValidate: true,
               });
               setValue("slug", slugify(next));
-              clearErrors("slug");
-              slugEditedRef.current = false;
             }}
           >
             <Shuffle className="size-4" />
           </ButtonTooltip>
         </div>
-        {errors.slug ? (
-          <p
-            className="mt-1.5 text-xs font-medium text-red-600"
-            id="slug-error"
-          >
-            {errors.slug.message}
-          </p>
-        ) : (
-          <p className="mt-1.5 text-xs text-neutral-500">
-            Auto-generated. You can change this later in your workspace
-            settings.
-          </p>
-        )}
       </div>
+      <input type="hidden" {...register("slug", { required: true })} />
 
       <div>
         <label>
