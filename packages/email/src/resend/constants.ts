@@ -6,7 +6,7 @@ export const RESEND_AUDIENCES = {
 };
 
 export const VARIANT_TO_FROM_MAP = {
-  primary: `Oliver <oliver@checkout.tech>`,
+  primary: `${APP_NAME} <team@chko.sh>`,
   notifications: `Dave <dave@checkout.tech>`,
   marketing: `${APP_NAME} <marketing@checkout.tech>`,
 };
