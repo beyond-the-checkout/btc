@@ -29,7 +29,7 @@ export async function sendCancellationFeedback({
         owner.email &&
         sendEmail({
           to: owner.email,
-          from: "Oliver & Dave <oliver@checkout.tech>",
+          from: "Beyond The Checkout <team@chko.sh>",
           replyTo: "team@chko.sh",
           subject: "Feedback for Checkout?",
           text: `Hey ${owner.name ? owner.name.split(" ")[0] : "there"}!\n\nSaw you canceled your Checkout subscription${reasonText ? ` and mentioned that ${reasonText}` : ""} – do you mind sharing if there's anything we could've done better on our side?\n\nWe're always looking to improve our product offering so any feedback would be greatly appreciated!\n\nThank you so much in advance!\n\nBest,\nOliver & Dave\nCo-founders, Beyond the Checkout, Inc.`,
