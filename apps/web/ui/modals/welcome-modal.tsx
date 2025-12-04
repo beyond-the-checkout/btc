@@ -9,6 +9,7 @@ import {
   type QROnboardingSeed,
 } from "@/lib/onboarding/qr/cookie";
 import { dispatchQROnboardingSeed } from "@/lib/onboarding/qr/events";
+import { trackConversion } from "@/lib/tracking-pixels";
 import {
   LANDING_DRAFT_STORAGE_KEY,
   readDraftsFromStorage,
@@ -62,7 +63,7 @@ function WelcomeModal({
   const handlePlanUpgrade = async () => {
     if (planId) {
       const currentPlan = getPlanDetails(planId);
-      const period = searchParams.get("period");
+      const period = searchParams.get("period") as "monthly" | "yearly" | null;
       if (currentPlan && period) {
         plausible(`Upgraded to ${currentPlan.name}`);
         posthog.capture("plan_upgraded", {
@@ -70,6 +71,16 @@ function WelcomeModal({
           period,
           revenue: currentPlan.price[period],
         });
+
+        // Google Ads: track paid plan purchase with revenue
+        const price = currentPlan.price[period];
+        if (price != null) {
+          trackConversion({
+            type: "purchase",
+            value: price,
+            currency: "USD",
+          });
+        }
       }
     }
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import { trackConversion } from "@/lib/tracking-pixels";
 import { useSession } from "next-auth/react";
 import { usePlausible } from "next-plausible";
 import posthog from "posthog-js";
@@ -11,6 +12,10 @@ export default function TrackSignup() {
 
   useEffect(() => {
     plausible("Signed Up");
+
+    // Google Ads: track signup as a lead conversion
+    trackConversion({ type: "lead" });
+
     if (session?.user) {
       posthog.identify(session.user["id"], {
         email: session.user.email,

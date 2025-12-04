@@ -7,7 +7,7 @@
 
 import type { TrackingPixelConfig } from "./types";
 
-/** Google Ads Measurement ID */
+/** Google Ads Measurement ID - only set this env var in production */
 export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 /** Google Ads Conversion Label (optional) */
