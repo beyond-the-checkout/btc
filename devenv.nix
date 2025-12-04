@@ -42,7 +42,6 @@ in
   pkgs-codex.codex
   pkgs.mysql84
   pkgs.nodePackages.typescript
-  pkgs.nodePackages.ts-node
   pkgs.nodePackages.yarn
   pkgs.opentofu
   pkgs-pnpm.pnpm_9
