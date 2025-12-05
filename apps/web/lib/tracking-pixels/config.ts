@@ -5,14 +5,16 @@
  * Currently supports Google Ads only. Extensible for future vendors.
  */
 
-import type { TrackingPixelConfig } from "./types";
+import type { ConversionEventType, TrackingPixelConfig } from "./types";
 
 /** Google Ads Measurement ID - only set this env var in production */
 export const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
-/** Google Ads Conversion Label (optional) */
-export const GOOGLE_CONVERSION_LABEL =
-  process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL;
+/** Google Ads Conversion Labels by event type */
+export const GOOGLE_CONVERSION_LABEL_LEAD =
+  process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL_LEAD;
+export const GOOGLE_CONVERSION_LABEL_PURCHASE =
+  process.env.NEXT_PUBLIC_GOOGLE_CONVERSION_LABEL_PURCHASE;
 
 // =============================================================================
 // FUTURE VENDOR IDS (uncomment when implementing)
@@ -26,11 +28,24 @@ export const GOOGLE_CONVERSION_LABEL =
  * Vendors without configured IDs will be undefined.
  */
 export function getTrackingConfig(): TrackingPixelConfig {
+  // Build conversion labels map from env vars
+  const conversionLabels: Partial<Record<ConversionEventType, string>> = {};
+  if (GOOGLE_CONVERSION_LABEL_LEAD) {
+    conversionLabels.lead = GOOGLE_CONVERSION_LABEL_LEAD;
+    conversionLabels.signup = GOOGLE_CONVERSION_LABEL_LEAD; // signup also uses lead label
+  }
+  if (GOOGLE_CONVERSION_LABEL_PURCHASE) {
+    conversionLabels.purchase = GOOGLE_CONVERSION_LABEL_PURCHASE;
+  }
+
   return {
     google: GOOGLE_ADS_ID
       ? {
           measurementId: GOOGLE_ADS_ID,
-          conversionLabel: GOOGLE_CONVERSION_LABEL,
+          conversionLabels:
+            Object.keys(conversionLabels).length > 0
+              ? conversionLabels
+              : undefined,
         }
       : undefined,
 

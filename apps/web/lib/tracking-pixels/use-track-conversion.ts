@@ -41,7 +41,7 @@ const GOOGLE_EVENT_MAP: Record<ConversionEventType, string> = {
 function fireGoogleConversion(
   event: ConversionEvent,
   measurementId: string,
-  conversionLabel?: string,
+  conversionLabels?: Partial<Record<ConversionEventType, string>>,
   debug?: boolean,
 ) {
   const win = getWindow();
@@ -54,6 +54,9 @@ function fireGoogleConversion(
     event.type === "custom" && event.customEventName
       ? event.customEventName
       : GOOGLE_EVENT_MAP[event.type];
+
+  // Look up conversion label for this specific event type
+  const conversionLabel = conversionLabels?.[event.type];
 
   const eventParams: Record<string, any> = {
     send_to: conversionLabel
@@ -155,7 +158,7 @@ export function useTrackConversion() {
       fireGoogleConversion(
         event,
         config.google.measurementId,
-        config.google.conversionLabel,
+        config.google.conversionLabels,
         config.debug,
       );
     }
@@ -186,7 +189,7 @@ export function trackConversion(event: ConversionEvent) {
     fireGoogleConversion(
       event,
       config.google.measurementId,
-      config.google.conversionLabel,
+      config.google.conversionLabels,
       config.debug,
     );
   }

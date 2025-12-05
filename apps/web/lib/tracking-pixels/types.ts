@@ -37,8 +37,8 @@ export interface ConversionEvent {
 export interface GoogleAdsConfig {
   /** Google Ads measurement ID (e.g., 'AW-17773015108') */
   measurementId: string;
-  /** Optional conversion label for specific conversion actions */
-  conversionLabel?: string;
+  /** Conversion labels for specific event types */
+  conversionLabels?: Partial<Record<ConversionEventType, string>>;
 }
 
 // =============================================================================

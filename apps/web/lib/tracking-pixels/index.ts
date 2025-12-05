@@ -47,7 +47,8 @@ export { trackConversion, useTrackConversion } from "./use-track-conversion";
 // Configuration
 export {
   GOOGLE_ADS_ID,
-  GOOGLE_CONVERSION_LABEL,
+  GOOGLE_CONVERSION_LABEL_LEAD,
+  GOOGLE_CONVERSION_LABEL_PURCHASE,
   getTrackingConfig,
   hasTrackingEnabled,
 } from "./config";
