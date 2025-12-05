@@ -1,4 +1,5 @@
 import { ClientOnly } from "@dub/ui";
+import { CHECKOUT_BASE_URL } from "@dub/utils";
 import { PropsWithChildren, Suspense } from "react";
 
 export const AuthLayout = ({
@@ -21,14 +22,14 @@ export const AuthLayout = ({
           <p className="px-20 py-8 text-center text-xs font-medium text-neutral-500 md:px-0">
             By continuing, you agree to Checkout&rsquo;s{" "}
             <a
-              href="/tos"
+              href={`${CHECKOUT_BASE_URL}/tos`}
               className="font-semibold text-neutral-600 hover:text-neutral-800"
             >
               Terms of Service
             </a>{" "}
             and{" "}
             <a
-              href="/privacy-policy"
+              href={`${CHECKOUT_BASE_URL}/privacy-policy`}
               className="font-semibold text-neutral-600 hover:text-neutral-800"
             >
               Privacy Policy

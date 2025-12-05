@@ -3,7 +3,7 @@ import { DEFAULT_PARTNER_GROUP } from "@/lib/zod/schemas/groups";
 import { formatRewardDescription } from "@/ui/partners/format-reward-description";
 import { prisma } from "@dub/prisma";
 import { Wordmark } from "@dub/ui";
-import { APP_DOMAIN, PARTNERS_DOMAIN } from "@dub/utils";
+import { APP_DOMAIN, CHECKOUT_BASE_URL, PARTNERS_DOMAIN } from "@dub/utils";
 import { constructMetadata } from "@dub/utils/src/functions";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -102,14 +102,14 @@ export default async function ApplyLayout(
             </Link>
             <span className="flex items-center gap-2">
               <a
-                href="/tos"
+                href={`${CHECKOUT_BASE_URL}/tos`}
                 className="transition-colors duration-75 hover:text-neutral-600"
               >
                 Terms of Service
               </a>
               <span className="text-base text-neutral-200">&bull;</span>
               <a
-                href="/privacy-policy"
+                href={`${CHECKOUT_BASE_URL}/privacy-policy`}
                 className="transition-colors duration-75 hover:text-neutral-600"
               >
                 Privacy Policy
