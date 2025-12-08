@@ -1,6 +1,6 @@
 export const BRAND = {
   name: "Beyond the Checkout",
-  short: "BTC",
+  short: "Checkout",
   home: "https://chko.sh/home",
   pricing: "https://chko.sh/pricing",
   enterprise: "https://chko.sh/enterprise",

@@ -115,42 +115,12 @@ export const PLANS = [
         tooltip: "ADVANCED_LINK_FEATURES",
       },
       {
-        id: "ai",
-        text: "Unlimited AI credits",
-        tooltip: {
-          title:
-            "Subject to fair use policy – you will be notified if you exceed the limit, which are high enough for frequent usage.",
-          cta: "Learn more.",
-          href: "https://dub.co/blog/introducing-dub-ai",
-        },
-      },
-      {
-        id: "dotlink",
-        text: "Free .link domain",
-        tooltip: {
-          title:
-            "All our paid plans come with a free .link custom domain, which helps improve click-through rates.",
-          cta: "Learn more.",
-          href: "https://dub.co/help/article/free-dot-link-domain",
-        },
-      },
-      {
         id: "folders",
         text: "QR code folders",
         tooltip: {
           title: "Organize and manage access to your QR codes using folders.",
           cta: "Learn more.",
           href: "https://chko.dev/help/article/qr-code-folders",
-        },
-      },
-      {
-        id: "deeplinks",
-        text: "Deep links",
-        tooltip: {
-          title:
-            "Redirect users to a specific page within your mobile application using deep links.",
-          cta: "Learn more.",
-          href: "https://chko.dev/docs/concepts/deep-links/quickstart",
         },
       },
     ] as PlanFeature[],
