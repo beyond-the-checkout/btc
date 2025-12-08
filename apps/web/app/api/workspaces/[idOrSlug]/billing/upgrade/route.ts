@@ -27,9 +27,23 @@ export const POST = withWorkspace(async ({ req, workspace, session }) => {
 
   const lookupKey = `${plan}_${period}`;
 
+  console.log(`[billing/upgrade] Looking up price with key: ${lookupKey}`);
+
   const prices = await stripe.prices.list({
     lookup_keys: [lookupKey],
   });
+
+  if (!prices.data[0]) {
+    console.error(
+      `[billing/upgrade] No price found for lookup key: ${lookupKey}. ` +
+        `Available prices count: ${prices.data.length}. ` +
+        `Stripe key prefix: ${process.env.STRIPE_SECRET_KEY?.substring(0, 10)}`,
+    );
+    throw new DubApiError({
+      code: "not_found",
+      message: `Price not found for plan "${plan}" with period "${period}". Please check Stripe configuration.`,
+    });
+  }
 
   const activeSubscription = workspace.stripeId
     ? await stripe.subscriptions
