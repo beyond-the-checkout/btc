@@ -8,7 +8,7 @@ import type { UsagePointT } from "./types";
  * Usage Service (Tinybird Wrapper)
  *
  * Provides a simple interface for fetching workspace usage data
- * from Tinybird's v2_usage pipe.
+ * from Tinybird's v3_usage pipe.
  *
  * This wraps the existing Tinybird infrastructure to keep the LF
  * service layer clean and testable.
@@ -28,14 +28,12 @@ export interface GetUsageArgs {
  * @param args - Usage query parameters
  * @returns Array of time-series usage points
  */
-export async function getUsage(
-  args: GetUsageArgs,
-): Promise<UsagePointT[]> {
+export async function getUsage(args: GetUsageArgs): Promise<UsagePointT[]> {
   const { workspaceId, resource, start, end, timezone = "UTC" } = args;
 
   // Build Tinybird pipe (reusing existing infrastructure)
   const pipe = tb.buildPipe({
-    pipe: "v2_usage",
+    pipe: "v3_usage",
     parameters: usageQuerySchema.extend({
       workspaceId: z
         .string()
