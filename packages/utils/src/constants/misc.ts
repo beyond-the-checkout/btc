@@ -26,6 +26,15 @@ export const DEFAULT_LINK_PROPS: any = {
 export const GOOGLE_FAVICON_URL =
   "https://www.google.com/s2/favicons?sz=64&domain_url=";
 
+// Google profile avatar URL prefixes (used by Google OAuth)
+// Google uses multiple load-balanced servers (lh3-lh6) for user content
+export const GOOGLE_PROFILE_AVATAR_URLS = [
+  "https://lh3.googleusercontent.com/",
+  "https://lh4.googleusercontent.com/",
+  "https://lh5.googleusercontent.com/",
+  "https://lh6.googleusercontent.com/",
+];
+
 export const OG_AVATAR_URL = "https://api.dub.co/og/avatar/";
 
 export const PAGINATION_LIMIT = 100;

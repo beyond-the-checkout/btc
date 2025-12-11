@@ -1,6 +1,10 @@
 import { plans, roles } from "@/lib/types";
 import z from "@/lib/zod";
-import { GOOGLE_FAVICON_URL, R2_URL } from "@dub/utils";
+import {
+  GOOGLE_FAVICON_URL,
+  GOOGLE_PROFILE_AVATAR_URLS,
+  R2_URL,
+} from "@dub/utils";
 import { fileTypeFromBuffer } from "file-type";
 
 export const RECURRING_MAX_DURATIONS = [0, 1, 3, 6, 12, 18, 24, 36];
@@ -108,10 +112,16 @@ export const storedR2ImageUrlSchema = z
     message: `URL must start with ${R2_URL}`,
   });
 
+// Allowlisted remote image URL prefixes (favicon service and Google profile avatars)
+const allowlistedImageUrlPrefixes = [
+  GOOGLE_FAVICON_URL,
+  ...GOOGLE_PROFILE_AVATAR_URLS,
+];
+
 // Uploaded image could be any of the following:
 // - Base64 encoded image
 // - R2_URL
-// - Special case for GOOGLE_FAVICON_URL
+// - Allowlisted remote URLs (Google favicon service, Google profile avatars)
 // This schema contains an async refinement check for base64 image validation,
 // which requires using parseAsync() instead of parse() when validating
 export const uploadedImageSchema = z
@@ -122,9 +132,14 @@ export const uploadedImageSchema = z
       .string()
       .url()
       .trim()
-      .refine((url) => url.startsWith(GOOGLE_FAVICON_URL), {
-        message: `Image URL must start with ${GOOGLE_FAVICON_URL}`,
-      }),
+      .refine(
+        (url) =>
+          allowlistedImageUrlPrefixes.some((prefix) => url.startsWith(prefix)),
+        {
+          message:
+            "Invalid image format. Supported: base64-encoded images, R2 storage URLs, or allowlisted image URLs.",
+        },
+      ),
   ])
   .transform((v) => v || null);
 

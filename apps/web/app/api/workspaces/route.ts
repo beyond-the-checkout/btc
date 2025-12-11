@@ -73,6 +73,9 @@ export const POST = withSession(async ({ req, session }) => {
     });
   }
 
+  // Only upload to R2 if logo is base64-encoded; remote URLs are stored directly
+  const isBase64Logo = logo?.startsWith("data:image/");
+
   try {
     let uploadedImageUrl: string | undefined;
 
@@ -98,8 +101,11 @@ export const POST = withSession(async ({ req, session }) => {
         }
 
         const workspaceId = createWorkspaceId();
+        // For base64 logos, generate R2 URL; for remote URLs, use as-is
         uploadedImageUrl = logo
-          ? `${R2_URL}/workspaces/${workspaceId}/logo_${nanoid(7)}`
+          ? isBase64Logo
+            ? `${R2_URL}/workspaces/${workspaceId}/logo_${nanoid(7)}`
+            : logo
           : undefined;
 
         return await tx.project.create({
@@ -173,8 +179,9 @@ export const POST = withSession(async ({ req, session }) => {
           name: session.user.name || undefined,
           audience: "app.chko.sh",
         }),
-        // Upload logo to R2 if uploaded
-        logo &&
+        // Upload logo to R2 if base64-encoded (remote URLs are stored directly)
+        isBase64Logo &&
+          logo &&
           uploadedImageUrl &&
           storage.upload(uploadedImageUrl.replace(`${R2_URL}/`, ""), logo),
       ]),
