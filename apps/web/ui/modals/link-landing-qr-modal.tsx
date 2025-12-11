@@ -298,12 +298,12 @@ function LinkLandingQRModalInner({
     <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
       <LinkQRModalProvider value={providerValue}>
         <div className="flex flex-col gap-3">
-          {/* URL input - centered at 50% width on desktop, 90% on mobile */}
-          <div className="mx-auto w-[90%] sm:w-4/5 lg:w-1/2">
+          {/* URL input - spans full two-column width */}
+          <div className="mx-auto w-[90%] sm:w-4/5 lg:w-full">
             <div className="space-y-1">
               <label
                 htmlFor={`${id}-destination-url`}
-                className="block text-center text-sm font-semibold text-neutral-900"
+                className="block text-center text-base font-semibold text-neutral-900"
               >
                 Destination URL
               </label>
@@ -312,7 +312,7 @@ function LinkLandingQRModalInner({
                 type="url"
                 placeholder="https://your-destination.com"
                 className={cn(
-                  "h-10 w-full rounded-xl border-2 border-neutral-200 px-5 text-center text-sm outline-none transition-all duration-200",
+                  "h-14 w-full rounded-xl border-2 border-neutral-200 px-5 text-center text-lg outline-none transition-all duration-200",
                   "placeholder:text-neutral-400",
                   "focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100 focus:ring-0",
                   "hover:border-neutral-300",
@@ -403,26 +403,9 @@ function LinkLandingQRModalInner({
                     </AnimatePresence>
                   )}
                   {!url && (
-                    <div className="flex flex-col items-center gap-2 p-6 text-center">
-                      <div className="rounded-xl bg-neutral-100 p-3">
-                        <svg
-                          className="h-12 w-12 text-neutral-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M12 4v16m8-8H4"
-                          />
-                        </svg>
-                      </div>
-                      <p className="text-xs font-medium text-neutral-500">
-                        Enter a URL above to generate your QR code
-                      </p>
-                    </div>
+                    <p className="text-sm font-medium text-neutral-500">
+                      Enter a URL above to generate your QR code
+                    </p>
                   )}
                 </div>
               </div>
@@ -447,33 +430,37 @@ function LinkLandingQRModalInner({
             </div>
           </div>
 
-          {/* Action buttons - primary CTA with secondary utilities */}
-          {url && qrData && (
-            <div className="mx-auto w-[90%] sm:w-4/5 lg:w-1/2">
-              <div className="flex flex-col gap-3">
-                <Button
-                  variant="primary"
-                  text={ctaText}
-                  onClick={handleContinue}
-                  className="h-11 w-full text-sm font-medium"
+          {/* Action buttons - always visible, disabled until URL entered */}
+          <div className="mx-auto w-[90%] sm:w-4/5 lg:w-full">
+            <div className="flex flex-col gap-3">
+              <Button
+                variant="primary"
+                text={ctaText}
+                onClick={handleContinue}
+                disabled={!url || !qrData}
+                disabledTooltip={
+                  !url || !qrData
+                    ? "Enter a destination URL to continue"
+                    : undefined
+                }
+                className="h-11 w-full text-sm font-medium"
+              />
+              {/* DraftControls hidden but rendered to maintain autosave/restore functionality */}
+              <div className="hidden">
+                <DraftControls
+                  ref={draftControlsRef}
+                  workspaceId="landing"
+                  persistenceOverride={landingDraftsAPI}
+                  qrDesignFromModal={draft}
+                  onRestoreQrDesignFromDraft={(d) =>
+                    setDraft(d ?? DEFAULT_QR_CODE_DESIGN)
+                  }
+                  pendingOnSwitch="flush"
+                  debounceMs={1000}
                 />
-                {/* DraftControls hidden but rendered to maintain autosave/restore functionality */}
-                <div className="hidden">
-                  <DraftControls
-                    ref={draftControlsRef}
-                    workspaceId="landing"
-                    persistenceOverride={landingDraftsAPI}
-                    qrDesignFromModal={draft}
-                    onRestoreQrDesignFromDraft={(d) =>
-                      setDraft(d ?? DEFAULT_QR_CODE_DESIGN)
-                    }
-                    pendingOnSwitch="flush"
-                    debounceMs={1000}
-                  />
-                </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </LinkQRModalProvider>
     </div>
