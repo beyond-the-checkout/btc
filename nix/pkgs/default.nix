@@ -26,4 +26,8 @@
   # Claude Code - AI-powered coding assistant from Anthropic
   # Normally installed via: npm install -g @anthropic-ai/claude-code
   claude-code = pkgs.callPackage ./claude-code.nix { };
+
+  # OpenAI Codex CLI - AI-powered coding assistant
+  # Normally installed via: npm install -g @openai/codex
+  codex = pkgs.callPackage ./codex.nix { };
 }

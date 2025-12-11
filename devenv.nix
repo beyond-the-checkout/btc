@@ -7,12 +7,6 @@ let
     config.allowUnfree = true;
   };
 
-  # Pin codex to version 0.55.0
-  pkgs-codex = import inputs.nixpkgs-codex {
-    system = pkgs.stdenv.system;
-    config.allowUnfree = true;
-  };
-
   # Pin pnpm to version 9.15.9
   pkgs-pnpm = import inputs.nixpkgs-pnpm {
     system = pkgs.stdenv.system;
@@ -39,7 +33,7 @@ in
   pkgs.caddy
   pkgs.jwt-cli
   pkgs.nodejs_20
-  pkgs-codex.codex
+  customPkgs.codex
   pkgs.mysql84
   pkgs.nodePackages.typescript
   pkgs.nodePackages.yarn
@@ -62,7 +56,7 @@ in
 # customPkgs.droid  # ✓ Working - binary download
   customPkgs.beads  # Beads (bd) CLI - memory system for coding agents
   customPkgs.linearis  # Linearis CLI - Linear.app with JSON output for LLM agents
-  customPkgs.claude-code  # Claude Code v2.0.51 - AI coding assistant
+  customPkgs.claude-code
   ];
   # graphql-scalars
   # type-graphql
@@ -115,6 +109,7 @@ in
     echo "  bd: $(bd --version 2>/dev/null || echo 'not available')"
     echo "  linearis: $(linearis --version 2>/dev/null || echo 'not available')"
     echo "  claude: $(claude --version 2>/dev/null || echo 'not available')"
+    echo "  codex: $(codex --version 2>/dev/null || echo 'not available')"
     # echo "  tb: $(tb --version 2>/dev/null || echo 'not available')"
 
     # Set DEVENV_PROFILE for Starship

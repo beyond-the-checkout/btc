@@ -3,10 +3,10 @@
     "devenv": {
       "locked": {
         "dir": "src/modules",
-        "lastModified": 1764669403,
+        "lastModified": 1765463314,
         "owner": "cachix",
         "repo": "devenv",
-        "rev": "3f2d25e7af748127da0571266054575dd8fec5ab",
+        "rev": "ec805a5ad3e3ffb6d47d05c078a60db2e636fac4",
         "type": "github"
       },
       "original": {
@@ -19,10 +19,10 @@
     "flake-compat": {
       "flake": false,
       "locked": {
-        "lastModified": 1764712249,
+        "lastModified": 1765121682,
         "owner": "edolstra",
         "repo": "flake-compat",
-        "rev": "3b279e4317ccfa4865356387935310531357d919",
+        "rev": "65f23138d8d09a92e30f1e5c87611b23ef451bf3",
         "type": "github"
       },
       "original": {
@@ -40,10 +40,10 @@
         ]
       },
       "locked": {
-        "lastModified": 1763988335,
+        "lastModified": 1765464257,
         "owner": "cachix",
         "repo": "git-hooks.nix",
-        "rev": "50b9238891e388c9fdc6a5c49e49c42533a1b5ce",
+        "rev": "09e45f2598e1a8499c3594fe11ec2943f34fe509",
         "type": "github"
       },
       "original": {
@@ -87,21 +87,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-codex": {
-      "locked": {
-        "lastModified": 1762350968,
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "28eef4c1fe2a61c3bf6c4baee7ec69b4439a91a8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "28eef4c1fe2a61c3bf6c4baee7ec69b4439a91a8",
-        "type": "github"
-      }
-    },
     "nixpkgs-pnpm": {
       "locked": {
         "lastModified": 1741595210,
@@ -119,10 +104,10 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1764642553,
+        "lastModified": 1765270179,
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "f720de59066162ee879adcc8c79e15c51fe6bfb4",
+        "rev": "677fbe97984e7af3175b6c121f3c39ee5c8d62c9",
         "type": "github"
       },
       "original": {
@@ -137,7 +122,6 @@
         "devenv": "devenv",
         "git-hooks": "git-hooks",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-codex": "nixpkgs-codex",
         "nixpkgs-pnpm": "nixpkgs-pnpm",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "pre-commit-hooks": [
