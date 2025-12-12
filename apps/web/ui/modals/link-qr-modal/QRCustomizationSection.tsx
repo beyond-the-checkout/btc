@@ -22,10 +22,10 @@ export function QRCustomizationSection(): JSX.Element {
     <>
       {/* Dot Pattern selector */}
       <div>
-        <span className="mb-2 block text-sm font-medium text-neutral-700">
+        <span className="mb-1.5 block text-sm font-medium text-neutral-700">
           Dot Pattern
         </span>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           {DOT_TYPES.map((pattern) => {
             const isSelected = draft.qrDotType === pattern;
             const patternLabels: Record<
@@ -48,7 +48,7 @@ export function QRCustomizationSection(): JSX.Element {
                     setDraft((d) => ({ ...d, qrDotType: pattern }))
                   }
                   className={cn(
-                    "flex size-12 items-center justify-center rounded-md border transition-all",
+                    "flex size-10 items-center justify-center rounded-md border transition-all",
                     isSelected
                       ? "border-black bg-neutral-50 ring-1 ring-black"
                       : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
@@ -67,13 +67,13 @@ export function QRCustomizationSection(): JSX.Element {
         <span className="block text-sm font-medium text-neutral-700">
           Corner Eyes
         </span>
-        <div className="mt-3 space-y-3">
+        <div className="mt-2 space-y-2">
           {/* Outer Frame (Corner Square) */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-neutral-600">
               Outer Frame
             </label>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               {CORNER_SQUARE_TYPES.map((type) => {
                 const isSelected = draft.qrCornerSquareType === type;
                 const typeLabels: Record<CornerSquareType, string> = {
@@ -96,7 +96,7 @@ export function QRCustomizationSection(): JSX.Element {
                         }))
                       }
                       className={cn(
-                        "flex size-12 items-center justify-center rounded-md border transition-all",
+                        "flex size-10 items-center justify-center rounded-md border transition-all",
                         isSelected
                           ? "border-black bg-neutral-50 ring-1 ring-black"
                           : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
@@ -112,10 +112,10 @@ export function QRCustomizationSection(): JSX.Element {
 
           {/* Inner Dot (Corner Dot) */}
           <div>
-            <label className="mb-2 block text-xs font-medium text-neutral-600">
+            <label className="mb-1 block text-xs font-medium text-neutral-600">
               Inner Dot
             </label>
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               {CORNER_DOT_TYPES.map((type) => {
                 const isSelected = draft.qrCornerDotType === type;
                 const typeLabels: Record<CornerDotType, string> = {
@@ -133,7 +133,7 @@ export function QRCustomizationSection(): JSX.Element {
                         setDraft((d) => ({ ...d, qrCornerDotType: type }))
                       }
                       className={cn(
-                        "flex size-12 items-center justify-center rounded-md border transition-all",
+                        "flex size-10 items-center justify-center rounded-md border transition-all",
                         isSelected
                           ? "border-black bg-neutral-50 ring-1 ring-black"
                           : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
@@ -150,13 +150,13 @@ export function QRCustomizationSection(): JSX.Element {
       </div>
 
       {/* QR Shape and Frame Style side by side */}
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         {/* QR Shape selector */}
         <div>
-          <span className="mb-2 block text-sm font-medium text-neutral-700">
+          <span className="mb-1.5 block text-sm font-medium text-neutral-700">
             QR Code Shape
           </span>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Tooltip content="Square">
               <button
                 type="button"
@@ -180,13 +180,13 @@ export function QRCustomizationSection(): JSX.Element {
                   })
                 }
                 className={cn(
-                  "flex size-12 items-center justify-center rounded-md border transition-all",
+                  "flex size-10 items-center justify-center rounded-md border transition-all",
                   draft.qrShape === "square"
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                 )}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <rect
                     x="6"
                     y="6"
@@ -222,13 +222,13 @@ export function QRCustomizationSection(): JSX.Element {
                   })
                 }
                 className={cn(
-                  "flex size-12 items-center justify-center rounded-md border transition-all",
+                  "flex size-10 items-center justify-center rounded-md border transition-all",
                   draft.qrShape === "circle"
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                 )}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <circle
                     cx="12"
                     cy="12"
@@ -245,10 +245,10 @@ export function QRCustomizationSection(): JSX.Element {
 
         {/* Frame style selector - Always visible with "No Frame" option */}
         <div>
-          <span className="mb-2 block text-sm font-medium text-neutral-700">
+          <span className="mb-1.5 block text-sm font-medium text-neutral-700">
             Frame Style
           </span>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* No Frame option - always available */}
             <Tooltip content="No Frame">
               <button
@@ -263,13 +263,13 @@ export function QRCustomizationSection(): JSX.Element {
                   }))
                 }
                 className={cn(
-                  "flex size-12 items-center justify-center rounded-md border transition-all",
+                  "flex size-10 items-center justify-center rounded-md border transition-all",
                   draft.qrFrameStyle === undefined
                     ? "border-black bg-neutral-50 ring-1 ring-black"
                     : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                 )}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <line
                     x1="4"
                     y1="20"
@@ -297,13 +297,13 @@ export function QRCustomizationSection(): JSX.Element {
                       }))
                     }
                     className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      "flex size-10 items-center justify-center rounded-md border transition-all",
                       draft.qrFrameStyle === "square"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                     )}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <rect
                         x="6"
                         y="6"
@@ -329,13 +329,13 @@ export function QRCustomizationSection(): JSX.Element {
                       }))
                     }
                     className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      "flex size-10 items-center justify-center rounded-md border transition-all",
                       draft.qrFrameStyle === "rounded"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                     )}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <rect
                         x="6"
                         y="6"
@@ -364,13 +364,13 @@ export function QRCustomizationSection(): JSX.Element {
                       }))
                     }
                     className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      "flex size-10 items-center justify-center rounded-md border transition-all",
                       draft.qrFrameStyle === "solid-circle"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                     )}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <circle
                         cx="12"
                         cy="12"
@@ -394,13 +394,13 @@ export function QRCustomizationSection(): JSX.Element {
                       }))
                     }
                     className={cn(
-                      "flex size-12 items-center justify-center rounded-md border transition-all",
+                      "flex size-10 items-center justify-center rounded-md border transition-all",
                       draft.qrFrameStyle === "dotted-circle"
                         ? "border-black bg-neutral-50 ring-1 ring-black"
                         : "hover:border-border-emphasis border-neutral-200 hover:bg-neutral-50",
                     )}
                   >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                       <circle
                         cx="12"
                         cy="12"

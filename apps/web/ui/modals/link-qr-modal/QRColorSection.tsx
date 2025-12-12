@@ -1,8 +1,8 @@
 import { Tooltip } from "@dub/ui";
 import { Check2 } from "@dub/ui/icons";
 import { cn } from "@dub/utils";
-import { HexColorInput, HexColorPicker } from "react-colorful";
 import type { JSX } from "react";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import { DEFAULT_COLORS } from "../link-qr-modal.constants";
 import { useLinkQRContext } from "../link-qr-modal.context";
 
@@ -18,10 +18,10 @@ export function QRColorSection(): JSX.Element {
           !draft.qrFrameStyle && "opacity-40",
         )}
       >
-        <span className="mb-2 block text-sm font-medium text-neutral-700">
+        <span className="mb-1.5 block text-sm font-medium text-neutral-700">
           Frame Color
         </span>
-        <div className="flex gap-6">
+        <div className="flex gap-4">
           <div
             className={cn(
               "relative flex h-9 w-32 shrink-0 rounded-md shadow-sm",
@@ -68,10 +68,10 @@ export function QRColorSection(): JSX.Element {
 
       {/* Color selector */}
       <div>
-        <span className="block text-sm font-medium text-neutral-700">
+        <span className="mb-1.5 block text-sm font-medium text-neutral-700">
           Dots Color
         </span>
-        <div className="mt-2 flex gap-6">
+        <div className="flex gap-4">
           <div className="relative flex h-9 w-32 shrink-0 rounded-md shadow-sm">
             <Tooltip
               content={
@@ -117,7 +117,7 @@ export function QRColorSection(): JSX.Element {
               className="block w-full rounded-r-md border-2 border-l-0 pl-3 text-neutral-900 placeholder-neutral-400 focus:outline-none focus:ring-black sm:text-sm"
             />
           </div>
-          <div className="mt-1 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             {DEFAULT_COLORS.map((color) => {
               const isSelected = draft.fgColor === color;
               return (
@@ -135,14 +135,15 @@ export function QRColorSection(): JSX.Element {
                     }))
                   }
                   className={cn(
-                    "flex size-7 items-center justify-center rounded-full transition-all",
+                    "relative flex size-6 items-center justify-center rounded-full transition-all",
+                    "after:absolute after:inset-[-8px] after:content-['']",
                     isSelected
-                      ? "ring-1 ring-black ring-offset-[3px]"
+                      ? "ring-1 ring-black ring-offset-2"
                       : "ring-black/10 hover:ring-4",
                   )}
                   style={{ backgroundColor: color }}
                 >
-                  {isSelected && <Check2 className="size-4 text-white" />}
+                  {isSelected && <Check2 className="size-3.5 text-white" />}
                 </button>
               );
             })}

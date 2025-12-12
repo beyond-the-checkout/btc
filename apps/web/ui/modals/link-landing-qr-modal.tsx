@@ -22,7 +22,6 @@ import {
   readDraftsFromStorage,
   useLinkDrafts,
 } from "@/ui/modals/link-builder/use-link-drafts";
-// DownloadPopover/CopyPopover removed - users go to account creation to download
 import { LinkQRModalProvider } from "@/ui/modals/link-qr-modal.context";
 import {
   DEFAULT_QR_CODE_DESIGN,
@@ -32,6 +31,7 @@ import { QRColorSection } from "@/ui/modals/link-qr-modal/QRColorSection";
 import { QRCustomizationSection } from "@/ui/modals/link-qr-modal/QRCustomizationSection";
 import { QRCode } from "@/ui/shared/qr-code";
 import { Button, Modal, ShimmerDots, useMediaQuery } from "@dub/ui";
+import { Sliders } from "@dub/ui/icons";
 import { APP_DOMAIN, cn } from "@dub/utils";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -172,6 +172,9 @@ function LinkLandingQRModalInner({
     storageKey: LANDING_DRAFT_STORAGE_KEY,
   });
 
+  // Customization panel expanded state
+  const [isCustomizing, setIsCustomizing] = useState(false);
+
   useEffect(() => {
     return () => {
       draftControlsRef.current?.onClose();
@@ -183,7 +186,6 @@ function LinkLandingQRModalInner({
       next: "/onboarding/plan",
       [QR_ONBOARDING_SOURCE_PARAM]: QR_ONBOARDING_SOURCE_VALUE,
     });
-    // Use full URL to ensure cross-domain navigation from custom domains
     // Flush any pending draft saves before navigation
     draftControlsRef.current?.onClose();
 
@@ -295,12 +297,17 @@ function LinkLandingQRModalInner({
   );
 
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-5xl px-4">
       <LinkQRModalProvider value={providerValue}>
-        <div className="flex flex-col gap-3">
-          {/* URL input - spans full two-column width */}
-          <div className="mx-auto w-[90%] sm:w-4/5 lg:w-full">
-            <div className="space-y-1">
+        <div className="flex flex-col gap-5">
+          {/* URL input - expands to match cards width when customizing */}
+          <div
+            className={cn(
+              "mx-auto w-full transition-all duration-500 ease-out",
+              isCustomizing ? "lg:w-[912px]" : "lg:w-[448px]",
+            )}
+          >
+            <div className="space-y-2">
               <label
                 htmlFor={`${id}-destination-url`}
                 className="block text-center text-base font-semibold text-neutral-900"
@@ -314,7 +321,7 @@ function LinkLandingQRModalInner({
                 className={cn(
                   "h-14 w-full rounded-xl border-2 border-neutral-200 px-5 text-center text-lg outline-none transition-all duration-200",
                   "placeholder:text-neutral-400",
-                  "focus:border-blue-500 focus:shadow-lg focus:shadow-blue-100 focus:ring-0",
+                  "focus:border-neutral-900 focus:ring-0",
                   "hover:border-neutral-300",
                 )}
                 {...register("url")}
@@ -322,58 +329,47 @@ function LinkLandingQRModalInner({
             </div>
           </div>
 
-          {/* Two equal-sized cards side by side */}
-          <div className="mx-auto grid w-[90%] gap-4 sm:w-4/5 lg:w-full lg:grid-cols-2">
-            {/* Left card: QR Preview - matches height of customization card */}
-            <div className="relative overflow-hidden">
-              {/* Decorative background elements */}
-              <div className="absolute -inset-3 rounded-2xl bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 opacity-40 blur-xl" />
+          {/* QR Preview + Customization panel - flexbox layout */}
+          <div className="flex justify-center">
+            {/* Container always uses lg:flex-row so exit animation keeps customize panel to the right */}
+            <div className="flex flex-col gap-4 lg:flex-row">
+              {/* QR Preview Card - FIXED SIZE on desktop, responsive on mobile */}
+              <div className="relative w-full flex-shrink-0 max-lg:max-w-md lg:w-[448px]">
+                {/* Subtle glow effect */}
+                <div className="absolute -inset-2 rounded-3xl bg-gradient-to-br from-neutral-100 via-neutral-50 to-white opacity-60 blur-xl" />
 
-              {/* Main preview container - height matches customization card */}
-              <div className="relative flex h-full min-h-[400px] flex-col rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg">
-                <div
-                  className="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl border-2 border-neutral-100 bg-gradient-to-br from-neutral-50 to-white"
-                  suppressHydrationWarning
-                >
-                  {!isMobile && (
-                    <ShimmerDots className="opacity-20 [mask-image:radial-gradient(50%_50%,transparent_30%,black)]" />
-                  )}
-                  {url && (
+                <div className="relative flex h-[620px] max-h-[calc(100vh-12rem)] flex-col rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm">
+                  {/* QR Code Display */}
+                  <div
+                    className="relative flex flex-1 items-center justify-center overflow-hidden rounded-xl bg-neutral-50/50"
+                    suppressHydrationWarning
+                  >
+                    {!isMobile && (
+                      <ShimmerDots className="opacity-10 [mask-image:radial-gradient(50%_50%,transparent_40%,black)]" />
+                    )}
                     <AnimatePresence mode="wait">
-                      <motion.div
-                        key={
-                          draft.fgColor +
-                          draft.qrHideLogo +
-                          draft.qrDotType +
-                          draft.qrCornerSquareType +
-                          draft.qrCornerDotType +
-                          draft.qrShape +
-                          draft.hasFrame +
-                          (draft.qrFrameStyle || "") +
-                          (draft.qrFrameColor || "") +
-                          (draft.qrDotsColor || "") +
-                          (draft.qrCornerSquareColor || "") +
-                          (draft.qrCornerDotColor || "")
-                        }
-                        initial={{
-                          filter: "blur(4px)",
-                          opacity: 0,
-                          scale: 0.92,
-                        }}
-                        animate={{
-                          filter: "blur(0px)",
-                          opacity: 1,
-                          scale: 1,
-                        }}
-                        exit={{
-                          filter: "blur(4px)",
-                          opacity: 0,
-                          scale: 0.92,
-                        }}
-                        transition={{ duration: 0.3, ease: "easeOut" }}
-                        className="relative flex size-full items-center justify-center p-2"
-                      >
-                        <div className="flex w-full max-w-md items-center justify-center">
+                      {url ? (
+                        <motion.div
+                          key={
+                            draft.fgColor +
+                            draft.qrHideLogo +
+                            draft.qrDotType +
+                            draft.qrCornerSquareType +
+                            draft.qrCornerDotType +
+                            draft.qrShape +
+                            draft.hasFrame +
+                            (draft.qrFrameStyle || "") +
+                            (draft.qrFrameColor || "") +
+                            (draft.qrDotsColor || "") +
+                            (draft.qrCornerSquareColor || "") +
+                            (draft.qrCornerDotColor || "")
+                          }
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ duration: 0.25, ease: "easeOut" }}
+                          className="relative flex size-full items-center justify-center p-4"
+                        >
                           <QRCode
                             url={url}
                             fgColor={draft.qrDotsColor || draft.fgColor}
@@ -398,68 +394,92 @@ function LinkLandingQRModalInner({
                             }}
                             frameOptions={frameOptions}
                           />
-                        </div>
-                      </motion.div>
+                        </motion.div>
+                      ) : (
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="px-4 text-center text-sm text-neutral-400"
+                        >
+                          Enter a URL to generate your QR code
+                        </motion.p>
+                      )}
                     </AnimatePresence>
-                  )}
-                  {!url && (
-                    <p className="text-sm font-medium text-neutral-500">
-                      Enter a URL above to generate your QR code
-                    </p>
-                  )}
+                  </div>
+
+                  {/* Customize toggle button - sits at bottom of preview card */}
+                  <button
+                    type="button"
+                    onClick={() => setIsCustomizing(!isCustomizing)}
+                    className={cn(
+                      "mt-4 flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-colors duration-200",
+                      isCustomizing
+                        ? "bg-neutral-900 text-white hover:bg-neutral-800"
+                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200",
+                    )}
+                  >
+                    <Sliders className="size-4" />
+                    <span>Customize</span>
+                  </button>
                 </div>
               </div>
-            </div>
 
-            {/* Right card: Customization - same size as preview card */}
-            <div className="flex min-h-[400px] flex-col rounded-2xl border border-neutral-200 bg-neutral-50 p-4 shadow-sm">
-              <h3 className="mb-3 text-sm font-semibold text-neutral-900">
-                Customize Your QR Code
-              </h3>
-              <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
-                {/* Logo, Dot Pattern, Corner Eyes */}
-                <div className="flex flex-col gap-4">
-                  <QRCustomizationSection />
-                </div>
-
-                {/* Colors at the bottom */}
-                <div className="flex flex-col gap-4">
-                  <QRColorSection />
-                </div>
-              </div>
+              {/* Customization Panel - slides in from right */}
+              {/* popLayout removes exiting element from flow so it animates from its last position */}
+              <AnimatePresence mode="popLayout">
+                {isCustomizing && (
+                  <motion.div
+                    initial={{ opacity: 0, x: isMobile ? 0 : 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: isMobile ? 0 : 24 }}
+                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                    className="flex h-[620px] max-h-[calc(100vh-12rem)] w-full flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-neutral-200/80 bg-neutral-50/80 p-5 shadow-sm backdrop-blur-sm max-lg:max-w-md lg:w-[448px]"
+                  >
+                    <h3 className="mb-3 flex-shrink-0 text-sm font-semibold text-neutral-900">
+                      Customize
+                    </h3>
+                    <div className="scrollbar-thin scrollbar-thumb-neutral-300/50 scrollbar-track-transparent hover:scrollbar-thumb-neutral-400/70 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+                      <QRCustomizationSection />
+                      <QRColorSection />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
-          {/* Action buttons - always visible, disabled until URL entered */}
-          <div className="mx-auto w-[90%] sm:w-4/5 lg:w-full">
-            <div className="flex flex-col gap-3">
-              <Button
-                variant="primary"
-                text={ctaText}
-                onClick={handleContinue}
-                disabled={!url || !qrData}
-                disabledTooltip={
-                  !url || !qrData
-                    ? "Enter a destination URL to continue"
-                    : undefined
-                }
-                className="h-11 w-full text-sm font-medium"
-              />
-              {/* DraftControls hidden but rendered to maintain autosave/restore functionality */}
-              <div className="hidden">
-                <DraftControls
-                  ref={draftControlsRef}
-                  workspaceId="landing"
-                  persistenceOverride={landingDraftsAPI}
-                  qrDesignFromModal={draft}
-                  onRestoreQrDesignFromDraft={(d) =>
-                    setDraft(d ?? DEFAULT_QR_CODE_DESIGN)
-                  }
-                  pendingOnSwitch="flush"
-                  debounceMs={1000}
-                />
-              </div>
-            </div>
+          {/* CTA Button - expands to match cards width when customizing */}
+          <div
+            className={cn(
+              "mx-auto w-full transition-all duration-500 ease-out",
+              isCustomizing ? "lg:w-[912px]" : "lg:w-[448px]",
+            )}
+          >
+            <Button
+              variant="primary"
+              text={ctaText}
+              onClick={handleContinue}
+              disabled={!url || !qrData}
+              disabledTooltip={
+                !url ? "Enter a destination URL to continue" : undefined
+              }
+              className="h-12 w-full text-base font-medium"
+            />
+          </div>
+
+          {/* DraftControls hidden but rendered to maintain autosave/restore functionality */}
+          <div className="hidden">
+            <DraftControls
+              ref={draftControlsRef}
+              workspaceId="landing"
+              persistenceOverride={landingDraftsAPI}
+              qrDesignFromModal={draft}
+              onRestoreQrDesignFromDraft={(d) =>
+                setDraft(d ?? DEFAULT_QR_CODE_DESIGN)
+              }
+              pendingOnSwitch="flush"
+              debounceMs={1000}
+            />
           </div>
         </div>
       </LinkQRModalProvider>
