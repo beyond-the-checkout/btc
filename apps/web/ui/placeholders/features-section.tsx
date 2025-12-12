@@ -4,10 +4,10 @@ import Link from "next/link";
 import { PropsWithChildren } from "react";
 import Markdown from "react-markdown";
 import { Analytics } from "./feature-graphics/analytics";
-import { Collaboration } from "./feature-graphics/collaboration";
 import { Domains } from "./feature-graphics/domains";
 import { Personalization } from "./feature-graphics/personalization";
 import { QR } from "./feature-graphics/qr";
+import { QRCustomization } from "./feature-graphics/qr-customization";
 
 export function FeaturesSection({
   domain,
@@ -83,11 +83,10 @@ export function FeaturesSection({
           </FeatureCard>
           <FeatureCard
             className="border-r-0 border-neutral-200 lg:border-r"
-            title="Dynamic QR at scale"
-            description="Update anytime, manage thousands. Create, version, and update codes per SKU or campaign—no reprint required. Variable data printing support included."
+            title="Fully Customizable QR Codes"
+            description="Design QR codes that match your brand. Choose dot patterns, corner styles, colors, frames, and add your logo—all with pixel-perfect control at any scale."
           >
-            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
-            <Collaboration />
+            <QRCustomization />
           </FeatureCard>
           <FeatureCard
             title="Complete Data Ownership"
