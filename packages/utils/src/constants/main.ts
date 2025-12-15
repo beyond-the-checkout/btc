@@ -23,9 +23,10 @@ export const APP_PORT = requireEnv(
   "NEXT_PUBLIC_APP_PORT",
 );
 
-const getLocalAppDomain = () => {
-  return `http://localhost:${APP_PORT}`;
-};
+export const APP_DOMAIN = requireEnv(
+  process.env.NEXT_PUBLIC_APP_URL,
+  "NEXT_PUBLIC_APP_URL",
+);
 
 export const APP_HOSTNAMES = new Set([
   `app.${APP_DOMAIN_ENV}`,
@@ -34,17 +35,8 @@ export const APP_HOSTNAMES = new Set([
   "localhost",
 ]);
 
-export const APP_DOMAIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ||
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-    ? `https://app.${APP_DOMAIN_ENV}`
-    : getLocalAppDomain();
-
 export const APP_DOMAIN_WITH_NGROK =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ||
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-    ? `https://app.${APP_DOMAIN_ENV}`
-    : process.env.NEXT_PUBLIC_NGROK_URL ?? getLocalAppDomain();
+  process.env.NEXT_PUBLIC_NGROK_URL ?? APP_DOMAIN;
 
 export const API_HOSTNAMES = new Set([
   `api.${APP_DOMAIN_ENV}`,
@@ -54,12 +46,10 @@ export const API_HOSTNAMES = new Set([
   "api.localhost",
 ]);
 
-export const API_DOMAIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://api.${APP_DOMAIN_ENV}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://api-staging.${APP_DOMAIN_ENV}`
-      : `http://api.localhost:${APP_PORT}`;
+export const API_DOMAIN = requireEnv(
+  process.env.NEXT_PUBLIC_API_URL,
+  "NEXT_PUBLIC_API_URL",
+);
 
 export const ADMIN_HOSTNAMES = new Set([
   `admin.${APP_DOMAIN_ENV}`,
@@ -74,20 +64,13 @@ export const PARTNERS_HOSTNAMES = new Set([
   "partners.localhost",
 ]);
 
-export const PARTNERS_DOMAIN =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://partners.${APP_DOMAIN_ENV}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://partners-staging.${APP_DOMAIN_ENV}`
-      : `http://partners.localhost:${APP_PORT}`;
+export const PARTNERS_DOMAIN = requireEnv(
+  process.env.NEXT_PUBLIC_PARTNERS_URL,
+  "NEXT_PUBLIC_PARTNERS_URL",
+);
 
 export const PARTNERS_DOMAIN_WITH_NGROK =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? `https://partners.${APP_DOMAIN_ENV}`
-    : process.env.NEXT_PUBLIC_VERCEL_ENV === "preview"
-      ? `https://partners-staging.${APP_DOMAIN_ENV}`
-      : process.env.NEXT_PUBLIC_NGROK_URL ??
-        `http://partners.localhost:${APP_PORT}`;
+  process.env.NEXT_PUBLIC_NGROK_URL ?? PARTNERS_DOMAIN;
 
 export const DUB_LOGO = "https://assets.dub.co/logo.png";
 export const DUB_LOGO_SQUARE = "https://assets.dub.co/logo-square.png";
