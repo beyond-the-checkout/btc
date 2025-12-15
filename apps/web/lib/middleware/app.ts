@@ -104,6 +104,14 @@ export default async function AppMiddleware(req: NextRequest) {
         path.startsWith("/settings/") ||
         isTopLevelSettingsRedirect(path))
     ) {
+      // Honor `next` parameter for logged-in users on /login or /register
+      // This supports the QR onboarding flow where users may already be logged in
+      if (path === "/login" || path === "/register") {
+        const next = req.nextUrl.searchParams.get("next");
+        if (next && next.startsWith("/")) {
+          return NextResponse.redirect(new URL(next, req.url));
+        }
+      }
       return WorkspacesMiddleware(req, user);
     }
 

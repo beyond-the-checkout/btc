@@ -9,6 +9,27 @@ import { SignUpForm } from "@/ui/auth/register/signup-form";
 import { VerifyEmailForm } from "@/ui/auth/register/verify-email-form";
 import { truncate } from "@dub/utils";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+
+/**
+ * Build an auth link preserving the `next` and `source` query params.
+ * This ensures users can navigate between register and login
+ * while maintaining the return destination.
+ */
+function buildAuthLink(
+  path: "/login" | "/register",
+  searchParams: URLSearchParams,
+): string {
+  const params = new URLSearchParams();
+  const next = searchParams.get("next");
+  const source = searchParams.get("source");
+
+  if (next) params.set("next", next);
+  if (source) params.set("source", source);
+
+  const queryString = params.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
 
 export default function RegisterPageClient() {
   return (
@@ -19,6 +40,8 @@ export default function RegisterPageClient() {
 }
 
 function SignUp() {
+  const searchParams = useSearchParams();
+
   return (
     <>
       <div className="w-full max-w-sm">
@@ -31,7 +54,7 @@ function SignUp() {
         <p className="mt-6 text-center text-sm font-medium text-neutral-500">
           Already have an account?&nbsp;
           <Link
-            href="/login"
+            href={buildAuthLink("/login", searchParams)}
             className="font-semibold text-neutral-700 transition-colors hover:text-neutral-900"
           >
             Log in

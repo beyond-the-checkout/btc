@@ -1,10 +1,6 @@
 "use client";
 
 import { createUserAccountAction } from "@/lib/actions/create-user-account";
-import {
-  QR_ONBOARDING_SOURCE_PARAM,
-  QR_ONBOARDING_SOURCE_VALUE,
-} from "@/lib/onboarding/qr";
 import { AnimatedSizeContainer, Button, useMediaQuery } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { OTPInput } from "input-otp";
@@ -37,16 +33,14 @@ export const VerifyEmailForm = () => {
       });
 
       if (response?.ok) {
-        const source = searchParams.get(QR_ONBOARDING_SOURCE_PARAM);
-
-        // QR-first onboarding: start at workspace creation so users can name/confirm their workspace
-        if (source === QR_ONBOARDING_SOURCE_VALUE) {
-          router.replace(
-            `/onboarding/workspace?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`,
-          );
+        // Honor the `next` query param if present and safe (internal path)
+        const next = searchParams.get("next");
+        if (next && next.startsWith("/")) {
+          router.replace(next);
           return;
         }
 
+        // Fallback to onboarding
         router.replace("/onboarding");
       } else {
         toast.error(
