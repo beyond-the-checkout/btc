@@ -1,16 +1,20 @@
 "use client";
 
-import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 import Cookies, { type CookieAttributes } from "js-cookie";
+import {
+  parseQROnboardingSeed,
+  QR_ONBOARDING_SEED_COOKIE,
+  serializeQROnboardingSeed,
+  type QROnboardingSeed,
+} from "./seed";
 
-export const QR_ONBOARDING_SEED_COOKIE = "qr-onboarding-seed";
-
-export type QROnboardingSeed = {
-  url: string;
-  qrDesign?: QRCodeDesign;
-  timestamp: number;
-  id?: string;
-};
+// Re-export shared types and constants for backwards compatibility
+export {
+  parseQROnboardingSeed,
+  QR_ONBOARDING_SEED_COOKIE,
+  serializeQROnboardingSeed,
+  type QROnboardingSeed,
+} from "./seed";
 
 function isProd(): boolean {
   return process.env.NODE_ENV === "production";
@@ -70,7 +74,7 @@ export function setQROnboardingSeedCookie(
 ): void {
   const opts = getCrossSubdomainCookieOptions();
   const expires = new Date(Date.now() + ttlMinutes * 60_000);
-  Cookies.set(QR_ONBOARDING_SEED_COOKIE, JSON.stringify(seed), {
+  Cookies.set(QR_ONBOARDING_SEED_COOKIE, serializeQROnboardingSeed(seed), {
     ...opts,
     expires,
   });
@@ -80,13 +84,8 @@ export function setQROnboardingSeedCookie(
  * Read and parse the onboarding seed cookie.
  */
 export function readQROnboardingSeedCookie(): QROnboardingSeed | null {
-  try {
-    const value = Cookies.get(QR_ONBOARDING_SEED_COOKIE);
-    if (!value) return null;
-    return JSON.parse(value) as QROnboardingSeed;
-  } catch {
-    return null;
-  }
+  const value = Cookies.get(QR_ONBOARDING_SEED_COOKIE);
+  return parseQROnboardingSeed(value);
 }
 
 /**
