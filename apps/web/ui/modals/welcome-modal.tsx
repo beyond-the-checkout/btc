@@ -9,14 +9,31 @@ import {
   type QROnboardingSeed,
 } from "@/lib/onboarding/qr/cookie";
 import { dispatchQROnboardingSeed } from "@/lib/onboarding/qr/events";
+import { getQRAsCanvas, getQRData } from "@/lib/qr";
+import { frameStyleToFrameType } from "@/lib/qr/types";
+import useWorkspace from "@/lib/swr/use-workspace";
 import { trackConversion } from "@/lib/tracking-pixels";
 import {
   LANDING_DRAFT_STORAGE_KEY,
   readDraftsFromStorage,
 } from "@/ui/modals/link-builder/use-link-drafts";
 import { ModalContext } from "@/ui/modals/modal-provider";
-import { Button, Modal, useRouterStuff, useScrollProgress } from "@dub/ui";
-import { cn, getPlanDetails, PLANS, PRO_PLAN } from "@dub/utils";
+import { QRCode } from "@/ui/shared/qr-code";
+import {
+  Button,
+  LoadingSpinner,
+  Modal,
+  useRouterStuff,
+  useScrollProgress,
+} from "@dub/ui";
+import {
+  cn,
+  DUB_QR_LOGO,
+  getPlanDetails,
+  linkConstructor,
+  PLANS,
+  PRO_PLAN,
+} from "@dub/utils";
 import { usePlausible } from "next-plausible";
 import { useSearchParams } from "next/navigation";
 import posthog from "posthog-js";
@@ -41,7 +58,26 @@ const WELCOME_QUERY_KEYS_TO_CLEAR = [
   "upgraded",
   "plan",
   "period",
+  "qrLinkId", // New: clear the QR link ID
 ] as const;
+
+// Type for the link data we fetch
+type FetchedLink = {
+  id: string;
+  domain: string;
+  key: string;
+  url: string;
+  qrDotType?: string | null;
+  qrDotsColor?: string | null;
+  qrCornerSquareType?: string | null;
+  qrCornerSquareColor?: string | null;
+  qrCornerDotType?: string | null;
+  qrCornerDotColor?: string | null;
+  qrShape?: string | null;
+  qrFrameStyle?: string | null;
+  qrFrameColor?: string | null;
+  qrHideLogo?: boolean | null;
+};
 
 function WelcomeModal({
   showWelcomeModal,
@@ -53,12 +89,41 @@ function WelcomeModal({
   const { setShowLinkBuilder } = useContext(ModalContext);
   const { queryParams } = useRouterStuff();
   const searchParams = useSearchParams();
+  const { id: workspaceId, plan } = useWorkspace();
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const downloadAnchorRef = useRef<HTMLAnchorElement>(null);
   const { scrollProgress, updateScrollProgress } = useScrollProgress(scrollRef);
 
   const planId = searchParams.get("plan");
+  const qrLinkId = searchParams.get("qrLinkId");
   const plausible = usePlausible();
+
+  // State for fetched link
+  const [fetchedLink, setFetchedLink] = useState<FetchedLink | null>(null);
+  const [loadingLink, setLoadingLink] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  // Fetch link when qrLinkId is present
+  useEffect(() => {
+    if (!qrLinkId || !workspaceId || !showWelcomeModal) return;
+
+    setLoadingLink(true);
+    fetch(`/api/links/${qrLinkId}?workspaceId=${workspaceId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch link");
+        return res.json();
+      })
+      .then((data) => {
+        setFetchedLink(data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch created link:", err);
+      })
+      .finally(() => {
+        setLoadingLink(false);
+      });
+  }, [qrLinkId, workspaceId, showWelcomeModal]);
 
   const handlePlanUpgrade = async () => {
     if (planId) {
@@ -88,7 +153,7 @@ function WelcomeModal({
     handlePlanUpgrade();
   }, [searchParams, planId]);
 
-  const plan = planId
+  const planInfo = planId
     ? PLANS.find(
         (p) => p.name.toLowerCase() === planId.replace("+", " ").toLowerCase(),
       ) ?? PRO_PLAN
@@ -125,7 +190,90 @@ function WelcomeModal({
     }
   }, [showWelcomeModal, searchParams]);
 
-  const shouldShowQrVariant = onboarded && isQrFlow && !!latest;
+  // Determine which variant to show
+  const shouldShowQrDownloadVariant = onboarded && isQrFlow && !!qrLinkId;
+  const shouldShowQrResumeVariant =
+    onboarded && isQrFlow && !qrLinkId && !!latest;
+
+  // Compute QR data for the fetched link
+  const qrData = useMemo(() => {
+    if (!fetchedLink) return null;
+    const shortUrl = linkConstructor({
+      domain: fetchedLink.domain,
+      key: fetchedLink.key,
+    });
+
+    const frameType = frameStyleToFrameType(
+      fetchedLink.qrFrameStyle as
+        | "square"
+        | "rounded"
+        | "solid-circle"
+        | "dotted-circle"
+        | undefined,
+    );
+    const frameOptions = frameType
+      ? {
+          type: frameType,
+          color:
+            fetchedLink.qrFrameColor || fetchedLink.qrDotsColor || "#000000",
+        }
+      : undefined;
+
+    return getQRData({
+      url: shortUrl,
+      hideLogo: fetchedLink.qrHideLogo ?? false,
+      logo: DUB_QR_LOGO,
+      fgColor: fetchedLink.qrDotsColor || "#000000",
+      qrShape: (fetchedLink.qrShape as "square" | "circle") || "square",
+      dotsOptions: {
+        type: (fetchedLink.qrDotType as any) || "square",
+        color: fetchedLink.qrDotsColor || "#000000",
+      },
+      eyeOptions: {
+        cornerSquare: {
+          type: (fetchedLink.qrCornerSquareType as any) || "square",
+          color: fetchedLink.qrCornerSquareColor || "#000000",
+        },
+        cornerDot: {
+          type: (fetchedLink.qrCornerDotType as any) || "square",
+          color: fetchedLink.qrCornerDotColor || "#000000",
+        },
+      },
+      frameOptions,
+    });
+  }, [fetchedLink]);
+
+  // Download handler for the dynamic QR
+  const handleDownloadQrPng = useCallback(async () => {
+    if (!qrData || !downloadAnchorRef.current) return;
+    setDownloading(true);
+    try {
+      const dataUrl = await getQRAsCanvas(qrData, "image/png");
+      downloadAnchorRef.current.href = dataUrl as string;
+      downloadAnchorRef.current.download = `qr-code-${fetchedLink?.key || "download"}.png`;
+      downloadAnchorRef.current.click();
+
+      // Clear artifacts after successful download
+      clearQROnboardingSeedCookie();
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem(LANDING_DRAFT_STORAGE_KEY);
+        }
+      } catch {
+        // no-op
+      }
+
+      // Clear URL params and close modal
+      queryParams({
+        del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
+      });
+      setShowWelcomeModal(false);
+    } catch (err) {
+      console.error("Failed to download QR:", err);
+    } finally {
+      setDownloading(false);
+    }
+  }, [qrData, fetchedLink, queryParams, setShowWelcomeModal]);
 
   const handleResumeQr = useCallback((): void => {
     // Important: clear URL params BEFORE opening the builder to avoid ModalProvider re-triggering
@@ -175,7 +323,61 @@ function WelcomeModal({
               onScroll={updateScrollProgress}
               className="scrollbar-hide max-h-[calc(100vh-350px)] overflow-y-auto pb-6"
             >
-              {shouldShowQrVariant ? (
+              {shouldShowQrDownloadVariant ? (
+                <>
+                  <h1 className="text-center text-lg font-medium text-neutral-950">
+                    Your dynamic QR code is ready
+                  </h1>
+                  <p className="mt-2 text-center text-sm text-neutral-500">
+                    Download your QR code and start tracking scans. You can
+                    update the destination URL anytime from your dashboard.
+                  </p>
+                  {/* QR Preview */}
+                  {loadingLink ? (
+                    <div className="mt-6 flex justify-center">
+                      <LoadingSpinner className="size-8" />
+                    </div>
+                  ) : fetchedLink && qrData ? (
+                    <div className="mt-6 flex justify-center">
+                      <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4">
+                        <QRCode
+                          url={linkConstructor({
+                            domain: fetchedLink.domain,
+                            key: fetchedLink.key,
+                          })}
+                          fgColor={fetchedLink.qrDotsColor || "#000000"}
+                          hideLogo={fetchedLink.qrHideLogo ?? false}
+                          logo={DUB_QR_LOGO}
+                          scale={1.5}
+                          qrShape={
+                            (fetchedLink.qrShape as "square" | "circle") ||
+                            "square"
+                          }
+                          dotsOptions={{
+                            type: (fetchedLink.qrDotType as any) || "square",
+                            color: fetchedLink.qrDotsColor || "#000000",
+                          }}
+                          eyeOptions={{
+                            cornerSquare: {
+                              type:
+                                (fetchedLink.qrCornerSquareType as any) ||
+                                "square",
+                              color:
+                                fetchedLink.qrCornerSquareColor || "#000000",
+                            },
+                            cornerDot: {
+                              type:
+                                (fetchedLink.qrCornerDotType as any) ||
+                                "square",
+                              color: fetchedLink.qrCornerDotColor || "#000000",
+                            },
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                </>
+              ) : shouldShowQrResumeVariant ? (
                 <>
                   <h1 className="text-center text-lg font-medium text-neutral-950">
                     {fromCookie
@@ -192,29 +394,29 @@ function WelcomeModal({
                   <h1
                     className={cn(
                       "text-lg font-medium text-neutral-950",
-                      plan ? "text-left" : "text-center",
+                      planInfo ? "text-left" : "text-center",
                     )}
                   >
-                    {plan
-                      ? `${brandName(true)} ${plan.name} looks good on you!`
+                    {planInfo
+                      ? `${brandName(true)} ${planInfo.name} looks good on you!`
                       : `Welcome to ${brandName(false)}!`}
                   </h1>
                   <p
                     className={cn(
                       "mt-2 text-sm text-neutral-500",
-                      plan ? "text-left" : "text-center",
+                      planInfo ? "text-left" : "text-center",
                     )}
                   >
                     Thanks for signing up – your account is ready to go! Now you
                     have one central, organized place to build and manage all
                     your QR codes.
                   </p>
-                  {plan && (
+                  {planInfo && (
                     <>
                       <h2 className="mb-2 mt-6 text-base font-medium text-neutral-950">
-                        Explore the benefits of your {plan.name} plan
+                        Explore the benefits of your {planInfo.name} plan
                       </h2>
-                      <PlanFeatures plan={plan.name} />
+                      <PlanFeatures plan={planInfo.name} />
                     </>
                   )}
                 </>
@@ -226,7 +428,29 @@ function WelcomeModal({
               style={{ opacity: 1 - Math.pow(scrollProgress, 2) }}
             ></div>
           </div>
-          {shouldShowQrVariant ? (
+          {shouldShowQrDownloadVariant ? (
+            <div className="mt-2 flex flex-col gap-2">
+              <Button
+                type="button"
+                variant="primary"
+                text={downloading ? "Downloading..." : "Download PNG"}
+                loading={downloading || loadingLink}
+                disabled={!fetchedLink || !qrData}
+                onClick={handleDownloadQrPng}
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                text="Close"
+                onClick={() => {
+                  queryParams({
+                    del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
+                  });
+                  setShowWelcomeModal(false);
+                }}
+              />
+            </div>
+          ) : shouldShowQrResumeVariant ? (
             <Button
               type="button"
               variant="primary"
@@ -250,6 +474,8 @@ function WelcomeModal({
           )}
         </div>
       </div>
+      {/* Hidden anchor for triggering downloads */}
+      <a ref={downloadAnchorRef} className="hidden" />
     </Modal>
   );
 }
