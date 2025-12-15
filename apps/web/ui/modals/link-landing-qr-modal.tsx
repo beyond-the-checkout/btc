@@ -5,7 +5,7 @@ import {
   QR_ONBOARDING_SOURCE_VALUE,
 } from "@/lib/onboarding/qr";
 import { setQROnboardingSeedCookie } from "@/lib/onboarding/qr/cookie";
-import { getQRData } from "@/lib/qr";
+import { getQRAsCanvas, getQRAsSVGDataUri, getQRData } from "@/lib/qr";
 import { frameStyleToFrameType } from "@/lib/qr/types";
 import type { QRLinkProps } from "@/lib/types";
 import {
@@ -30,9 +30,9 @@ import {
 import { QRColorSection } from "@/ui/modals/link-qr-modal/QRColorSection";
 import { QRCustomizationSection } from "@/ui/modals/link-qr-modal/QRCustomizationSection";
 import { QRCode } from "@/ui/shared/qr-code";
-import { Button, Modal, ShimmerDots, useMediaQuery } from "@dub/ui";
-import { Sliders } from "@dub/ui/icons";
-import { APP_DOMAIN, cn } from "@dub/utils";
+import { Button, IconMenu, Modal, ShimmerDots, useMediaQuery } from "@dub/ui";
+import { Photo, Sliders, Sparkle3 } from "@dub/ui/icons";
+import { APP_DOMAIN, cn, nanoid } from "@dub/utils";
 import { AnimatePresence, motion } from "motion/react";
 import {
   Dispatch,
@@ -175,17 +175,77 @@ function LinkLandingQRModalInner({
   // Customization panel expanded state
   const [isCustomizing, setIsCustomizing] = useState(false);
 
+  // Download/Upgrade modal state
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+
+  // Hidden anchor ref for triggering downloads
+  const downloadAnchorRef = useRef<HTMLAnchorElement>(null);
+
   useEffect(() => {
     return () => {
       draftControlsRef.current?.onClose();
     };
   }, []);
 
-  const handleContinue = () => {
-    const params = new URLSearchParams({
-      next: "/onboarding/plan",
-      [QR_ONBOARDING_SOURCE_PARAM]: QR_ONBOARDING_SOURCE_VALUE,
-    });
+  /**
+   * Trigger a file download using a hidden anchor element.
+   */
+  function triggerDownload(dataUrl: string, filename: string): void {
+    if (!downloadAnchorRef.current) return;
+    downloadAnchorRef.current.href = dataUrl;
+    downloadAnchorRef.current.download = filename;
+    downloadAnchorRef.current.click();
+  }
+
+  /**
+   * Generate a filename based on the destination URL.
+   */
+  function generateFilename(
+    destinationUrl: string | undefined,
+    extension: string,
+  ): string {
+    if (!destinationUrl) return `qr-code.${extension}`;
+
+    try {
+      const parsed = new URL(destinationUrl);
+      const domain = parsed.hostname
+        .replace(/^www\./, "")
+        .split(".")[0]
+        .replace(/[^a-z0-9-]/gi, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")
+        .toLowerCase();
+
+      return `${domain || "qr-code"}-qr-code.${extension}`;
+    } catch {
+      return `qr-code.${extension}`;
+    }
+  }
+
+  /**
+   * Handle static PNG download
+   */
+  async function handleDownloadPng(): Promise<void> {
+    if (!qrData) return;
+    const dataUrl = await getQRAsCanvas(qrData, "image/png");
+    triggerDownload(dataUrl as string, generateFilename(url, "png"));
+    setShowDownloadModal(false);
+  }
+
+  /**
+   * Handle static SVG download
+   */
+  async function handleDownloadSvg(): Promise<void> {
+    if (!qrData) return;
+    const dataUrl = await getQRAsSVGDataUri(qrData);
+    triggerDownload(dataUrl, generateFilename(url, "svg"));
+    setShowDownloadModal(false);
+  }
+
+  /**
+   * Handle upgrade to dynamic QR code flow
+   */
+  function handleUpgradeToDynamic(): void {
     // Flush any pending draft saves before navigation
     draftControlsRef.current?.onClose();
 
@@ -194,11 +254,41 @@ function LinkLandingQRModalInner({
       url: url ?? "",
       qrDesign: draft,
       timestamp: Date.now(),
-      id: "landing",
+      id: nanoid(16), // unique id for idempotency
     });
 
+    // Navigate to register with next pointing to QR bootstrap route
+    const nextPath = `/onboarding/qr-landing?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`;
+    const params = new URLSearchParams({
+      next: nextPath,
+      [QR_ONBOARDING_SOURCE_PARAM]: QR_ONBOARDING_SOURCE_VALUE,
+    });
     window.location.href = `${APP_DOMAIN}/register?${params.toString()}`;
-  };
+  }
+
+  /**
+   * Handle login link for existing users
+   */
+  function handleLoginExistingUser(): void {
+    // Flush any pending draft saves before navigation
+    draftControlsRef.current?.onClose();
+
+    // Persist QR onboarding seed cookie for cross-subdomain handoff
+    setQROnboardingSeedCookie({
+      url: url ?? "",
+      qrDesign: draft,
+      timestamp: Date.now(),
+      id: nanoid(16),
+    });
+
+    // Navigate to login with next pointing to QR bootstrap route
+    const nextPath = `/onboarding/qr-landing?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`;
+    const params = new URLSearchParams({
+      next: nextPath,
+      [QR_ONBOARDING_SOURCE_PARAM]: QR_ONBOARDING_SOURCE_VALUE,
+    });
+    window.location.href = `${APP_DOMAIN}/login?${params.toString()}`;
+  }
 
   // Logo is not used in landing page QR creator
   const logo = undefined;
@@ -234,8 +324,9 @@ function LinkLandingQRModalInner({
     return getQRData({
       url,
       hideLogo: draft.qrHideLogo,
-      logo: undefined,
+      logo,
       fgColor: draft.qrDotsColor || draft.fgColor,
+      qrShape: draft.qrShape,
       dotsOptions: {
         type: draft.qrDotType,
         color: draft.qrDotsColor || draft.fgColor,
@@ -458,7 +549,7 @@ function LinkLandingQRModalInner({
             <Button
               variant="primary"
               text={ctaText}
-              onClick={handleContinue}
+              onClick={() => setShowDownloadModal(true)}
               disabled={!url || !qrData}
               disabledTooltip={
                 !url ? "Enter a destination URL to continue" : undefined
@@ -481,6 +572,104 @@ function LinkLandingQRModalInner({
               debounceMs={1000}
             />
           </div>
+
+          {/* Hidden anchor for triggering downloads */}
+          <a ref={downloadAnchorRef} className="hidden" />
+
+          {/* Download / Upgrade Modal */}
+          <Modal
+            showModal={showDownloadModal}
+            setShowModal={setShowDownloadModal}
+            className="sm:max-w-md"
+          >
+            <div className="flex flex-col p-6">
+              <h2 className="mb-2 text-lg font-semibold text-neutral-900">
+                Download your QR code
+              </h2>
+              <p className="mb-6 text-sm text-neutral-500">
+                Choose to download a static QR code or upgrade to a dynamic one
+                for free to track scans and update the destination anytime.
+              </p>
+
+              {/* Static Download Section */}
+              <div className="mb-6">
+                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-neutral-400">
+                  Static QR Code
+                </h3>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDownloadPng}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                  >
+                    <IconMenu
+                      text="Download PNG"
+                      icon={<Photo className="h-4 w-4" />}
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadSvg}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+                  >
+                    <IconMenu
+                      text="Download SVG"
+                      icon={<Photo className="h-4 w-4" />}
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-neutral-200" />
+                </div>
+                <div className="relative flex justify-center text-xs">
+                  <span className="bg-white px-2 text-neutral-400">or</span>
+                </div>
+              </div>
+
+              {/* Upgrade Section */}
+              <div>
+                <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-neutral-400">
+                  Dynamic QR Code
+                </h3>
+                <p className="mb-3 text-sm text-neutral-600">
+                  Create a free account to get a dynamic QR code that lets you:
+                </p>
+                <ul className="mb-4 space-y-1.5 text-sm text-neutral-600">
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    Track scans and analytics
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    Update destination URL anytime
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-green-500">✓</span>
+                    Customize design after creation
+                  </li>
+                </ul>
+                <Button
+                  variant="primary"
+                  text="Upgrade to Dynamic (Free)"
+                  onClick={handleUpgradeToDynamic}
+                  icon={<Sparkle3 className="h-4 w-4" />}
+                  className="h-11 w-full"
+                />
+                <button
+                  type="button"
+                  onClick={handleLoginExistingUser}
+                  className="mt-3 w-full text-center text-sm text-neutral-500 hover:text-neutral-700"
+                >
+                  Already have an account?{" "}
+                  <span className="font-medium underline">Log in</span>
+                </button>
+              </div>
+            </div>
+          </Modal>
         </div>
       </LinkQRModalProvider>
     </div>
