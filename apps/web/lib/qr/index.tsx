@@ -35,35 +35,35 @@ import { useEffect, useRef, useState, type JSX } from "react";
 import qrcodegen from "./codegen";
 import {
   DEFAULT_BGCOLOR,
+  DEFAULT_CORNER_DOT_TYPE,
+  DEFAULT_CORNER_SQUARE_TYPE,
   DEFAULT_DOT_TYPE,
   DEFAULT_FGCOLOR,
+  DEFAULT_FRAME_TYPE,
   DEFAULT_LEVEL,
   DEFAULT_MARGIN,
   DEFAULT_SIZE,
   ERROR_LEVEL_MAP,
-  DEFAULT_CORNER_SQUARE_TYPE,
-  DEFAULT_CORNER_DOT_TYPE,
-  DEFAULT_FRAME_TYPE,
 } from "./constants";
+import { detectEyes, isInEye } from "./eye-detector";
+import {
+  drawCornerDotCanvas,
+  drawCornerSquareCanvas,
+  generateCornerDotPath,
+  generateCornerSquarePath,
+} from "./eye-patterns";
+import { getFramePadding, renderCanvasFrame, renderSVGFrame } from "./frames";
 import { DotType, DotsOptions, Modules, QRProps, QRPropsCanvas } from "./types";
 import {
   SUPPORTS_PATH2D,
   createGetNeighbor,
   excavateModules,
   generatePath,
-  getImageSettings,
-  getCircularBorderParams,
-  shouldPlaceCircularBorderDot,
   getBorderDotSizeAt,
+  getCircularBorderParams,
+  getImageSettings,
+  shouldPlaceCircularBorderDot,
 } from "./utils";
-import { detectEyes, isInEye } from "./eye-detector";
-import {
-  drawCornerSquareCanvas,
-  drawCornerDotCanvas,
-  generateCornerSquarePath,
-  generateCornerDotPath,
-} from "./eye-patterns";
-import { renderCanvasFrame, getFramePadding, renderSVGFrame } from "./frames";
 export * from "./types";
 export * from "./utils";
 
@@ -149,7 +149,9 @@ function renderCanvasCornerDots(
   const params = getCircularBorderParams(numCells, margin);
 
   // Build occupancy grid first, so we can apply neighbor-aware styling like core modules
-  const borderCells: boolean[][] = Array.from({ length: params.gridSize }, () => Array(params.gridSize).fill(false));
+  const borderCells: boolean[][] = Array.from({ length: params.gridSize }, () =>
+    Array(params.gridSize).fill(false),
+  );
   for (let y = 0; y < params.gridSize; y += 1) {
     for (let x = 0; x < params.gridSize; x += 1) {
       borderCells[y][x] = shouldPlaceCircularBorderDot(x, y, params);
@@ -199,7 +201,9 @@ function renderCanvasCornerDots(
             ctx.fill();
             continue;
           } else if (neighborCount === 0) {
-            const r = useExtraRounded ? localSize / 2 : Math.min(localSize / 2, 0.45);
+            const r = useExtraRounded
+              ? localSize / 2
+              : Math.min(localSize / 2, 0.45);
             ctx.arc(cx, cy, r, 0, Math.PI * 2);
           } else if (neighborCount === 1) {
             // Side-rounded (round the side WITHOUT neighbor)
@@ -208,13 +212,27 @@ function renderCanvasCornerDots(
               ctx.moveTo(mx, my);
               ctx.lineTo(mx, my + localSize);
               ctx.lineTo(mx + localSize / 2, my + localSize);
-              ctx.arc(mx + localSize / 2, cy, r, Math.PI / 2, -Math.PI / 2, false);
+              ctx.arc(
+                mx + localSize / 2,
+                cy,
+                r,
+                Math.PI / 2,
+                -Math.PI / 2,
+                false,
+              );
               ctx.closePath();
             } else if (right) {
               ctx.moveTo(mx + localSize, my);
               ctx.lineTo(mx + localSize, my + localSize);
               ctx.lineTo(mx + localSize / 2, my + localSize);
-              ctx.arc(mx + localSize / 2, cy, r, Math.PI / 2, -Math.PI / 2, true);
+              ctx.arc(
+                mx + localSize / 2,
+                cy,
+                r,
+                Math.PI / 2,
+                -Math.PI / 2,
+                true,
+              );
               ctx.closePath();
             } else if (top) {
               ctx.moveTo(mx, my);
@@ -235,7 +253,14 @@ function renderCanvasCornerDots(
             if (left && top) rotation = Math.PI / 2;
             else if (top && right) rotation = Math.PI;
             else if (right && bottom) rotation = -Math.PI / 2;
-            drawCornerRoundedWithRotation(ctx, mx, my, localSize, rotation, useExtraRounded);
+            drawCornerRoundedWithRotation(
+              ctx,
+              mx,
+              my,
+              localSize,
+              rotation,
+              useExtraRounded,
+            );
             ctx.fill();
             continue;
           }
@@ -266,7 +291,13 @@ function renderCanvasCornerDots(
             ctx.moveTo(mx, my);
             ctx.lineTo(mx + localSize, my);
             ctx.lineTo(mx + localSize, my + r);
-            ctx.arcTo(mx + localSize, my + localSize, mx + localSize - r, my + localSize, r);
+            ctx.arcTo(
+              mx + localSize,
+              my + localSize,
+              mx + localSize - r,
+              my + localSize,
+              r,
+            );
             ctx.lineTo(mx, my + localSize);
             ctx.closePath();
           } else {
@@ -293,7 +324,7 @@ function renderCanvasModules(
   cells: Modules,
   margin: number,
   dotType: DotType,
-  eyes: ReturnType<typeof detectEyes> = []
+  eyes: ReturnType<typeof detectEyes> = [],
 ) {
   // Use unified path generation for all dot types when possible to avoid seams
   if (SUPPORTS_PATH2D) {
@@ -395,7 +426,14 @@ function renderCanvasModules(
               }
               // bottom && left uses rotation = 0 (default)
 
-              drawCornerRoundedWithRotation(ctx, mx, my, 1, rotation, useExtraRounded);
+              drawCornerRoundedWithRotation(
+                ctx,
+                mx,
+                my,
+                1,
+                rotation,
+                useExtraRounded,
+              );
               return; // drawCornerRoundedWithRotation handles fill
             } else {
               // Inline neighbors (opposite) - use square
@@ -523,11 +561,15 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
       const paramsLocal = getCircularBorderParams(numCells, margin);
       const scalePxPerCell = size / numCells;
       // Align shape padding with border grid extent (gridOffset), not viewBox rounding
-      const shapePaddingPxLocal = qrShape === "circle" ? paramsLocal.gridOffset * scalePxPerCell : 0;
+      const shapePaddingPxLocal =
+        qrShape === "circle" ? paramsLocal.gridOffset * scalePxPerCell : 0;
 
       // Calculate frame padding on the full visual size (core + border) - matches SVG approach
       const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
-      const framePadding = getFramePadding(size + shapePaddingPxLocal * 2, frameType);
+      const framePadding = getFramePadding(
+        size + shapePaddingPxLocal * 2,
+        frameType,
+      );
 
       const outputSize = size + shapePaddingPxLocal * 2 + framePadding * 2;
 
@@ -545,7 +587,10 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
 
       // Translate to account for frame and shape padding
       ctx.save();
-      ctx.translate((framePadding + shapePaddingPxLocal) * pixelRatio, (framePadding + shapePaddingPxLocal) * pixelRatio);
+      ctx.translate(
+        (framePadding + shapePaddingPxLocal) * pixelRatio,
+        (framePadding + shapePaddingPxLocal) * pixelRatio,
+      );
       ctx.scale(scale, scale);
 
       // Detect eye positions for custom rendering
@@ -570,8 +615,10 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
       renderCanvasModules(ctx, cells, margin, dotType, eyes);
 
       // Render eyes with custom patterns
-      const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
-      const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
+      const cornerSquareType =
+        eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+      const cornerDotType =
+        eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
       const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
       const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
 
@@ -602,10 +649,11 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
         ctx.scale(pixelRatio, pixelRatio);
         renderCanvasFrame(ctx, {
           frameOptions,
-          qrSize: (function(){
+          qrSize: (function () {
             if (qrShape !== "circle") return size;
             const paramsLocal = getCircularBorderParams(numCells, margin);
-            const extendedViewBoxLocal = Math.ceil(paramsLocal.circleRadius * 2) + margin * 2;
+            const extendedViewBoxLocal =
+              Math.ceil(paramsLocal.circleRadius * 2) + margin * 2;
             const viewBoxOffsetLocal = (extendedViewBoxLocal - numCells) / 2;
             const shapePaddingLocal = viewBoxOffsetLocal * (size / numCells);
             return size + shapePaddingLocal * 2;
@@ -634,9 +682,13 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
     ).getModules();
     const numCellsForStyle = cellsForStyle.length + margin * 2;
     const paramsStyle = getCircularBorderParams(numCellsForStyle, margin);
-    const shapePaddingPxStyle = paramsStyle.gridOffset * (size / numCellsForStyle);
+    const shapePaddingPxStyle =
+      paramsStyle.gridOffset * (size / numCellsForStyle);
     // Calculate frame padding on the full visual size (core + border)
-    const framePaddingStyle = getFramePadding(size + shapePaddingPxStyle * 2, frameType);
+    const framePaddingStyle = getFramePadding(
+      size + shapePaddingPxStyle * 2,
+      frameType,
+    );
     outputSize = size + shapePaddingPxStyle * 2 + framePaddingStyle * 2;
   } else {
     const framePaddingStyle = getFramePadding(size, frameType);
@@ -675,12 +727,19 @@ export function QRCodeCanvas(props: QRPropsCanvas) {
 /**
  * Generate corner dots as SVG string for circular QR codes
  */
-function generateCornerDotsString(numCells: number, margin: number, dotType: DotType, color: string): string {
+function generateCornerDotsString(
+  numCells: number,
+  margin: number,
+  dotType: DotType,
+  color: string,
+): string {
   const dots: string[] = [];
   const params = getCircularBorderParams(numCells, margin);
 
   // Build occupancy grid for neighbor-aware shapes
-  const borderCells: boolean[][] = Array.from({ length: params.gridSize }, () => Array(params.gridSize).fill(false));
+  const borderCells: boolean[][] = Array.from({ length: params.gridSize }, () =>
+    Array(params.gridSize).fill(false),
+  );
   for (let y = 0; y < params.gridSize; y += 1) {
     for (let x = 0; x < params.gridSize; x += 1) {
       borderCells[y][x] = shouldPlaceCircularBorderDot(x, y, params);
@@ -740,9 +799,20 @@ function generateCornerDotsString(numCells: number, margin: number, dotType: Dot
             }
           } else if (neighborCount === 2 && !hasOpposites) {
             // Two perpendicular neighbors: corner-rounded (round the corner WITHOUT neighbors)
-            console.log('[SVG Export] Perpendicular corner detected:', { x, y, left, right, top, bottom, localSize, useExtraRounded });
+            console.log("[SVG Export] Perpendicular corner detected:", {
+              x,
+              y,
+              left,
+              right,
+              top,
+              bottom,
+              localSize,
+              useExtraRounded,
+            });
             // Cap radius to avoid gaps between adjacent dots
-            const r = useExtraRounded ? localSize : Math.min(localSize / 2, 0.45);
+            const r = useExtraRounded
+              ? localSize
+              : Math.min(localSize / 2, 0.45);
             if (left && top) {
               // Neighbors on left and top, round bottom-right corner
               dotPath = `M${dotX},${dotY} L${dotX + localSize},${dotY} L${dotX + localSize},${dotY + localSize - r} A${r},${r} 0 0 1 ${dotX + localSize - r},${dotY + localSize} L${dotX},${dotY + localSize} z`;
@@ -818,16 +888,23 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     if (calculatedImageSettings.excavation != null)
       cells = excavateModules(cells, calculatedImageSettings.excavation);
 
-    const base64Image = await getBase64Image(imageSettings.src);
+    try {
+      const base64Image = await getBase64Image(imageSettings.src);
 
-    image = [
-      `<image href="${base64Image}"`,
-      `height="${calculatedImageSettings.h}"`,
-      `width="${calculatedImageSettings.w}"`,
-      `x="${calculatedImageSettings.x + margin}"`,
-      `y="${calculatedImageSettings.y + margin}"`,
-      'preserveAspectRatio="none"></image>',
-    ].join(" ");
+      image = [
+        `<image href="${base64Image}"`,
+        `height="${calculatedImageSettings.h}"`,
+        `width="${calculatedImageSettings.w}"`,
+        `x="${calculatedImageSettings.x + margin}"`,
+        `y="${calculatedImageSettings.y + margin}"`,
+        'preserveAspectRatio="none"></image>',
+      ].join(" ");
+    } catch (error) {
+      console.error("[QR] Failed to load logo for SVG export; skipping logo.", {
+        src: imageSettings.src,
+        error,
+      });
+    }
   }
 
   const eyes = detectEyes(cells);
@@ -836,50 +913,73 @@ export async function getQRAsSVGDataUri(props: QRProps) {
   const fgPath = generatePath(cells, margin, dotType, eyes);
 
   // Generate eye patterns (inline to avoid JSX in this function)
-  const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+  const cornerSquareType =
+    eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
   const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
   const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
   const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
 
-  const eyePaths = eyes.map((eye) => {
-    const squarePath = generateCornerSquarePath(eye, cornerSquareType, margin);
-    const dotPath = generateCornerDotPath(eye, cornerDotType, margin);
-    return [
-      `<path fill="${cornerSquareColor}" d="${squarePath}" shapeRendering="crispEdges" fill-rule="evenodd" clip-rule="evenodd"></path>`,
-      `<path fill="${cornerDotColor}" d="${dotPath}" shapeRendering="crispEdges"></path>`,
-    ].join("");
-  }).join("");
+  const eyePaths = eyes
+    .map((eye) => {
+      const squarePath = generateCornerSquarePath(
+        eye,
+        cornerSquareType,
+        margin,
+      );
+      const dotPath = generateCornerDotPath(eye, cornerDotType, margin);
+      return [
+        `<path fill="${cornerSquareColor}" d="${squarePath}" shapeRendering="crispEdges" fill-rule="evenodd" clip-rule="evenodd"></path>`,
+        `<path fill="${cornerDotColor}" d="${dotPath}" shapeRendering="crispEdges"></path>`,
+      ].join("");
+    })
+    .join("");
 
   // Calculate frame parameters
   const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
 
   // Corner dots and shape padding to preserve QR core size
-  const cornerDots = qrShape === "circle" ? generateCornerDotsString(numCells, margin, dotType, dotsColor) : "";
+  const cornerDots =
+    qrShape === "circle"
+      ? generateCornerDotsString(numCells, margin, dotType, dotsColor)
+      : "";
   const params = getCircularBorderParams(numCells, margin);
-  const extendedViewBoxSize = qrShape === "circle" ? Math.ceil(params.circleRadius * 2) + margin * 2 : numCells;
-  const viewBoxOffset = qrShape === "circle" ? (extendedViewBoxSize - numCells) / 2 : 0; // in cell units
+  const extendedViewBoxSize =
+    qrShape === "circle"
+      ? Math.ceil(params.circleRadius * 2) + margin * 2
+      : numCells;
+  const viewBoxOffset =
+    qrShape === "circle" ? (extendedViewBoxSize - numCells) / 2 : 0; // in cell units
   const scalePxPerCell = size / numCells;
-  const shapePaddingPx = qrShape === "circle" ? params.gridOffset * scalePxPerCell : 0;
+  const shapePaddingPx =
+    qrShape === "circle" ? params.gridOffset * scalePxPerCell : 0;
 
   // Frame padding computed on the full visual size (core + border)
-  const framePaddingForFrame = getFramePadding(size + shapePaddingPx * 2, frameType);
+  const framePaddingForFrame = getFramePadding(
+    size + shapePaddingPx * 2,
+    frameType,
+  );
   const outputSize = size + shapePaddingPx * 2 + framePaddingForFrame * 2;
 
   // Frame surrounds the full visual content
-  const frameSVG = frameOptions && frameOptions.type && frameOptions.type !== "none"
-    ? renderSVGFrame({
-        frameOptions,
-        qrSize: size + shapePaddingPx * 2,
-        margin: 0,
-      })
-    : "";
+  const frameSVG =
+    frameOptions && frameOptions.type && frameOptions.type !== "none"
+      ? renderSVGFrame({
+          frameOptions,
+          qrSize: size + shapePaddingPx * 2,
+          margin: 0,
+        })
+      : "";
 
   // Build outer SVG with background, corner dots group, and nested core SVG
-  const cornerDotsGroup = qrShape === "circle" && cornerDots
-    ? `<g transform="translate(${framePaddingForFrame + shapePaddingPx}, ${framePaddingForFrame + shapePaddingPx}) scale(${scalePxPerCell})">${cornerDots}</g>`
-    : "";
+  const cornerDotsGroup =
+    qrShape === "circle" && cornerDots
+      ? `<g transform="translate(${framePaddingForFrame + shapePaddingPx}, ${framePaddingForFrame + shapePaddingPx}) scale(${scalePxPerCell})">${cornerDots}</g>`
+      : "";
 
-  const coreBgStr = qrShape === "circle" ? "" : `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`;
+  const coreBgStr =
+    qrShape === "circle"
+      ? ""
+      : `<path fill="${bgColor}" d="M0,0 h${numCells}v${numCells}H0z" shapeRendering="crispEdges"></path>`;
   const coreSvg = [
     `<svg x="${framePaddingForFrame + shapePaddingPx}" y="${framePaddingForFrame + shapePaddingPx}" width="${size}" height="${size}" viewBox="0 0 ${numCells} ${numCells}">`,
     coreBgStr,
@@ -897,7 +997,9 @@ export async function getQRAsSVGDataUri(props: QRProps) {
     `<rect fill="${bgColor}" x="0" y="0" width="${outputSize}" height="${outputSize}" />`,
     cornerDotsGroup,
     coreSvg,
-    frameSVG ? `<g transform="translate(${frameOffset}, ${frameOffset})">${frameSVG}</g>` : "",
+    frameSVG
+      ? `<g transform="translate(${frameOffset}, ${frameOffset})">${frameSVG}</g>`
+      : "",
     "</svg>",
   ].join("");
 
@@ -907,8 +1009,8 @@ export async function getQRAsSVGDataUri(props: QRProps) {
 const getBase64Image = (imgUrl: string) => {
   return new Promise(function (resolve, reject) {
     const img = new Image();
-    img.src = imgUrl;
     img.setAttribute("crossOrigin", "anonymous");
+    img.src = imgUrl;
 
     img.onload = function () {
       const canvas = document.createElement("canvas");
@@ -924,20 +1026,37 @@ const getBase64Image = (imgUrl: string) => {
     };
 
     img.onerror = function () {
-      reject("The image could not be loaded.");
+      reject(
+        `Failed to load image from ${imgUrl}. Check CORS configuration or network availability.`,
+      );
     };
   });
 };
 
 function waitUntilImageLoaded(img: HTMLImageElement, src: string) {
-  return new Promise((resolve) => {
-    function onFinish() {
+  return new Promise((resolve, reject) => {
+    function cleanup() {
       img.onload = null;
       img.onerror = null;
+    }
+
+    function onLoad() {
+      cleanup();
       resolve(true);
     }
-    img.onload = onFinish;
-    img.onerror = onFinish;
+
+    function onError() {
+      cleanup();
+      reject(new Error(`Failed to load image from ${src}`));
+    }
+
+    img.onload = onLoad;
+    img.onerror = onError;
+
+    if (!img.crossOrigin) {
+      img.crossOrigin = "anonymous";
+    }
+
     img.src = src;
     img.loading = "eager";
   });
@@ -979,20 +1098,38 @@ export async function getQRAsCanvas(
 
   const image = new Image();
   image.crossOrigin = "anonymous";
+  let imageLoadFailed = false;
+
   if (calculatedImageSettings) {
-    // @ts-expect-error: imageSettings is not null
-    await waitUntilImageLoaded(image, imageSettings.src);
-    if (calculatedImageSettings.excavation != null) {
-      cells = excavateModules(cells, calculatedImageSettings.excavation);
+    try {
+      // @ts-expect-error: imageSettings is not null
+      await waitUntilImageLoaded(image, imageSettings.src);
+      if (calculatedImageSettings.excavation != null) {
+        cells = excavateModules(cells, calculatedImageSettings.excavation);
+      }
+    } catch (error) {
+      console.error(
+        "[QR] Failed to load logo for canvas export; skipping logo.",
+        {
+          // @ts-expect-error: imageSettings is not null
+          src: imageSettings.src,
+          error,
+        },
+      );
+      imageLoadFailed = true;
     }
   }
 
   // Compute shape padding so the QR core remains the same pixel size
   const params = getCircularBorderParams(numCells, margin);
-  const extendedViewBoxSize = qrShape === "circle" ? Math.ceil(params.circleRadius * 2) + margin * 2 : numCells;
+  const extendedViewBoxSize =
+    qrShape === "circle"
+      ? Math.ceil(params.circleRadius * 2) + margin * 2
+      : numCells;
   const scalePxPerCell = size / numCells;
   // Align shape padding with border grid extent (gridOffset), not viewBox rounding
-  const shapePaddingPx = qrShape === "circle" ? params.gridOffset * scalePxPerCell : 0;
+  const shapePaddingPx =
+    qrShape === "circle" ? params.gridOffset * scalePxPerCell : 0;
 
   // Calculate frame padding on the full visual size (core + border) - matches SVG approach
   const frameType = frameOptions?.type ?? DEFAULT_FRAME_TYPE;
@@ -1010,7 +1147,10 @@ export async function getQRAsCanvas(
 
   // Translate to account for frame + shape padding
   ctx.save();
-  ctx.translate((framePadding + shapePaddingPx) * pixelRatio, (framePadding + shapePaddingPx) * pixelRatio);
+  ctx.translate(
+    (framePadding + shapePaddingPx) * pixelRatio,
+    (framePadding + shapePaddingPx) * pixelRatio,
+  );
   ctx.scale(scale, scale);
 
   const eyes = detectEyes(cells);
@@ -1034,7 +1174,8 @@ export async function getQRAsCanvas(
   renderCanvasModules(ctx, cells, margin, dotType, eyes);
 
   // Render eyes with custom patterns
-  const cornerSquareType = eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
+  const cornerSquareType =
+    eyeOptions?.cornerSquare?.type ?? DEFAULT_CORNER_SQUARE_TYPE;
   const cornerDotType = eyeOptions?.cornerDot?.type ?? DEFAULT_CORNER_DOT_TYPE;
   const cornerSquareColor = eyeOptions?.cornerSquare?.color ?? fgColor;
   const cornerDotColor = eyeOptions?.cornerDot?.color ?? fgColor;
@@ -1048,6 +1189,7 @@ export async function getQRAsCanvas(
   });
 
   const haveImageToRender =
+    !imageLoadFailed &&
     calculatedImageSettings != null &&
     image !== null &&
     image.complete &&
