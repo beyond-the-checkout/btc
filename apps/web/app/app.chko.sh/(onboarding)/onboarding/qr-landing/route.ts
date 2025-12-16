@@ -69,6 +69,19 @@ export async function GET(req: Request) {
     const seedCookie = cookieStore.get(QR_ONBOARDING_SEED_COOKIE);
     const seed = parseQROnboardingSeed(seedCookie?.value);
 
+    // 3. CSRF validation: seedId in URL must match id in cookie
+    // This prevents CSRF attacks where an attacker tricks a user into
+    // visiting this route - they can't know the random ID in the cookie
+    const requestUrl = new URL(req.url);
+    const urlSeedId = requestUrl.searchParams.get("seedId");
+    if (seed?.id && urlSeedId !== seed.id) {
+      console.error("CSRF validation failed: seedId mismatch", {
+        urlSeedId,
+        cookieSeedId: seed.id,
+      });
+      return NextResponse.redirect(new URL("/onboarding", origin));
+    }
+
     // If no seed, redirect to dashboard directly
     if (!seed?.url) {
       const defaultWorkspace = session.user.defaultWorkspace;
@@ -81,7 +94,7 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL("/onboarding", origin));
     }
 
-    // 3. Determine target workspace
+    // 4. Determine target workspace
     let workspace: { id: string; slug: string; plan: PlanProps } | null = null;
 
     // Check if user has a default workspace
@@ -134,7 +147,7 @@ export async function GET(req: Request) {
       }
     }
 
-    // 4. Create the first dynamic link with QR design
+    // 5. Create the first dynamic link with QR design
     // Convert QR design to link fields and sanitize based on plan
     const qrFields = sanitizeQrFieldsForPlan(
       qrDesignToLinkQRFields(seed.qrDesign),
@@ -172,13 +185,13 @@ export async function GET(req: Request) {
 
       const link = await createLink(fallbackResult.link);
 
-      // 5. Verify link is fully committed before redirect
+      // 6. Verify link is fully committed before redirect
       await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
 
-      // 6. Mark onboarding complete
+      // 7. Mark onboarding complete
       await redis.set(`onboarding-step:${userId}`, "completed");
 
-      // 7. Clear the seed cookie and redirect
+      // 8. Clear the seed cookie and redirect
       const hostname = new URL(req.url).hostname;
       const cookieOpts = getServerCookieOptions(hostname);
       const response = NextResponse.redirect(
@@ -196,15 +209,15 @@ export async function GET(req: Request) {
 
     const link = await createLink(processedResult.link);
 
-    // 5. Verify link is fully committed before redirect
+    // 6. Verify link is fully committed before redirect
     // This guards against potential read-replica lag in PlanetScale/Vitess
     // where the WelcomeModal might fetch the link before it's visible
     await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
 
-    // 6. Mark onboarding complete
+    // 7. Mark onboarding complete
     await redis.set(`onboarding-step:${userId}`, "completed");
 
-    // 7. Clear the seed cookie and redirect to dashboard
+    // 8. Clear the seed cookie and redirect to dashboard
     const hostname = new URL(req.url).hostname;
     const cookieOpts = getServerCookieOptions(hostname);
     const response = NextResponse.redirect(

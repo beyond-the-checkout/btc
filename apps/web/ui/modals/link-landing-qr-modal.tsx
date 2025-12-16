@@ -249,16 +249,20 @@ function LinkLandingQRModalInner({
     // Flush any pending draft saves before navigation
     draftControlsRef.current?.onClose();
 
+    // Generate unique seed ID for idempotency and CSRF protection
+    const seedId = nanoid(16);
+
     // Persist QR onboarding seed cookie for cross-subdomain handoff
     setQROnboardingSeedCookie({
       url: url ?? "",
       qrDesign: draft,
       timestamp: Date.now(),
-      id: nanoid(16), // unique id for idempotency
+      id: seedId,
     });
 
     // Navigate to register with next pointing to QR bootstrap route
-    const nextPath = `/onboarding/qr-landing?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`;
+    // Include seedId in URL for CSRF validation (must match cookie)
+    const nextPath = `/onboarding/qr-landing?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}&seedId=${seedId}`;
     const params = new URLSearchParams({
       next: nextPath,
       [QR_ONBOARDING_SOURCE_PARAM]: QR_ONBOARDING_SOURCE_VALUE,
@@ -273,16 +277,20 @@ function LinkLandingQRModalInner({
     // Flush any pending draft saves before navigation
     draftControlsRef.current?.onClose();
 
+    // Generate unique seed ID for idempotency and CSRF protection
+    const seedId = nanoid(16);
+
     // Persist QR onboarding seed cookie for cross-subdomain handoff
     setQROnboardingSeedCookie({
       url: url ?? "",
       qrDesign: draft,
       timestamp: Date.now(),
-      id: nanoid(16),
+      id: seedId,
     });
 
     // Navigate to login with next pointing to QR bootstrap route
-    const nextPath = `/onboarding/qr-landing?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}`;
+    // Include seedId in URL for CSRF validation (must match cookie)
+    const nextPath = `/onboarding/qr-landing?${QR_ONBOARDING_SOURCE_PARAM}=${QR_ONBOARDING_SOURCE_VALUE}&seedId=${seedId}`;
     const params = new URLSearchParams({
       next: nextPath,
       [QR_ONBOARDING_SOURCE_PARAM]: QR_ONBOARDING_SOURCE_VALUE,
