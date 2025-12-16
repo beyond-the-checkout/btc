@@ -13,6 +13,7 @@ import {
   buildQrFilename,
   buildQrRenderData,
   getQRAsCanvas,
+  getQRAsSVGDataUri,
   resolveLogo,
   toQRDataInput,
 } from "@/lib/qr";
@@ -106,7 +107,9 @@ function WelcomeModal({
   // State for fetched link
   const [fetchedLink, setFetchedLink] = useState<FetchedLink | null>(null);
   const [loadingLink, setLoadingLink] = useState(false);
-  const [downloading, setDownloading] = useState(false);
+  const [downloadingFormat, setDownloadingFormat] = useState<
+    "png" | "svg" | null
+  >(null);
 
   // Fetch link when qrLinkId is present
   useEffect(() => {
@@ -216,15 +219,26 @@ function WelcomeModal({
     const mergedDesign = {
       fgColor: seedDesign?.fgColor ?? "#000000",
       qrHideLogo: fetchedLink.qrHideLogo ?? seedDesign?.qrHideLogo ?? false,
-      qrDotType: (fetchedLink.qrDotType ?? seedDesign?.qrDotType ?? "square") as any,
-      qrCornerSquareType: (fetchedLink.qrCornerSquareType ?? seedDesign?.qrCornerSquareType ?? "square") as any,
-      qrCornerDotType: (fetchedLink.qrCornerDotType ?? seedDesign?.qrCornerDotType ?? "square") as any,
-      qrShape: (fetchedLink.qrShape ?? seedDesign?.qrShape ?? "square") as "square" | "circle",
-      qrFrameStyle: (fetchedLink.qrFrameStyle ?? seedDesign?.qrFrameStyle) as any,
+      qrDotType: (fetchedLink.qrDotType ??
+        seedDesign?.qrDotType ??
+        "square") as any,
+      qrCornerSquareType: (fetchedLink.qrCornerSquareType ??
+        seedDesign?.qrCornerSquareType ??
+        "square") as any,
+      qrCornerDotType: (fetchedLink.qrCornerDotType ??
+        seedDesign?.qrCornerDotType ??
+        "square") as any,
+      qrShape: (fetchedLink.qrShape ?? seedDesign?.qrShape ?? "square") as
+        | "square"
+        | "circle",
+      qrFrameStyle: (fetchedLink.qrFrameStyle ??
+        seedDesign?.qrFrameStyle) as any,
       qrFrameColor: fetchedLink.qrFrameColor ?? seedDesign?.qrFrameColor,
       qrDotsColor: fetchedLink.qrDotsColor ?? seedDesign?.qrDotsColor,
-      qrCornerSquareColor: fetchedLink.qrCornerSquareColor ?? seedDesign?.qrCornerSquareColor,
-      qrCornerDotColor: fetchedLink.qrCornerDotColor ?? seedDesign?.qrCornerDotColor,
+      qrCornerSquareColor:
+        fetchedLink.qrCornerSquareColor ?? seedDesign?.qrCornerSquareColor,
+      qrCornerDotColor:
+        fetchedLink.qrCornerDotColor ?? seedDesign?.qrCornerDotColor,
     };
 
     const renderData = buildQrRenderData(mergedDesign, {
@@ -236,14 +250,29 @@ function WelcomeModal({
     return toQRDataInput(renderData);
   }, [fetchedLink, latest, logo]);
 
-  // Download handler for the dynamic QR
+  // Common cleanup after successful download
+  const cleanupAfterDownload = useCallback(() => {
+    clearQROnboardingSeedCookie();
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(LANDING_DRAFT_STORAGE_KEY);
+      }
+    } catch {
+      // no-op
+    }
+    queryParams({
+      del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
+    });
+    setShowWelcomeModal(false);
+  }, [queryParams, setShowWelcomeModal]);
+
+  // Download handler for PNG
   const handleDownloadQrPng = useCallback(async () => {
     if (!qrData || !downloadAnchorRef.current) return;
-    setDownloading(true);
+    setDownloadingFormat("png");
     try {
       const dataUrl = await getQRAsCanvas(qrData, "image/png");
       downloadAnchorRef.current.href = dataUrl as string;
-      // Use standardized filename utility
       downloadAnchorRef.current.download = buildQrFilename({
         mode: "dynamic",
         extension: "png",
@@ -251,28 +280,35 @@ function WelcomeModal({
         linkDomain: fetchedLink?.domain,
       });
       downloadAnchorRef.current.click();
-
-      // Clear artifacts after successful download
-      clearQROnboardingSeedCookie();
-      try {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem(LANDING_DRAFT_STORAGE_KEY);
-        }
-      } catch {
-        // no-op
-      }
-
-      // Clear URL params and close modal
-      queryParams({
-        del: [...WELCOME_QUERY_KEYS_TO_CLEAR],
-      });
-      setShowWelcomeModal(false);
+      cleanupAfterDownload();
     } catch (err) {
-      console.error("Failed to download QR:", err);
+      console.error("Failed to download QR PNG:", err);
     } finally {
-      setDownloading(false);
+      setDownloadingFormat(null);
     }
-  }, [qrData, fetchedLink, queryParams, setShowWelcomeModal]);
+  }, [qrData, fetchedLink, cleanupAfterDownload]);
+
+  // Download handler for SVG
+  const handleDownloadQrSvg = useCallback(async () => {
+    if (!qrData || !downloadAnchorRef.current) return;
+    setDownloadingFormat("svg");
+    try {
+      const dataUrl = await getQRAsSVGDataUri(qrData);
+      downloadAnchorRef.current.href = dataUrl;
+      downloadAnchorRef.current.download = buildQrFilename({
+        mode: "dynamic",
+        extension: "svg",
+        linkKey: fetchedLink?.key,
+        linkDomain: fetchedLink?.domain,
+      });
+      downloadAnchorRef.current.click();
+      cleanupAfterDownload();
+    } catch (err) {
+      console.error("Failed to download QR SVG:", err);
+    } finally {
+      setDownloadingFormat(null);
+    }
+  }, [qrData, fetchedLink, cleanupAfterDownload]);
 
   const handleResumeQr = useCallback((): void => {
     // Important: clear URL params BEFORE opening the builder to avoid ModalProvider re-triggering
@@ -410,14 +446,38 @@ function WelcomeModal({
           </div>
           {shouldShowQrDownloadVariant ? (
             <div className="mt-2 flex flex-col gap-2">
-              <Button
-                type="button"
-                variant="primary"
-                text={downloading ? "Downloading..." : "Download PNG"}
-                loading={downloading || loadingLink}
-                disabled={!fetchedLink || !qrData}
-                onClick={handleDownloadQrPng}
-              />
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="primary"
+                  text={
+                    downloadingFormat === "png"
+                      ? "Downloading..."
+                      : "Download PNG"
+                  }
+                  loading={downloadingFormat === "png" || loadingLink}
+                  disabled={
+                    !fetchedLink || !qrData || downloadingFormat !== null
+                  }
+                  onClick={handleDownloadQrPng}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="primary"
+                  text={
+                    downloadingFormat === "svg"
+                      ? "Downloading..."
+                      : "Download SVG"
+                  }
+                  loading={downloadingFormat === "svg" || loadingLink}
+                  disabled={
+                    !fetchedLink || !qrData || downloadingFormat !== null
+                  }
+                  onClick={handleDownloadQrSvg}
+                  className="flex-1"
+                />
+              </div>
               <Button
                 type="button"
                 variant="secondary"

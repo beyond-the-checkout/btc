@@ -7,10 +7,10 @@
 
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, type RefObject } from "react";
 import { toast } from "sonner";
 import { getQRAsCanvas, getQRAsSVGDataUri, type QRProps } from "./index";
-import { buildQrFilename } from "./render";
+import { buildQrFilename, type QrFileExtension } from "./render";
 
 export type QrDownloadMode = "dynamic" | "static";
 
@@ -33,7 +33,7 @@ export type UseQrDownloadsOptions = {
 
 export type UseQrDownloadsReturn = {
   /** Hidden anchor ref - must be rendered in component */
-  anchorRef: React.RefObject<HTMLAnchorElement | null>;
+  anchorRef: RefObject<HTMLAnchorElement | null>;
   /** Download as PNG */
   downloadPng: () => Promise<void>;
   /** Download as SVG */
@@ -84,24 +84,21 @@ export function useQrDownloads(
   /**
    * Trigger download via hidden anchor element
    */
-  const triggerDownload = useCallback(
-    (dataUrl: string, filename: string) => {
-      if (!anchorRef.current) {
-        console.error("[useQrDownloads] Anchor ref not available");
-        return;
-      }
-      anchorRef.current.href = dataUrl;
-      anchorRef.current.download = filename;
-      anchorRef.current.click();
-    },
-    [],
-  );
+  const triggerDownload = useCallback((dataUrl: string, filename: string) => {
+    if (!anchorRef.current) {
+      console.error("[useQrDownloads] Anchor ref not available");
+      return;
+    }
+    anchorRef.current.href = dataUrl;
+    anchorRef.current.download = filename;
+    anchorRef.current.click();
+  }, []);
 
   /**
    * Generate filename for given format
    */
   const getFilename = useCallback(
-    (extension: string) => {
+    (extension: QrFileExtension) => {
       return buildQrFilename({
         mode,
         extension,

@@ -78,6 +78,14 @@ export type BuildQrRenderOptions = {
  */
 export type QrRenderData = {
   url: string;
+  /**
+   * The resolved primary foreground color for the QR code.
+   *
+   * Note: This is set to the resolved dots color (qrDotsColor → fgColor → defaultColor),
+   * NOT the raw fgColor input from the design. This intentional behavior ensures
+   * consistency when the QR is passed to downstream components, as the top-level
+   * fgColor is used as a fallback by many rendering functions.
+   */
   fgColor: string;
   hideLogo: boolean;
   logo: string | undefined;
@@ -118,6 +126,12 @@ function resolveColor(
 /**
  * Build frame options from design, applying normalization.
  * Returns undefined if no frame is specified.
+ *
+ * Note: This function does not validate frame/shape compatibility (e.g., circle frames
+ * on square QR codes). The UI layer is responsible for ensuring that only compatible
+ * frame styles are presented to the user based on the selected QR shape. The frame
+ * rendering functions will render whatever combination is provided, which may result
+ * in visual inconsistencies if incompatible options are combined.
  */
 function buildFrameOptions(
   design: Partial<QRDesignInput>,
@@ -316,6 +330,9 @@ export function canToggleLogo(surface: QRSurface, plan?: string): boolean {
   return plan !== "free" && plan !== undefined;
 }
 
+/** Valid QR download file extensions */
+export type QrFileExtension = "png" | "svg" | "jpg" | "jpeg";
+
 /**
  * Generate a standardized filename for QR code downloads.
  *
@@ -325,19 +342,21 @@ export function canToggleLogo(surface: QRSurface, plan?: string): boolean {
  * - Fallback: `qr-code.{ext}`
  *
  * @param mode - "dynamic" for short links, "static" for direct URLs
- * @param extension - File extension (png, svg, jpg)
+ * @param extension - File extension (png, svg, jpg, jpeg). Note: jpeg is normalized to jpg.
  * @param linkKey - Short link key (for dynamic mode)
  * @param linkDomain - Short link domain (for dynamic mode)
  * @param destinationUrl - Target URL (for static mode)
  */
 export function buildQrFilename(options: {
   mode: "dynamic" | "static";
-  extension: string;
+  extension: QrFileExtension;
   linkKey?: string;
   linkDomain?: string;
   destinationUrl?: string;
 }): string {
-  const { mode, extension, linkKey, linkDomain, destinationUrl } = options;
+  const { mode, linkKey, linkDomain, destinationUrl } = options;
+  // Normalize jpeg to jpg for consistency
+  const extension = options.extension === "jpeg" ? "jpg" : options.extension;
 
   if (mode === "dynamic" && linkKey) {
     // Dynamic: use link key (optionally with domain)

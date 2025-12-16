@@ -64,9 +64,9 @@ import {
   getImageSettings,
   shouldPlaceCircularBorderDot,
 } from "./utils";
+export * from "./render";
 export * from "./types";
 export * from "./utils";
-export * from "./render";
 
 /**
  * Helper: Draw base corner-rounded shape (regular, radius = 0.5)
@@ -1229,6 +1229,20 @@ export async function getQRAsCanvas(
   return url;
 }
 
+/**
+ * Safely append ?qr=1 parameter to a URL, handling existing query strings.
+ */
+function appendQrParam(url: string): string {
+  try {
+    const urlObj = new URL(url);
+    urlObj.searchParams.set("qr", "1");
+    return urlObj.toString();
+  } catch {
+    // Fallback for invalid URLs - simple append
+    return url.includes("?") ? `${url}&qr=1` : `${url}?qr=1`;
+  }
+}
+
 export function getQRData({
   url,
   fgColor,
@@ -1251,7 +1265,7 @@ export function getQRData({
   frameOptions?: import("./types").FrameOptions;
 }) {
   return {
-    value: `${url}?qr=1`,
+    value: appendQrParam(url),
     bgColor: "#ffffff",
     fgColor,
     size: 1024,
