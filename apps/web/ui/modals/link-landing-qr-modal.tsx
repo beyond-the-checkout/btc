@@ -5,8 +5,8 @@ import {
   QR_ONBOARDING_SOURCE_VALUE,
 } from "@/lib/onboarding/qr";
 import { setQROnboardingSeedCookie } from "@/lib/onboarding/qr/cookie";
-import { getQRAsCanvas, getQRAsSVGDataUri, getQRData } from "@/lib/qr";
-import { frameStyleToFrameType } from "@/lib/qr/types";
+import { buildQrRenderData, resolveLogo, toQRDataInput } from "@/lib/qr";
+import { useQrDownloads } from "@/lib/qr/use-qr-downloads";
 import type { QRLinkProps } from "@/lib/types";
 import {
   DraftControls,
@@ -178,69 +178,11 @@ function LinkLandingQRModalInner({
   // Download/Upgrade modal state
   const [showDownloadModal, setShowDownloadModal] = useState(false);
 
-  // Hidden anchor ref for triggering downloads
-  const downloadAnchorRef = useRef<HTMLAnchorElement>(null);
-
   useEffect(() => {
     return () => {
       draftControlsRef.current?.onClose();
     };
   }, []);
-
-  /**
-   * Trigger a file download using a hidden anchor element.
-   */
-  function triggerDownload(dataUrl: string, filename: string): void {
-    if (!downloadAnchorRef.current) return;
-    downloadAnchorRef.current.href = dataUrl;
-    downloadAnchorRef.current.download = filename;
-    downloadAnchorRef.current.click();
-  }
-
-  /**
-   * Generate a filename based on the destination URL.
-   */
-  function generateFilename(
-    destinationUrl: string | undefined,
-    extension: string,
-  ): string {
-    if (!destinationUrl) return `qr-code.${extension}`;
-
-    try {
-      const parsed = new URL(destinationUrl);
-      const domain = parsed.hostname
-        .replace(/^www\./, "")
-        .split(".")[0]
-        .replace(/[^a-z0-9-]/gi, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "")
-        .toLowerCase();
-
-      return `${domain || "qr-code"}-qr-code.${extension}`;
-    } catch {
-      return `qr-code.${extension}`;
-    }
-  }
-
-  /**
-   * Handle static PNG download
-   */
-  async function handleDownloadPng(): Promise<void> {
-    if (!qrData) return;
-    const dataUrl = await getQRAsCanvas(qrData, "image/png");
-    triggerDownload(dataUrl as string, generateFilename(url, "png"));
-    setShowDownloadModal(false);
-  }
-
-  /**
-   * Handle static SVG download
-   */
-  async function handleDownloadSvg(): Promise<void> {
-    if (!qrData) return;
-    const dataUrl = await getQRAsSVGDataUri(qrData);
-    triggerDownload(dataUrl, generateFilename(url, "svg"));
-    setShowDownloadModal(false);
-  }
 
   /**
    * Handle upgrade to dynamic QR code flow
@@ -298,8 +240,8 @@ function LinkLandingQRModalInner({
     window.location.href = `${APP_DOMAIN}/login?${params.toString()}`;
   }
 
-  // Logo is not used in landing page QR creator
-  const logo = undefined;
+  // Use centralized logo resolution for landing surface (always DUB_QR_LOGO)
+  const logo = resolveLogo("landing");
 
   // Local QR state seeded from provider's initial design
   const [draft, setDraft] = useState<QRCodeDesign>(
@@ -316,42 +258,36 @@ function LinkLandingQRModalInner({
   // Derive URL directly from form
   const url = watch("url");
 
-  const frameOptions = useMemo(() => {
-    const style = draft.qrFrameStyle;
-    if (!style) return undefined;
-    const type = frameStyleToFrameType(style);
-    if (!type) return undefined;
-    return {
-      type,
-      color: draft.qrFrameColor || draft.fgColor,
-    };
-  }, [draft.qrFrameStyle, draft.qrFrameColor, draft.fgColor]);
-
-  const qrData = useMemo(() => {
+  // Build QR render data using centralized utility
+  const renderData = useMemo(() => {
     if (!url) return null;
-    return getQRData({
+    return buildQrRenderData(draft, {
       url,
-      hideLogo: draft.qrHideLogo,
       logo,
-      fgColor: draft.qrDotsColor || draft.fgColor,
-      qrShape: draft.qrShape,
-      dotsOptions: {
-        type: draft.qrDotType,
-        color: draft.qrDotsColor || draft.fgColor,
-      },
-      eyeOptions: {
-        cornerSquare: {
-          type: draft.qrCornerSquareType,
-          color: draft.qrCornerSquareColor || draft.fgColor,
-        },
-        cornerDot: {
-          type: draft.qrCornerDotType,
-          color: draft.qrCornerDotColor || draft.fgColor,
-        },
-      },
-      frameOptions,
+      hideLogo: draft.qrHideLogo,
     });
-  }, [url, draft, frameOptions]);
+  }, [url, draft, logo]);
+
+  // Frame options derived from render data for context compatibility
+  const frameOptions = renderData?.frameOptions;
+
+  // Convert to getQRData format
+  const qrData = useMemo(
+    () => (renderData ? toQRDataInput(renderData) : null),
+    [renderData],
+  );
+
+  // Shared download hook for consistent QR downloads
+  const {
+    anchorRef: downloadAnchorRef,
+    downloadPng,
+    downloadSvg,
+  } = useQrDownloads({
+    qrData,
+    mode: "static",
+    destinationUrl: url ?? undefined,
+    onDownloadSuccess: () => setShowDownloadModal(false),
+  });
 
   // Minimal link props for naming in DownloadPopover
   const linkProps = useMemo(() => {
@@ -371,7 +307,7 @@ function LinkLandingQRModalInner({
       draft,
       setDraft,
       url,
-      logo: undefined as string | undefined,
+      logo, // Use resolved logo from centralized utility
       hideLogo: draft.qrHideLogo,
       frameOptions,
       qrData,
@@ -388,6 +324,7 @@ function LinkLandingQRModalInner({
       draft,
       setDraft,
       url,
+      logo,
       frameOptions,
       qrData,
       linkProps,
@@ -607,7 +544,7 @@ function LinkLandingQRModalInner({
                 <div className="flex gap-2">
                   <button
                     type="button"
-                    onClick={handleDownloadPng}
+                    onClick={downloadPng}
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
                   >
                     <IconMenu
@@ -617,7 +554,7 @@ function LinkLandingQRModalInner({
                   </button>
                   <button
                     type="button"
-                    onClick={handleDownloadSvg}
+                    onClick={downloadSvg}
                     className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
                   >
                     <IconMenu

@@ -1,5 +1,4 @@
-import { getQRData } from "@/lib/qr";
-import { frameStyleToFrameType } from "@/lib/qr/types";
+import { getQRData, type FrameOptions } from "@/lib/qr";
 import type { QRLinkProps } from "@/lib/types";
 import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 import type { Dispatch, SetStateAction } from "react";
@@ -22,10 +21,7 @@ export interface LinkQRContextValue {
   url?: string;
   logo?: string;
   hideLogo: boolean;
-  frameOptions?: {
-    type: ReturnType<typeof frameStyleToFrameType>;
-    color: string;
-  };
+  frameOptions?: FrameOptions;
   qrData: ReturnType<typeof getQRData> | null;
   qrDataForActions: ReturnType<typeof getQRData> | null;
 

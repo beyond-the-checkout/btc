@@ -1,5 +1,12 @@
-import { getQRAsCanvas, getQRAsSVGDataUri, getQRData } from "@/lib/qr";
-import { frameStyleToFrameType } from "@/lib/qr/types";
+import {
+  buildQrRenderData,
+  canToggleLogo,
+  getQRAsCanvas,
+  getQRData,
+  resolveLogo,
+  toQRDataInput,
+} from "@/lib/qr";
+import { useQrDownloads } from "@/lib/qr/use-qr-downloads";
 import useDomain from "@/lib/swr/use-domain";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { QRLinkProps } from "@/lib/types";
@@ -16,7 +23,7 @@ import {
   useMediaQuery,
 } from "@dub/ui";
 import { Check, Hyperlink, Photo } from "@dub/ui/icons";
-import { API_DOMAIN, DUB_QR_LOGO, linkConstructor } from "@dub/utils";
+import { API_DOMAIN, linkConstructor } from "@dub/utils";
 import {
   Dispatch,
   PropsWithChildren,
@@ -25,7 +32,6 @@ import {
   useEffect,
   useId,
   useMemo,
-  useRef,
   useState,
   type JSX,
 } from "react";
@@ -199,60 +205,30 @@ function LinkQRModalInner({
     setDraft(baseDesign);
   }, [baseDesign]);
 
-  const frameOptions = useMemo(() => {
-    const type = frameStyleToFrameType(draft.qrFrameStyle as any);
-    return type
-      ? {
-          type,
-          color: draft.qrFrameColor || draft.fgColor,
-        }
-      : undefined;
-  }, [draft.qrFrameStyle, draft.qrFrameColor, draft.fgColor]);
+  // Use centralized logo resolution
+  const logo = resolveLogo("link-modal", plan, workspaceLogo, domainLogo);
+  const hideLogo = draft.qrHideLogo && canToggleLogo("link-modal", plan);
 
-  const hideLogo = draft.qrHideLogo && plan !== "free";
-  const logo =
-    plan === "free" ? DUB_QR_LOGO : domainLogo || workspaceLogo || DUB_QR_LOGO;
-
-  const qrData = useMemo(
+  // Build QR render data using centralized utility
+  const renderData = useMemo(
     () =>
       url
-        ? getQRData({
+        ? buildQrRenderData(draft, {
             url,
-            fgColor: draft.qrDotsColor || draft.fgColor,
-            hideLogo,
             logo,
-            qrShape: draft.qrShape,
-            dotsOptions: {
-              type: draft.qrDotType,
-              color: draft.qrDotsColor || draft.fgColor,
-            },
-            eyeOptions: {
-              cornerSquare: {
-                type: draft.qrCornerSquareType,
-                color: draft.qrCornerSquareColor || draft.fgColor,
-              },
-              cornerDot: {
-                type: draft.qrCornerDotType,
-                color: draft.qrCornerDotColor || draft.fgColor,
-              },
-            },
-            frameOptions,
+            hideLogo,
           })
         : null,
-    [
-      url,
-      draft.fgColor,
-      draft.qrDotsColor,
-      draft.qrCornerSquareColor,
-      draft.qrCornerDotColor,
-      draft.qrShape,
-      draft.qrDotType,
-      draft.qrCornerSquareType,
-      draft.qrCornerDotType,
-      hideLogo,
-      logo,
-      frameOptions,
-    ],
+    [url, draft, logo, hideLogo],
+  );
+
+  // Frame options derived from render data for context compatibility
+  const frameOptions = renderData?.frameOptions;
+
+  // Convert to getQRData format
+  const qrData = useMemo(
+    () => (renderData ? toQRDataInput(renderData) : null),
+    [renderData],
   );
 
   const qrDataForActions = useMemo(
@@ -320,17 +296,15 @@ export function DownloadPopover({
   qrData: ReturnType<typeof getQRData>;
   props: QRLinkProps;
 }>) {
-  const anchorRef = useRef<HTMLAnchorElement>(null);
-
-  function download(url: string, extension: string) {
-    if (!anchorRef.current) return;
-    anchorRef.current.href = url;
-    anchorRef.current.download = `${props.key}-qrcode.${extension}`;
-    anchorRef.current.click();
-    setOpenPopover(false);
-  }
-
   const [openPopover, setOpenPopover] = useState(false);
+
+  const { anchorRef, downloadSvg, downloadPng, downloadJpeg } = useQrDownloads({
+    qrData,
+    mode: "dynamic",
+    linkKey: props.key,
+    linkDomain: props.domain,
+    onDownloadSuccess: () => setOpenPopover(false),
+  });
 
   return (
     <div>
@@ -339,9 +313,7 @@ export function DownloadPopover({
           <div className="grid p-1 sm:min-w-48">
             <button
               type="button"
-              onClick={async () => {
-                download(await getQRAsSVGDataUri(qrData), "svg");
-              }}
+              onClick={downloadSvg}
               className="rounded-md p-2 text-left text-sm font-medium text-neutral-500 transition-all duration-75 hover:bg-neutral-100"
             >
               <IconMenu
@@ -351,12 +323,7 @@ export function DownloadPopover({
             </button>
             <button
               type="button"
-              onClick={async () => {
-                download(
-                  (await getQRAsCanvas(qrData, "image/png")) as string,
-                  "png",
-                );
-              }}
+              onClick={downloadPng}
               className="rounded-md p-2 text-left text-sm font-medium text-neutral-500 transition-all duration-75 hover:bg-neutral-100"
             >
               <IconMenu
@@ -366,12 +333,7 @@ export function DownloadPopover({
             </button>
             <button
               type="button"
-              onClick={async () => {
-                download(
-                  (await getQRAsCanvas(qrData, "image/jpeg")) as string,
-                  "jpg",
-                );
-              }}
+              onClick={downloadJpeg}
               className="rounded-md p-2 text-left text-sm font-medium text-neutral-500 transition-all duration-75 hover:bg-neutral-100"
             >
               <IconMenu
@@ -386,12 +348,8 @@ export function DownloadPopover({
       >
         {children}
       </Popover>
-      {/* This will be used to prompt downloads. */}
-      <a
-        className="hidden"
-        download={`${props.key}-qrcode.svg`}
-        ref={anchorRef}
-      />
+      {/* Hidden anchor for download trigger */}
+      <a className="hidden" ref={anchorRef} />
     </div>
   );
 }

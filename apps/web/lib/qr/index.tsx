@@ -66,6 +66,7 @@ import {
 } from "./utils";
 export * from "./types";
 export * from "./utils";
+export * from "./render";
 
 /**
  * Helper: Draw base corner-rounded shape (regular, radius = 0.5)

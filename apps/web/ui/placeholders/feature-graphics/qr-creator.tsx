@@ -1,8 +1,9 @@
 "use client";
 
 import { useDebounce } from "@/lib/hooks/use-debounce";
+import { buildQrRenderData, resolveLogo } from "@/lib/qr";
 import { DEFAULT_MARGIN } from "@/lib/qr/constants";
-import { DotType, frameStyleToFrameType } from "@/lib/qr/types";
+import { DotType } from "@/lib/qr/types";
 import type { QRCodeDesign } from "@/ui/modals/link-qr-modal.types";
 import { QRCode } from "@/ui/shared/qr-code";
 import {
@@ -12,7 +13,7 @@ import {
   QRShapeToggle,
 } from "@/ui/shared/qr-customization";
 import { Button, ClientOnly, Switch } from "@dub/ui";
-import { CHECKOUT_BASE_URL, DUB_QR_LOGO } from "@dub/utils";
+import { CHECKOUT_BASE_URL } from "@dub/utils";
 import { useCallback, useMemo, useState } from "react";
 
 /**
@@ -97,48 +98,34 @@ export function QRCreator(props: {
   // Logo state
   const [hideLogo, setHideLogo] = useState(false);
 
-  // Construct QR options
-  const dotsOptions = useMemo(
-    () => ({
-      type: dotPattern,
-      color: debouncedFgColor,
-    }),
-    [dotPattern, debouncedFgColor],
-  );
+  // Use centralized logo resolution for widget surface
+  const logo = resolveLogo("widget");
 
-  /**
-   * Eye (corner) pattern options - uses 'square' type for both elements
-   *
-   * Rationale: Square eye patterns provide:
-   * - Best scannability and error correction
-   * - Clear visual distinction from the main dot pattern
-   * - Professional, clean appearance
-   * Both cornerSquare (outer frame) and cornerDot (inner dot) use the
-   * same color as the main pattern for visual consistency.
-   */
-  const eyeOptions = useMemo(
-    () => ({
-      cornerSquare: {
-        type: "square" as const,
-        color: debouncedFgColor,
-      },
-      cornerDot: {
-        type: "square" as const,
-        color: debouncedFgColor,
-      },
-    }),
-    [debouncedFgColor],
-  );
+  // Build QR render data using centralized utility
+  const renderData = useMemo(() => {
+    const design = {
+      fgColor: debouncedFgColor,
+      qrHideLogo: hideLogo,
+      qrDotType: dotPattern,
+      qrCornerSquareType: "square" as const,
+      qrCornerDotType: "square" as const,
+      qrShape,
+      qrFrameStyle: frameStyle,
+      qrFrameColor: debouncedFgColor,
+      qrDotsColor: debouncedFgColor,
+      qrCornerSquareColor: debouncedFgColor,
+      qrCornerDotColor: debouncedFgColor,
+    };
 
-  const frameOptions = useMemo(() => {
-    const type = frameStyleToFrameType(frameStyle);
-    return type
-      ? {
-          type,
-          color: debouncedFgColor,
-        }
-      : undefined;
-  }, [frameStyle, debouncedFgColor]);
+    return buildQrRenderData(design, {
+      url: url || CHECKOUT_BASE_URL,
+      logo,
+      hideLogo,
+    });
+  }, [url, debouncedFgColor, hideLogo, dotPattern, qrShape, frameStyle, logo]);
+
+  // Extract options from render data for QRCode component
+  const { dotsOptions, eyeOptions, frameOptions } = renderData;
 
   // Handler for URL change
   const handleUrlChange = useCallback(
@@ -197,16 +184,16 @@ export function QRCreator(props: {
             <ClientOnly>
               <div className="relative flex size-full items-center justify-center">
                 <QRCode
-                  url={url || CHECKOUT_BASE_URL}
-                  fgColor={debouncedFgColor}
-                  hideLogo={hideLogo}
-                  logo={DUB_QR_LOGO}
+                  url={renderData.url}
+                  fgColor={renderData.fgColor}
+                  hideLogo={renderData.hideLogo}
+                  logo={renderData.logo}
                   scale={QR_PREVIEW_SCALE}
                   margin={DEFAULT_MARGIN}
-                  qrShape={qrShape}
-                  dotsOptions={dotsOptions}
-                  eyeOptions={eyeOptions}
-                  frameOptions={frameOptions}
+                  qrShape={renderData.qrShape}
+                  dotsOptions={renderData.dotsOptions}
+                  eyeOptions={renderData.eyeOptions}
+                  frameOptions={renderData.frameOptions}
                 />
               </div>
             </ClientOnly>

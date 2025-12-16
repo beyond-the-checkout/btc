@@ -9,8 +9,13 @@ import {
   type QROnboardingSeed,
 } from "@/lib/onboarding/qr/cookie";
 import { dispatchQROnboardingSeed } from "@/lib/onboarding/qr/events";
-import { getQRAsCanvas, getQRData } from "@/lib/qr";
-import { frameStyleToFrameType } from "@/lib/qr/types";
+import {
+  buildQrFilename,
+  buildQrRenderData,
+  getQRAsCanvas,
+  resolveLogo,
+  toQRDataInput,
+} from "@/lib/qr";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { trackConversion } from "@/lib/tracking-pixels";
 import {
@@ -28,7 +33,6 @@ import {
 } from "@dub/ui";
 import {
   cn,
-  DUB_QR_LOGO,
   getPlanDetails,
   linkConstructor,
   PLANS,
@@ -195,7 +199,10 @@ function WelcomeModal({
   const shouldShowQrResumeVariant =
     onboarded && isQrFlow && !qrLinkId && !!latest;
 
-  // Compute QR data for the fetched link
+  // Use centralized logo resolution for welcome surface
+  const logo = resolveLogo("welcome");
+
+  // Compute QR data for the fetched link using centralized utilities
   const qrData = useMemo(() => {
     if (!fetchedLink) return null;
     const shortUrl = linkConstructor({
@@ -205,75 +212,29 @@ function WelcomeModal({
 
     const seedDesign = latest?.qrDesign;
 
-    const frameStyle = fetchedLink.qrFrameStyle ?? seedDesign?.qrFrameStyle;
-    const frameType = frameStyleToFrameType(
-      frameStyle as
-        | "square"
-        | "rounded"
-        | "solid-circle"
-        | "dotted-circle"
-        | undefined,
-    );
-    const frameOptions = frameType
-      ? {
-          type: frameType,
-          color:
-            fetchedLink.qrFrameColor ??
-            seedDesign?.qrFrameColor ??
-            fetchedLink.qrDotsColor ??
-            seedDesign?.qrDotsColor ??
-            seedDesign?.fgColor ??
-            "#000000",
-        }
-      : undefined;
+    // Merge fetched link data with seed design, preferring fetched values
+    const mergedDesign = {
+      fgColor: seedDesign?.fgColor ?? "#000000",
+      qrHideLogo: fetchedLink.qrHideLogo ?? seedDesign?.qrHideLogo ?? false,
+      qrDotType: (fetchedLink.qrDotType ?? seedDesign?.qrDotType ?? "square") as any,
+      qrCornerSquareType: (fetchedLink.qrCornerSquareType ?? seedDesign?.qrCornerSquareType ?? "square") as any,
+      qrCornerDotType: (fetchedLink.qrCornerDotType ?? seedDesign?.qrCornerDotType ?? "square") as any,
+      qrShape: (fetchedLink.qrShape ?? seedDesign?.qrShape ?? "square") as "square" | "circle",
+      qrFrameStyle: (fetchedLink.qrFrameStyle ?? seedDesign?.qrFrameStyle) as any,
+      qrFrameColor: fetchedLink.qrFrameColor ?? seedDesign?.qrFrameColor,
+      qrDotsColor: fetchedLink.qrDotsColor ?? seedDesign?.qrDotsColor,
+      qrCornerSquareColor: fetchedLink.qrCornerSquareColor ?? seedDesign?.qrCornerSquareColor,
+      qrCornerDotColor: fetchedLink.qrCornerDotColor ?? seedDesign?.qrCornerDotColor,
+    };
 
-    return getQRData({
+    const renderData = buildQrRenderData(mergedDesign, {
       url: shortUrl,
-      hideLogo: fetchedLink.qrHideLogo ?? seedDesign?.qrHideLogo ?? false,
-      logo: DUB_QR_LOGO,
-      fgColor:
-        fetchedLink.qrDotsColor ??
-        seedDesign?.qrDotsColor ??
-        seedDesign?.fgColor ??
-        "#000000",
-      qrShape: (fetchedLink.qrShape ?? seedDesign?.qrShape ?? "square") as
-        | "square"
-        | "circle",
-      dotsOptions: {
-        type: (fetchedLink.qrDotType ??
-          seedDesign?.qrDotType ??
-          "square") as any,
-        color:
-          fetchedLink.qrDotsColor ??
-          seedDesign?.qrDotsColor ??
-          seedDesign?.fgColor ??
-          "#000000",
-      },
-      eyeOptions: {
-        cornerSquare: {
-          type: (fetchedLink.qrCornerSquareType ??
-            seedDesign?.qrCornerSquareType ??
-            "square") as any,
-          color:
-            fetchedLink.qrCornerSquareColor ??
-            seedDesign?.qrCornerSquareColor ??
-            seedDesign?.fgColor ??
-            "#000000",
-        },
-        cornerDot: {
-          type: (fetchedLink.qrCornerDotType ??
-            seedDesign?.qrCornerDotType ??
-            "square") as any,
-          color:
-            fetchedLink.qrCornerDotColor ??
-            seedDesign?.qrCornerDotColor ??
-            seedDesign?.fgColor ??
-            "#000000",
-        },
-      },
-      frameOptions,
+      logo,
+      hideLogo: mergedDesign.qrHideLogo,
     });
-  }, [fetchedLink, latest]);
+
+    return toQRDataInput(renderData);
+  }, [fetchedLink, latest, logo]);
 
   // Download handler for the dynamic QR
   const handleDownloadQrPng = useCallback(async () => {
@@ -282,7 +243,13 @@ function WelcomeModal({
     try {
       const dataUrl = await getQRAsCanvas(qrData, "image/png");
       downloadAnchorRef.current.href = dataUrl as string;
-      downloadAnchorRef.current.download = `qr-code-${fetchedLink?.key || "download"}.png`;
+      // Use standardized filename utility
+      downloadAnchorRef.current.download = buildQrFilename({
+        mode: "dynamic",
+        extension: "png",
+        linkKey: fetchedLink?.key,
+        linkDomain: fetchedLink?.domain,
+      });
       downloadAnchorRef.current.click();
 
       // Clear artifacts after successful download
@@ -364,7 +331,7 @@ function WelcomeModal({
                     Download your QR code and start tracking scans. You can
                     update the destination URL anytime from your dashboard.
                   </p>
-                  {/* QR Preview */}
+                  {/* QR Preview - uses pre-computed qrData from centralized utility */}
                   {loadingLink ? (
                     <div className="mt-6 flex justify-center">
                       <LoadingSpinner className="size-8" />
@@ -377,80 +344,14 @@ function WelcomeModal({
                             domain: fetchedLink.domain,
                             key: fetchedLink.key,
                           })}
-                          fgColor={
-                            fetchedLink.qrDotsColor ??
-                            latest?.qrDesign?.qrDotsColor ??
-                            latest?.qrDesign?.fgColor ??
-                            "#000000"
-                          }
-                          hideLogo={
-                            fetchedLink.qrHideLogo ??
-                            latest?.qrDesign?.qrHideLogo ??
-                            false
-                          }
-                          logo={DUB_QR_LOGO}
+                          fgColor={qrData.fgColor}
+                          hideLogo={qrData.hideLogo}
+                          logo={logo}
                           scale={1.5}
-                          qrShape={
-                            (fetchedLink.qrShape ??
-                              latest?.qrDesign?.qrShape ??
-                              "square") as "square" | "circle"
-                          }
-                          dotsOptions={{
-                            type: (fetchedLink.qrDotType ??
-                              latest?.qrDesign?.qrDotType ??
-                              "square") as any,
-                            color:
-                              fetchedLink.qrDotsColor ??
-                              latest?.qrDesign?.qrDotsColor ??
-                              latest?.qrDesign?.fgColor ??
-                              "#000000",
-                          }}
-                          eyeOptions={{
-                            cornerSquare: {
-                              type: (fetchedLink.qrCornerSquareType ??
-                                latest?.qrDesign?.qrCornerSquareType ??
-                                "square") as any,
-                              color:
-                                fetchedLink.qrCornerSquareColor ??
-                                latest?.qrDesign?.qrCornerSquareColor ??
-                                latest?.qrDesign?.fgColor ??
-                                "#000000",
-                            },
-                            cornerDot: {
-                              type: (fetchedLink.qrCornerDotType ??
-                                latest?.qrDesign?.qrCornerDotType ??
-                                "square") as any,
-                              color:
-                                fetchedLink.qrCornerDotColor ??
-                                latest?.qrDesign?.qrCornerDotColor ??
-                                latest?.qrDesign?.fgColor ??
-                                "#000000",
-                            },
-                          }}
-                          frameOptions={(function () {
-                            const frameStyle =
-                              fetchedLink.qrFrameStyle ??
-                              latest?.qrDesign?.qrFrameStyle;
-                            const frameType = frameStyleToFrameType(
-                              frameStyle as
-                                | "square"
-                                | "rounded"
-                                | "solid-circle"
-                                | "dotted-circle"
-                                | undefined,
-                            );
-                            if (!frameType) return undefined;
-                            return {
-                              type: frameType,
-                              color:
-                                fetchedLink.qrFrameColor ??
-                                latest?.qrDesign?.qrFrameColor ??
-                                fetchedLink.qrDotsColor ??
-                                latest?.qrDesign?.qrDotsColor ??
-                                latest?.qrDesign?.fgColor ??
-                                "#000000",
-                            };
-                          })()}
+                          qrShape={qrData.qrShape}
+                          dotsOptions={qrData.dotsOptions}
+                          eyeOptions={qrData.eyeOptions}
+                          frameOptions={qrData.frameOptions}
                         />
                       </div>
                     </div>
