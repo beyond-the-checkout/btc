@@ -1,3 +1,4 @@
+import { trackConversion } from "@/lib/tracking-pixels";
 import { Button, Modal, useRouterStuff } from "@dub/ui";
 import { getPlanDetails, PLANS, PRO_PLAN } from "@dub/utils";
 import { usePlausible } from "next-plausible";
@@ -29,7 +30,7 @@ function UpgradedModal({
   const handlePlanUpgrade = async () => {
     if (planId) {
       const currentPlan = getPlanDetails(planId);
-      const period = searchParams.get("period");
+      const period = searchParams.get("period") as "monthly" | "yearly" | null;
       if (currentPlan && period) {
         plausible(`Upgraded to ${currentPlan.name}`);
         posthog.capture("plan_upgraded", {
@@ -37,6 +38,16 @@ function UpgradedModal({
           period,
           revenue: currentPlan.price[period],
         });
+
+        // Google Ads: track paid plan purchase with revenue
+        const price = currentPlan.price[period];
+        if (price != null) {
+          trackConversion({
+            type: "purchase",
+            value: price,
+            currency: "USD",
+          });
+        }
       }
     }
   };
