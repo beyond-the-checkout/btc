@@ -27,6 +27,7 @@ import {
 import { PlanProps } from "@/lib/types";
 import { redis } from "@/lib/upstash";
 import { prisma } from "@dub/prisma";
+import { getUrlFromString } from "@dub/utils";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -94,7 +95,14 @@ export async function GET(req: Request) {
       return NextResponse.redirect(new URL("/onboarding", origin));
     }
 
-    // 4. Determine target workspace
+    // 4. Validate seed URL to prevent injection of malformed URLs
+    const validUrl = getUrlFromString(seed.url);
+    if (!validUrl) {
+      console.error("Invalid seed URL:", seed.url);
+      return NextResponse.redirect(new URL("/onboarding", origin));
+    }
+
+    // 5. Determine target workspace
     let workspace: { id: string; slug: string; plan: PlanProps } | null = null;
 
     // Check if user has a default workspace
@@ -147,7 +155,7 @@ export async function GET(req: Request) {
       }
     }
 
-    // 5. Create the first dynamic link with QR design
+    // 6. Create the first dynamic link with QR design
     // Convert QR design to link fields and sanitize based on plan
     const qrFields = sanitizeQrFieldsForPlan(
       qrDesignToLinkQRFields(seed.qrDesign),
@@ -157,7 +165,7 @@ export async function GET(req: Request) {
     // Process and create the link
     const processedResult = await processLink({
       payload: {
-        url: seed.url,
+        url: validUrl,
         ...qrFields,
       },
       workspace: { id: workspace.id, plan: workspace.plan },
@@ -168,7 +176,7 @@ export async function GET(req: Request) {
       console.error("Failed to process link:", processedResult.error);
       // Create a basic link without QR customization on error
       const fallbackResult = await processLink({
-        payload: { url: seed.url },
+        payload: { url: validUrl },
         workspace: { id: workspace.id, plan: workspace.plan },
         userId,
       });
@@ -185,13 +193,13 @@ export async function GET(req: Request) {
 
       const link = await createLink(fallbackResult.link);
 
-      // 6. Verify link is fully committed before redirect
+      // 7. Verify link is fully committed before redirect
       await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
 
-      // 7. Mark onboarding complete
+      // 8. Mark onboarding complete
       await redis.set(`onboarding-step:${userId}`, "completed");
 
-      // 8. Clear the seed cookie and redirect
+      // 9. Clear the seed cookie and redirect
       const hostname = new URL(req.url).hostname;
       const cookieOpts = getServerCookieOptions(hostname);
       const response = NextResponse.redirect(
@@ -209,15 +217,15 @@ export async function GET(req: Request) {
 
     const link = await createLink(processedResult.link);
 
-    // 6. Verify link is fully committed before redirect
+    // 7. Verify link is fully committed before redirect
     // This guards against potential read-replica lag in PlanetScale/Vitess
     // where the WelcomeModal might fetch the link before it's visible
     await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
 
-    // 7. Mark onboarding complete
+    // 8. Mark onboarding complete
     await redis.set(`onboarding-step:${userId}`, "completed");
 
-    // 8. Clear the seed cookie and redirect to dashboard
+    // 9. Clear the seed cookie and redirect to dashboard
     const hostname = new URL(req.url).hostname;
     const cookieOpts = getServerCookieOptions(hostname);
     const response = NextResponse.redirect(
