@@ -16,6 +16,7 @@ import { processLink } from "@/lib/api/links/process-link";
 import { createWorkspaceForUser } from "@/lib/api/workspaces/create-workspace-for-user";
 import { getSession } from "@/lib/auth";
 import {
+  getServerCookieOptions,
   parseQROnboardingSeed,
   QR_ONBOARDING_SEED_COOKIE,
 } from "@/lib/onboarding/qr/seed";
@@ -171,33 +172,51 @@ export async function GET(req: Request) {
 
       const link = await createLink(fallbackResult.link);
 
-      // 5. Mark onboarding complete
+      // 5. Verify link is fully committed before redirect
+      await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
+
+      // 6. Mark onboarding complete
       await redis.set(`onboarding-step:${userId}`, "completed");
 
-      // 6. Clear the seed cookie and redirect
+      // 7. Clear the seed cookie and redirect
+      const hostname = new URL(req.url).hostname;
+      const cookieOpts = getServerCookieOptions(hostname);
       const response = NextResponse.redirect(
         new URL(
           `/${workspace.slug}/links?onboarded=true&source=qr-landing&qrLinkId=${link.id}`,
           origin,
         ),
       );
-      response.cookies.delete(QR_ONBOARDING_SEED_COOKIE);
+      response.cookies.delete({
+        name: QR_ONBOARDING_SEED_COOKIE,
+        ...cookieOpts,
+      });
       return response;
     }
 
     const link = await createLink(processedResult.link);
 
-    // 5. Mark onboarding complete
+    // 5. Verify link is fully committed before redirect
+    // This guards against potential read-replica lag in PlanetScale/Vitess
+    // where the WelcomeModal might fetch the link before it's visible
+    await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
+
+    // 6. Mark onboarding complete
     await redis.set(`onboarding-step:${userId}`, "completed");
 
-    // 6. Clear the seed cookie and redirect to dashboard
+    // 7. Clear the seed cookie and redirect to dashboard
+    const hostname = new URL(req.url).hostname;
+    const cookieOpts = getServerCookieOptions(hostname);
     const response = NextResponse.redirect(
       new URL(
         `/${workspace.slug}/links?onboarded=true&source=qr-landing&qrLinkId=${link.id}`,
         origin,
       ),
     );
-    response.cookies.delete(QR_ONBOARDING_SEED_COOKIE);
+    response.cookies.delete({
+      name: QR_ONBOARDING_SEED_COOKIE,
+      ...cookieOpts,
+    });
     return response;
   } catch (error) {
     console.error("QR bootstrap route error:", error);

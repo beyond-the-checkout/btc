@@ -41,3 +41,39 @@ export function parseQROnboardingSeed(
 export function serializeQROnboardingSeed(seed: QROnboardingSeed): string {
   return JSON.stringify(seed);
 }
+
+/**
+ * Server-side cookie options for the QR onboarding seed cookie.
+ * Must match the options used by the client-side cookie.ts to ensure
+ * proper cookie deletion across subdomains.
+ *
+ * @param hostname - The request hostname (e.g., from req.headers or URL)
+ */
+export function getServerCookieOptions(hostname: string): {
+  domain?: string;
+  path: string;
+  secure: boolean;
+} {
+  const isProd = process.env.NODE_ENV === "production";
+
+  // Host-only cookies in local development
+  if (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "[::1]" ||
+    hostname.endsWith(".localhost")
+  ) {
+    return {
+      path: "/",
+      secure: isProd,
+    };
+  }
+
+  // Cross-subdomain cookie domain from env
+  const appDomain = process.env.NEXT_PUBLIC_APP_DOMAIN;
+  return {
+    path: "/",
+    secure: isProd,
+    ...(appDomain && { domain: `.${appDomain}` }),
+  };
+}
