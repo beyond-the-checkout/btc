@@ -118,6 +118,29 @@ export async function GET(req: Request) {
     // Determine if this is the QR landing flow (has seedId) or generic sign-up (no seedId)
     const isQrLandingFlow = !!urlSeedId && !!seed?.url;
 
+    // Check if this seedId has already been consumed (prevents duplicate link creation on refresh)
+    // The cookie is kept alive so WelcomeModal can read the QR design for download
+    if (isQrLandingFlow && urlSeedId) {
+      const consumedKey = `qr-seed-consumed:${urlSeedId}`;
+      const alreadyConsumed = await redis.get(consumedKey);
+      if (alreadyConsumed) {
+        // Seed already used - redirect to dashboard without creating another link
+        // The qrLinkId from the original creation is stored in Redis
+        const existingLinkId = alreadyConsumed as string;
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { defaultWorkspace: true },
+        });
+        const workspaceSlug = user?.defaultWorkspace || "links";
+        return NextResponse.redirect(
+          new URL(
+            `/${workspaceSlug}/links?onboarded=true&source=qr-landing&qrLinkId=${existingLinkId}`,
+            origin,
+          ),
+        );
+      }
+    }
+
     // If not the QR landing flow (no seedId or no seed URL), this is the generic sign-up path
     // Still create workspace if needed, mark onboarding complete, but don't create a link
     if (!isQrLandingFlow) {
@@ -306,20 +329,19 @@ export async function GET(req: Request) {
       // 8. Mark onboarding complete
       await redis.set(`onboarding-step:${userId}`, "completed");
 
-      // 9. Clear the seed cookie and redirect
-      const hostname = new URL(req.url).hostname;
-      const cookieOpts = getServerCookieOptions(hostname);
-      const response = NextResponse.redirect(
+      // 9. Mark seedId as consumed to prevent duplicate link creation on refresh
+      if (urlSeedId) {
+        await redis.set(`qr-seed-consumed:${urlSeedId}`, link.id, { ex: 3600 });
+      }
+
+      // 10. Redirect to dashboard - DO NOT delete cookie here!
+      // The cookie is kept alive so WelcomeModal can read the QR design for download.
+      return NextResponse.redirect(
         new URL(
           `/${workspace.slug}/links?onboarded=true&source=qr-landing&qrLinkId=${link.id}`,
           origin,
         ),
       );
-      response.cookies.delete({
-        name: QR_ONBOARDING_SEED_COOKIE,
-        ...cookieOpts,
-      });
-      return response;
     }
 
     const link = await createLink(processedResult.link);
@@ -332,20 +354,23 @@ export async function GET(req: Request) {
     // 8. Mark onboarding complete
     await redis.set(`onboarding-step:${userId}`, "completed");
 
-    // 9. Clear the seed cookie and redirect to dashboard
-    const hostname = new URL(req.url).hostname;
-    const cookieOpts = getServerCookieOptions(hostname);
-    const response = NextResponse.redirect(
+    // 9. Mark seedId as consumed to prevent duplicate link creation on refresh
+    // Store the linkId so we can redirect to the same link if user refreshes
+    // TTL of 1 hour matches the cookie TTL
+    if (urlSeedId) {
+      await redis.set(`qr-seed-consumed:${urlSeedId}`, link.id, { ex: 3600 });
+    }
+
+    // 10. Redirect to dashboard - DO NOT delete cookie here!
+    // The cookie is kept alive so WelcomeModal can read the QR design for download.
+    // WelcomeModal will clear the cookie after the user downloads the QR.
+    // Duplicate link creation is prevented by the Redis consumption check above.
+    return NextResponse.redirect(
       new URL(
         `/${workspace.slug}/links?onboarded=true&source=qr-landing&qrLinkId=${link.id}`,
         origin,
       ),
     );
-    response.cookies.delete({
-      name: QR_ONBOARDING_SEED_COOKIE,
-      ...cookieOpts,
-    });
-    return response;
   } catch (error) {
     console.error("QR bootstrap route error:", error);
     // On any unexpected error, clear cookie and redirect to / - middleware will route appropriately
