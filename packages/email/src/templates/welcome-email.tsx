@@ -75,20 +75,6 @@ export default function WelcomeEmail({
               in real time to see how your QR codes perform.
             </Text>
 
-            <Text className="mb-8 text-sm leading-6 text-gray-600">
-              <strong className="font-medium text-black">
-                4. Integrate with your workflow
-              </strong>
-              :{" "}
-              <Link
-                href={`${CHECKOUT_DOCS_BASE}/introduction`}
-                className="font-semibold text-black underline underline-offset-4"
-              >
-                Check out our docs
-              </Link>{" "}
-              to integrate QR code generation into your production process.
-            </Text>
-
             <Section className="mb-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
