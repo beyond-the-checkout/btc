@@ -11,6 +11,7 @@
  * - Filename generation
  */
 
+import { DUB_QR_LOGO } from "@dub/utils";
 import {
   DEFAULT_CORNER_DOT_TYPE,
   DEFAULT_CORNER_SQUARE_TYPE,
@@ -25,14 +26,6 @@ import {
   type DotType,
   type FrameOptions,
 } from "./types";
-
-/**
- * Local QR logo path for client-side canvas rendering.
- * Uses same-origin path to avoid CORS issues during canvas export.
- * The external DUB_QR_LOGO (assets.chko.sh) lacks CORS headers,
- * causing logo to be skipped in downloaded QR codes.
- */
-const LOCAL_QR_LOGO = "/logos/checkmark_black.png";
 
 /**
  * Surface types where QR codes are rendered.
@@ -285,7 +278,7 @@ export function getDefaultQRDesign(surface: QRSurface): QRDesignInput {
  *
  * Surface-specific behavior:
  * - link-modal: Plan-aware, can use workspace/domain logo, toggle available for paid
- * - landing/welcome/widget: Always LOCAL_QR_LOGO (same-origin for CORS), no toggle
+ * - landing/welcome/widget: Always DUB_QR_LOGO, no toggle
  *
  * @param surface - Where the QR is being rendered
  * @param plan - Workspace plan (only relevant for link-modal)
@@ -303,19 +296,19 @@ export function resolveLogo(
     case "link-modal":
       // Plan-aware logo selection
       if (plan === "free") {
-        return LOCAL_QR_LOGO;
+        return DUB_QR_LOGO;
       }
       // Paid plans: prefer domain logo, then workspace, then default
-      return domainLogo || workspaceLogo || LOCAL_QR_LOGO;
+      return domainLogo || workspaceLogo || DUB_QR_LOGO;
 
     case "landing":
     case "welcome":
     case "widget":
-      // Public surfaces always use branded logo (same-origin for CORS)
-      return LOCAL_QR_LOGO;
+      // Public surfaces always use branded logo
+      return DUB_QR_LOGO;
 
     default:
-      return LOCAL_QR_LOGO;
+      return DUB_QR_LOGO;
   }
 }
 
