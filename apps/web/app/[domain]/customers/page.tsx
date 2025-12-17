@@ -97,7 +97,7 @@ export default function CustomersPage() {
         </p>
         <div className="mt-8 flex gap-4">
           <Link
-            href={`${APP_DOMAIN}/register`}
+            href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
             className="rounded-lg bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-neutral-800"
           >
             Get started
@@ -204,7 +204,7 @@ export default function CustomersPage() {
           Create your first QR code in seconds. No credit card required.
         </p>
         <Link
-          href={`${APP_DOMAIN}/register`}
+          href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
           className="mt-8 inline-block rounded-lg bg-white px-6 py-3 text-sm font-medium text-neutral-900 shadow-sm transition-colors hover:bg-neutral-100"
         >
           Start for free

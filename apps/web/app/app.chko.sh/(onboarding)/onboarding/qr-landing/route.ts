@@ -1,15 +1,38 @@
 /**
- * QR Bootstrap Route Handler
+ * QR Bootstrap Route Handler - PRIMARY ONBOARDING FLOW
  *
- * This server-side route handles the QR landing onboarding flow:
- * 1. Reads the QR seed cookie (destination URL + QR design)
- * 2. Creates or uses existing workspace
- * 3. Creates the first dynamic link with QR design
- * 4. Marks onboarding as completed
- * 5. Redirects to dashboard with the new link ID
+ * This is the SOLE onboarding path for all new users. The legacy multi-step
+ * onboarding (workspace → usage → domain → plan → invite) is deprecated.
+ *
+ * ## Two Modes:
+ *
+ * 1. **QR Landing Flow** (with seed cookie + seedId):
+ *    - User created QR on landing page → seed cookie set
+ *    - Creates workspace + first dynamic link with QR design
+ *    - Redirects to dashboard with `onboarded=true&source=qr-landing&qrLinkId=...`
+ *    - WelcomeModal offers QR download
+ *
+ * 2. **Direct Signup Flow** (no seed):
+ *    - User signed up directly (no QR draft)
+ *    - Creates workspace only (no link)
+ *    - Redirects to dashboard with `onboarded=true`
+ *    - WelcomeModal shows generic welcome
+ *
+ * ## Entry Points:
+ * - CTA buttons: `APP_DOMAIN/register?next=/onboarding/qr-landing`
+ * - Email signup fallback: `/onboarding/qr-landing`
+ * - OAuth callback default: `/onboarding/qr-landing`
+ *
+ * ## Security:
+ * - CSRF protection via seedId (must match cookie)
+ * - URL validation for seed destinations
+ * - Stale cookies are cleared to prevent loops
  *
  * The route runs under /onboarding/* so middleware won't redirect away
  * before completion.
+ *
+ * @see onboarding_simplification.md for design rationale
+ * @see apps/web/app/app.chko.sh/(onboarding)/onboarding/(steps)/DEPRECATED.md for legacy flow
  */
 import { createLink } from "@/lib/api/links/create-link";
 import { processLink } from "@/lib/api/links/process-link";
@@ -70,36 +93,113 @@ export async function GET(req: Request) {
     const seedCookie = cookieStore.get(QR_ONBOARDING_SEED_COOKIE);
     const seed = parseQROnboardingSeed(seedCookie?.value);
 
-    // 3. CSRF validation: seedId in URL must match id in cookie
+    // 3. CSRF validation: only enforce when URL explicitly provides seedId (QR landing flow)
+    // If no seedId in URL, treat as generic sign-up path (ignore any stale cookie)
     // This prevents CSRF attacks where an attacker tricks a user into
     // visiting this route - they can't know the random ID in the cookie
     const requestUrl = new URL(req.url);
     const urlSeedId = requestUrl.searchParams.get("seedId");
-    if (seed?.id && urlSeedId !== seed.id) {
+    if (urlSeedId && seed?.id && urlSeedId !== seed.id) {
       console.error("CSRF validation failed: seedId mismatch", {
         urlSeedId,
         cookieSeedId: seed.id,
       });
-      return NextResponse.redirect(new URL("/onboarding", origin));
+      // Clear cookie and redirect to / - middleware will route appropriately
+      const hostname = new URL(req.url).hostname;
+      const cookieOpts = getServerCookieOptions(hostname);
+      const response = NextResponse.redirect(new URL("/", origin));
+      response.cookies.delete({
+        name: QR_ONBOARDING_SEED_COOKIE,
+        ...cookieOpts,
+      });
+      return response;
     }
 
-    // If no seed, redirect to dashboard directly
-    if (!seed?.url) {
-      const defaultWorkspace = session.user.defaultWorkspace;
-      if (defaultWorkspace) {
-        return NextResponse.redirect(
-          new URL(`/${defaultWorkspace}/links?onboarded=true`, origin),
+    // Determine if this is the QR landing flow (has seedId) or generic sign-up (no seedId)
+    const isQrLandingFlow = !!urlSeedId && !!seed?.url;
+
+    // If not the QR landing flow (no seedId or no seed URL), this is the generic sign-up path
+    // Still create workspace if needed, mark onboarding complete, but don't create a link
+    if (!isQrLandingFlow) {
+      // Log if seedId present but seed missing (stale/mismatched cookie scenario)
+      if (urlSeedId && !seed?.url) {
+        console.warn(
+          "seedId in URL but no valid seed cookie - treating as sign-up path",
+          {
+            urlSeedId,
+            hasSeedCookie: !!seedCookie?.value,
+          },
         );
       }
-      // No seed and no workspace, redirect to regular onboarding
-      return NextResponse.redirect(new URL("/onboarding", origin));
+      // Get or create workspace
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          name: true,
+          email: true,
+          image: true,
+          defaultWorkspace: true,
+        },
+      });
+
+      let workspaceSlug = user?.defaultWorkspace;
+
+      if (!workspaceSlug) {
+        // Create a workspace for the user
+        try {
+          const newWorkspace = await createWorkspaceForUser({
+            userId,
+            user: {
+              name: user?.name,
+              email: user?.email,
+              image: user?.image,
+              defaultWorkspace: user?.defaultWorkspace,
+            },
+          });
+          workspaceSlug = newWorkspace.slug;
+        } catch (error) {
+          console.error("Failed to create workspace for sign-up path:", error);
+          // Clear stale cookie and redirect to / - middleware will route appropriately
+          const hostname = new URL(req.url).hostname;
+          const cookieOpts = getServerCookieOptions(hostname);
+          const response = NextResponse.redirect(new URL("/", origin));
+          response.cookies.delete({
+            name: QR_ONBOARDING_SEED_COOKIE,
+            ...cookieOpts,
+          });
+          return response;
+        }
+      }
+
+      // Mark onboarding complete
+      await redis.set(`onboarding-step:${userId}`, "completed");
+
+      // Clear any stale QR seed cookie to avoid carrying it forward
+      const hostname = new URL(req.url).hostname;
+      const cookieOpts = getServerCookieOptions(hostname);
+      const response = NextResponse.redirect(
+        new URL(`/${workspaceSlug}/links?onboarded=true`, origin),
+      );
+      response.cookies.delete({
+        name: QR_ONBOARDING_SEED_COOKIE,
+        ...cookieOpts,
+      });
+      return response;
     }
 
     // 4. Validate seed URL to prevent injection of malformed URLs
     const validUrl = getUrlFromString(seed.url);
     if (!validUrl) {
       console.error("Invalid seed URL:", seed.url);
-      return NextResponse.redirect(new URL("/onboarding", origin));
+      // Clear cookie and redirect to / - middleware will route appropriately
+      const hostname = new URL(req.url).hostname;
+      const cookieOpts = getServerCookieOptions(hostname);
+      const response = NextResponse.redirect(new URL("/", origin));
+      response.cookies.delete({
+        name: QR_ONBOARDING_SEED_COOKIE,
+        ...cookieOpts,
+      });
+      return response;
     }
 
     // 5. Determine target workspace
@@ -150,8 +250,15 @@ export async function GET(req: Request) {
         });
       } catch (error) {
         console.error("Failed to create workspace:", error);
-        // Redirect to regular onboarding on failure
-        return NextResponse.redirect(new URL("/onboarding", origin));
+        // Clear cookie and redirect to / - middleware will route appropriately
+        const hostname = new URL(req.url).hostname;
+        const cookieOpts = getServerCookieOptions(hostname);
+        const response = NextResponse.redirect(new URL("/", origin));
+        response.cookies.delete({
+          name: QR_ONBOARDING_SEED_COOKIE,
+          ...cookieOpts,
+        });
+        return response;
       }
     }
 
@@ -241,7 +348,19 @@ export async function GET(req: Request) {
     return response;
   } catch (error) {
     console.error("QR bootstrap route error:", error);
-    // On any unexpected error, redirect to regular onboarding
-    return NextResponse.redirect(new URL("/onboarding", origin));
+    // On any unexpected error, clear cookie and redirect to / - middleware will route appropriately
+    try {
+      const hostname = new URL(req.url).hostname;
+      const cookieOpts = getServerCookieOptions(hostname);
+      const response = NextResponse.redirect(new URL("/", origin));
+      response.cookies.delete({
+        name: QR_ONBOARDING_SEED_COOKIE,
+        ...cookieOpts,
+      });
+      return response;
+    } catch {
+      // If cookie clearing fails, still redirect
+      return NextResponse.redirect(new URL("/", origin));
+    }
   }
 }

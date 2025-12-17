@@ -21,11 +21,9 @@ const UTM_PARAMS = {
   utm_medium: "Not Found Page",
 };
 
-export default async function NotFoundLinkPage(
-  props: {
-    params: Promise<{ domain: string }>;
-  }
-) {
+export default async function NotFoundLinkPage(props: {
+  params: Promise<{ domain: string }>;
+}) {
   const params = await props.params;
   return (
     <main className="flex min-h-screen flex-col justify-between">
@@ -48,7 +46,8 @@ export default async function NotFoundLinkPage(
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            This QR code does not exist on Checkout. Please check the URL and try again.
+            This QR code does not exist on Checkout. Please check the URL and
+            try again.
           </p>
         </div>
 
@@ -58,7 +57,10 @@ export default async function NotFoundLinkPage(
             "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
           )}
         >
-          <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
+          <ButtonLink
+            variant="primary"
+            href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
+          >
             Get started with CHKO.SH
           </ButtonLink>
           <ButtonLink

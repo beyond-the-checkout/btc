@@ -60,8 +60,8 @@ export default async function ExpiredLinkPage(props: {
                 "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
               )}
             >
-              This QR code has expired. Please contact the owner of this QR code to
-              get a new one.
+              This QR code has expired. Please contact the owner of this QR code
+              to get a new one.
             </p>
           </div>
 
@@ -71,7 +71,10 @@ export default async function ExpiredLinkPage(props: {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            <ButtonLink variant="primary" href="https://app.chko.sh/register">
+            <ButtonLink
+              variant="primary"
+              href="https://app.chko.sh/register?next=/onboarding/qr-landing"
+            >
               Get started with CHKO.SH
             </ButtonLink>
             <ButtonLink

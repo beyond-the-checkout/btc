@@ -43,7 +43,10 @@ export function CTA({
       </div>
 
       <div className="relative mx-auto mt-10 flex max-w-fit">
-        <ButtonLink variant="primary" href={`${APP_DOMAIN}/register`}>
+        <ButtonLink
+          variant="primary"
+          href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
+        >
           Get Started
         </ButtonLink>
       </div>

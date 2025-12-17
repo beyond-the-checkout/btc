@@ -152,7 +152,7 @@ export function PricingPlans() {
                 </button>
               ) : (
                 <a
-                  href={`${APP_DOMAIN}/register`}
+                  href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
                   className={cn(
                     "mb-6 flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition-colors",
                     isPopular

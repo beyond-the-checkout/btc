@@ -1,3 +1,19 @@
+/**
+ * @deprecated LEGACY ONBOARDING - DO NOT USE
+ *
+ * This multi-step onboarding flow (workspace → usage → domain → plan → invite) is DEPRECATED.
+ *
+ * The current onboarding flow is the QR-based single-step onboarding:
+ * - Route: /onboarding/qr-landing (apps/web/app/app.chko.sh/(onboarding)/onboarding/qr-landing/route.ts)
+ * - All new signups should route through /onboarding/qr-landing
+ * - This creates a workspace, marks onboarding complete, and redirects to dashboard
+ *
+ * This legacy flow is kept for backwards compatibility with existing users who may have
+ * bookmarked these URLs or have them in their browser history. New users should never
+ * reach these pages.
+ *
+ * See: onboarding_simplification.md for the design rationale
+ */
 import { Grid } from "@dub/ui";
 import { cn } from "@dub/utils";
 import Link from "next/link";

@@ -10,7 +10,8 @@ export const revalidate = false; // cache indefinitely
 
 export const metadata = constructMetadata({
   title: "Banned QR Code",
-  description: "This QR code has been banned for violating our terms of service.",
+  description:
+    "This QR code has been banned for violating our terms of service.",
   noIndex: true,
 });
 
@@ -57,7 +58,10 @@ export default async function BannedPage(props: {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:300ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            <ButtonLink variant="primary" href="https://app.chko.sh/register">
+            <ButtonLink
+              variant="primary"
+              href="https://app.chko.sh/register?next=/onboarding/qr-landing"
+            >
               Get started with CHKO.SH
             </ButtonLink>
             <ButtonLink

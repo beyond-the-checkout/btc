@@ -40,8 +40,8 @@ export const VerifyEmailForm = () => {
           return;
         }
 
-        // Fallback to onboarding
-        router.replace("/onboarding");
+        // Fallback to QR-based onboarding (the sole onboarding path)
+        router.replace("/onboarding/qr-landing");
       } else {
         toast.error(
           "Failed to sign in with credentials. Please try again or contact support.",
