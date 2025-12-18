@@ -10,7 +10,7 @@ export async function generateMetadata(props: { params: Promise<{ domain: string
   } Custom Domain`;
   const description = `${params.domain.toUpperCase()} is powered by ${
     process.env.NEXT_PUBLIC_APP_NAME
-  } - a QR-driven engagement platform that lets brands issue instant Bitcoin incentives for completing simple actions while capturing first-party data.`;
+  } - a QR-driven engagement platform that lets brands manage dynamic QR codes and gather first-party data.`;
 
   return constructMetadata({
     title,
