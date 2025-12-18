@@ -353,7 +353,7 @@ function LinkLandingQRModalInner({
               <input
                 id={`${id}-destination-url`}
                 type="url"
-                placeholder="https://your-destination.com"
+                placeholder="https://chko.sh"
                 className={cn(
                   "h-14 w-full rounded-xl border-2 border-neutral-200 px-5 text-center text-lg outline-none transition-all duration-200",
                   "placeholder:text-neutral-400",
@@ -432,13 +432,37 @@ function LinkLandingQRModalInner({
                           />
                         </motion.div>
                       ) : (
-                        <motion.p
+                        <motion.div
+                          key="sample-qr"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          className="px-4 text-center text-sm text-neutral-400"
+                          className="relative flex size-full flex-col items-center justify-center gap-4 p-4"
                         >
-                          Enter a URL to generate your QR code
-                        </motion.p>
+                          <QRCode
+                            url="https://chko.sh"
+                            fgColor="#a3a3a3"
+                            logo={logo}
+                            scale={2.2}
+                            qrShape="square"
+                            dotsOptions={{
+                              type: "square",
+                              color: "#a3a3a3",
+                            }}
+                            eyeOptions={{
+                              cornerSquare: {
+                                type: "square",
+                                color: "#a3a3a3",
+                              },
+                              cornerDot: {
+                                type: "square",
+                                color: "#a3a3a3",
+                              },
+                            }}
+                          />
+                          <p className="text-center text-sm text-neutral-400">
+                            Enter a URL to generate your QR code
+                          </p>
+                        </motion.div>
                       )}
                     </AnimatePresence>
                   </div>
