@@ -578,10 +578,9 @@ export const authOptions: NextAuthOptions = {
           Promise.allSettled([
             // track lead if dub_id cookie is present
             trackDubLead(user),
-            // trigger welcome workflow 15 minutes after the user signed up
+            // trigger welcome workflow immediately after signup
             qstash.publishJSON({
               url: `${APP_DOMAIN_WITH_NGROK}/api/cron/welcome-user`,
-              delay: 15 * 60,
               body: { userId: user.id },
             }),
           ]),
