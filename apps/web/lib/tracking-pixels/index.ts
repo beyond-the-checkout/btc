@@ -40,6 +40,7 @@
 
 // Components
 export { GoogleTag } from "./google-tag";
+export { default as TrackSignup } from "./track-signup";
 
 // Hooks
 export { trackConversion, useTrackConversion } from "./use-track-conversion";

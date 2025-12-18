@@ -18,7 +18,7 @@ import {
   toQRDataInput,
 } from "@/lib/qr";
 import useWorkspace from "@/lib/swr/use-workspace";
-import { trackConversion } from "@/lib/tracking-pixels";
+import { trackConversion, TrackSignup } from "@/lib/tracking-pixels";
 import {
   LANDING_DRAFT_STORAGE_KEY,
   readDraftsFromStorage,
@@ -168,8 +168,12 @@ function WelcomeModal({
 
   // QR flow detection
   const onboarded = searchParams.get("onboarded") === "true";
+  const isUpgrade = !!searchParams.get("upgraded") || !!planId;
   const source = getQROnboardingSource(searchParams);
   const isQrFlow = isQROnboarding(source);
+
+  // Track signup conversion for new users (not upgrades)
+  const shouldTrackSignup = onboarded && !isUpgrade;
 
   // Memoized latest QR seed (cookie preferred, then localStorage drafts)
   const latest:
@@ -349,6 +353,8 @@ function WelcomeModal({
         })
       }
     >
+      {/* Track signup conversion for new users completing onboarding */}
+      {shouldTrackSignup && <TrackSignup />}
       <div className="flex flex-col">
         <ModalHero />
         <div className="px-6 py-8 sm:px-12">

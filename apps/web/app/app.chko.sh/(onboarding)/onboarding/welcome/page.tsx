@@ -1,18 +1,20 @@
 import { NewBackground } from "@/ui/shared/new-background";
-import { cn, CHECKOUT_WORDMARK } from "@dub/utils/src";
+import { CHECKOUT_WORDMARK, cn } from "@dub/utils/src";
 import { NextButton } from "../next-button";
-import TrackSignup from "./track-signup";
 
 export default function Welcome() {
   return (
     <>
-      <TrackSignup />
       <NewBackground showAnimation showGradient={false} />
       <div className="relative flex min-h-screen flex-col items-center justify-center">
         <div className="flex max-w-sm flex-col items-center px-4 py-16 text-center">
           <div className="animate-slide-up-fade relative flex w-auto items-center justify-center px-6 py-2 [--offset:20px] [animation-duration:1.3s] [animation-fill-mode:both]">
             <Gradient className="opacity-10 mix-blend-overlay" />
-            <img src={CHECKOUT_WORDMARK} alt="Beyond the Checkout" className="relative w-48 h-auto sm:w-64" />
+            <img
+              src={CHECKOUT_WORDMARK}
+              alt="Beyond the Checkout"
+              className="relative h-auto w-48 sm:w-64"
+            />
             <Gradient className="opacity-50 mix-blend-hard-light" />
           </div>
           <h1 className="animate-slide-up-fade mt-14 text-xl font-semibold text-neutral-900 [--offset:10px] [animation-delay:250ms] [animation-duration:1s] [animation-fill-mode:both]">
