@@ -26,7 +26,6 @@ import {
   Hyperlink,
   LinkBroken,
   LocationPin,
-  Magic,
   MapPosition,
   MobilePhone,
   OfficeBuilding,
@@ -471,18 +470,6 @@ export function useAnalyticsFilters({
 
   const filters: ComponentProps<typeof Filter.Select>["filters"] = useMemo(
     () => [
-      {
-        key: "ai",
-        icon: Magic,
-        label: "Ask AI",
-        separatorAfter: true,
-        options:
-          aiFilterSuggestions?.map(({ icon, value }) => ({
-            value,
-            label: value,
-            icon,
-          })) ?? null,
-      },
       ...(dashboardProps
         ? []
         : programPage
