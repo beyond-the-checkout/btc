@@ -12,7 +12,7 @@ const partners = [
     description:
       "Teaching kids about free markets and entrepreneurship through interactive learning.",
     quote:
-      "Teaching financial literacy requires capturing attention in creative ways. This platform allowed us to integrate Bitcoin-incentivized QR codes directly into our event materials. The result? Parents and kids weren't just walking by; they were actively scanning to learn more and unlock rewards. It's a powerful tool for engagement that aligns perfectly with our mission.",
+      "Teaching financial literacy requires capturing attention in creative ways. With dynamic QR codes on our event materials, we can update destinations on the fly and see exactly which activities drive the most engagement. Parents and kids weren't just walking by—they were actively scanning to learn more. The real-time analytics helped us optimize our booth layout mid-event.",
     category: "Education",
   },
   {
@@ -21,16 +21,16 @@ const partners = [
     href: "https://foundation.xyz/",
     description: "Digital art and collectibles platform built for creators.",
     quote:
-      "Privacy and security are paramount to our users, but so is community connection. This platform offered us a way to engage our audience via QR codes without invasive tracking, while still offering a value-add through Bitcoin incentives. It's a clean, professional way to bridge the physical and digital gap for hardware users.",
+      "Privacy and security are paramount to our users, but so is community connection. These QR codes let us engage our audience without invasive tracking while maintaining a polished, professional look. Being able to update where codes point without reprinting is a game-changer for hardware packaging.",
     category: "Tech",
   },
   {
     name: "BTC-TC",
     logo: "https://assets.chko.sh/partners/BTC-TC_Gold-Black.jpg",
     href: "https://btc-tc.com/",
-    description: "Premium Bitcoin trading cards and collectibles.",
+    description: "Premium trading cards and collectibles.",
     quote:
-      "Building a strong network relies on effective communication tools. We utilized these incentivized QR codes to streamline interactions and gather feedback efficiently. The Bitcoin incentive served as a perfect 'proof of work' for our community's attention, ensuring high-quality engagement and genuine feedback from our user base.",
+      "Building a strong collector network relies on effective communication tools. We put QR codes on every card pack, and the scan analytics tell us exactly which products generate the most interest. Being able to redirect scans to new campaigns without reprinting saved us thousands.",
     category: "Community",
   },
   {
@@ -38,18 +38,18 @@ const partners = [
     logo: "https://assets.chko.sh/partners/ShamoryLogo.jpg",
     href: "https://shamory.com/",
     description:
-      "Fun, educational card game teaching Bitcoin basics to families.",
+      "Fun, educational card game teaching financial basics to families.",
     quote:
-      "We are always looking for ways to make Bitcoin fun and accessible for families. Using these incentivized QR codes created a 'digital scavenger hunt' feel for our customers. The ability to offer small Bitcoin rewards for engagement turned passive browsing into active excitement. It's been a fantastic value-add for the Shamory universe.",
+      "We wanted our card game to feel interactive beyond the table. QR codes on our packaging link to tutorials, bonus content, and community features—and we can update those links seasonally. The dashboard shows us scan patterns by region, helping us plan where to focus marketing efforts.",
     category: "Education",
   },
   {
     name: "Panties for Bitcoin",
     logo: "https://assets.chko.sh/partners/P4B_RoundLogo.png",
     href: "https://www.pantiesforbitcoin.com/",
-    description: "Bold lingerie brand accepting Bitcoin payments.",
+    description: "Bold lingerie brand with a tech-forward approach.",
     quote:
-      "Our brand is about merging quality with the Bitcoin ethos. We tested these QR codes on our packaging and at events, and the response was incredible. Customers loved the surprise of scanning a code and receiving a real Bitcoin incentive. It builds immediate goodwill and makes the unboxing experience even more rewarding.",
+      "We tested QR codes on our packaging and at events, and the response was incredible. Customers scan to access exclusive content and care instructions. The analytics showed us which product lines drive the most engagement, and we can update the destination without touching the packaging.",
     category: "Lifestyle",
   },
   {
@@ -58,25 +58,25 @@ const partners = [
     href: "https://nihowdy.com/",
     description: "Modern Chinese language learning platform.",
     quote:
-      "At NiHowdy, we are already built on the premise of saving money and earning Bitcoin. Integrating this QR code platform was a natural fit. It streamlined how we connect with new users, offering them an instant, tangible proof of our 'earn while you save' model. The engagement metrics speak for themselves—people love immediate value.",
+      "Integrating QR codes into our physical materials was a natural fit. Students scan to access lessons, and we see exactly which materials drive app downloads. The ability to A/B test different landing pages by updating the QR destination has dramatically improved our conversion rates.",
     category: "Lifestyle",
   },
   {
     name: "Proof of Pod",
     logo: "https://assets.chko.sh/partners/ProofOfPod_Logo.png",
     href: "https://www.youtube.com/@ProofofPod",
-    description: "Bitcoin-focused podcast bringing stories from the community.",
+    description: "Podcast bringing stories from the community.",
     quote:
-      "Audience engagement is the lifeblood of any podcast. These QR codes gave us a direct line to our listeners at meetups and conferences. By attaching a small Bitcoin incentive to the scan, we saw a massive spike in newsletter sign-ups and feedback. It turns a 'listener' into an active participant instantly.",
+      "Audience engagement is the lifeblood of any podcast. QR codes on our merch and event materials give us a direct line to listeners. The scan analytics show us which episodes and topics resonate most, and we can update codes to point to new content without reprinting anything.",
     category: "Media",
   },
   {
     name: "Jippi",
     logo: "https://assets.chko.sh/partners/Jippi_Logo.png",
     href: "https://jippi.app/",
-    description: "Gamified Bitcoin savings app for everyday purchases.",
+    description: "Gamified savings app for everyday purchases.",
     quote:
-      "Gamification is at the heart of Jippi. Adding incentivized QR codes to our physical touchpoints effectively extended our game into the real world. It gave players a reason to stop, scan, and interact, driving higher retention and bridging the gap between our app and our community events.",
+      "Adding QR codes to our physical touchpoints extended our app into the real world. The codes on our promotional materials link directly to personalized onboarding flows, and we can see exactly which events and locations drive the most sign-ups. Dynamic updates mean we never waste printed materials.",
     category: "Gaming",
   },
 ];
@@ -93,7 +93,8 @@ export default function CustomersPage() {
         </h1>
         <p className="mt-6 text-lg text-neutral-600">
           Checkout gives superpowers to businesses of all sizes – from startups
-          to established brands building with Bitcoin.
+          to established brands looking to connect physical products with
+          digital experiences.
         </p>
         <div className="mt-8 flex gap-4">
           <Link
