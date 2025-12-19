@@ -9,11 +9,9 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import DashboardPasswordForm from "./form";
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ dashboardId: string }>;
-  }
-) {
+export async function generateMetadata(props: {
+  params: Promise<{ dashboardId: string }>;
+}) {
   const params = await props.params;
   const data = await getDashboard({ id: params.dashboardId });
 
@@ -29,11 +27,9 @@ export async function generateMetadata(
   });
 }
 
-export default async function DashboardPage(
-  props: {
-    params: Promise<{ dashboardId: string }>;
-  }
-) {
+export default async function DashboardPage(props: {
+  params: Promise<{ dashboardId: string }>;
+}) {
   const params = await props.params;
   const data = await getDashboard({ id: params.dashboardId });
 
@@ -44,7 +40,8 @@ export default async function DashboardPage(
 
   if (
     data.password &&
-    (await cookies()).get(`dub_password_${params.dashboardId}`)?.value !== data.password
+    (await cookies()).get(`dub_password_${params.dashboardId}`)?.value !==
+      data.password
   ) {
     return (
       <main className="flex h-screen w-screen items-center justify-center">
@@ -66,8 +63,8 @@ export default async function DashboardPage(
 
   return (
     <div className="flex min-h-screen flex-col justify-between bg-neutral-50/80">
-      <NavMobile staticDomain="app.dub.co" />
-      <Nav staticDomain="app.dub.co" />
+      <NavMobile staticDomain="chko.sh" />
+      <Nav staticDomain="chko.sh" />
       <Suspense fallback={<div className="h-screen w-full bg-neutral-50" />}>
         <Analytics
           dashboardProps={{
@@ -79,7 +76,7 @@ export default async function DashboardPage(
           }}
         />
       </Suspense>
-      <Footer staticDomain="app.dub.co" />
+      <Footer staticDomain="chko.sh" />
     </div>
   );
 }
