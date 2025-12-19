@@ -28,9 +28,9 @@ const socials = [
 
 const navigation = {
   company: [
-    { name: "About", href: "/about" },
+    { name: "About", href: "/" },
     { name: "Customers", href: "/customers" },
-    { name: "Contact", href: "/contact" },
+    { name: "Contact", href: "mailto:team@chko.sh" },
   ],
   legal: LEGAL_PAGES.map(({ name, slug }) => ({
     name,
