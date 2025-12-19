@@ -132,7 +132,7 @@ export const DestinationUrlInput = forwardRef<
             id={inputId}
             placeholder={
               domains?.find(({ slug }) => slug === domain)?.placeholder ||
-              "https://dub.co/help/article/what-is-dub"
+              "https://your-destination.com"
             }
             autoFocus={!key && !isMobile}
             autoComplete="off"
