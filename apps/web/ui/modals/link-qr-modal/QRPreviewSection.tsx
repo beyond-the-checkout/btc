@@ -31,11 +31,7 @@ export function QRPreviewSection(): JSX.Element {
           </span>
           <InfoTooltip
             content={
-              <SimpleTooltipContent
-                title="Customize your QR code to fit your brand."
-                cta="Learn more."
-                href="https://dub.co/help/article/custom-qr-codes"
-              />
+              <SimpleTooltipContent title="Customize your QR code to fit your brand." />
             }
           />
         </div>

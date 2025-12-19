@@ -62,8 +62,6 @@ export function QRLogoSection(): JSX.Element | null {
                   ? "Upgrade to a paid plan to customize your QR code logo."
                   : "Add your brand logo to the center of your QR code."
               }
-              cta="Learn more."
-              href="https://dub.co/help/article/custom-qr-codes"
             />
           }
         />
