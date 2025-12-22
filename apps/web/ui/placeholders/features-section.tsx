@@ -20,29 +20,28 @@ export function FeaturesSection({
     <div className="mt-20">
       <div className="mx-auto w-full max-w-xl px-4 text-center">
         <div className="mx-auto flex h-7 w-fit items-center rounded-full border border-neutral-200 bg-white px-4 text-xs text-neutral-800">
-          Platform Features
+          Everything you need
         </div>
         <h2 className="font-display mt-2 text-balance text-3xl font-medium text-neutral-900">
-          Everything you need for reliable, dynamic QR codes
+          QR codes built for businesses that print on real things
         </h2>
         <p className="mt-3 text-pretty text-lg text-neutral-500">
-          Checkout delivers guaranteed longevity, complete data ownership, and
-          transparent pricing for QR codes at scale. Update anytime, manage
-          thousands, and track every scan.
+          Menus. Packaging. Table tents. Signage. You print thousands of them,
+          and you need codes that still work next year. And the year after that.
         </p>
       </div>
       <div className="mx-auto mt-14 grid w-full max-w-screen-lg grid-cols-1 px-4 sm:grid-cols-2">
         <div className="contents divide-neutral-200 max-sm:divide-y sm:divide-x">
           <FeatureCard
-            title="Guaranteed Longevity"
-            description="Your QR codes never expire. We guarantee long-term reliability with no arbitrary expiration dates or surprise shutdowns."
+            title="Never expires"
+            description="No arbitrary expiration dates. No surprise shutdowns. Once created, your QR code works indefinitely. Even if you cancel your account."
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Domains />
           </FeatureCard>
           <FeatureCard
-            title="Easy QR Code Generation"
-            description="Create QR codes in seconds with our intuitive interface. No technical knowledge required—just enter your URL and generate. Bulk creation and API access available."
+            title="Update anytime"
+            description="Change where your code points whenever you want. New menu? New landing page? Update the destination. The printed code stays the same."
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <QR />
@@ -53,7 +52,7 @@ export function FeaturesSection({
           className="border-y border-neutral-200 pt-12 sm:col-span-2"
           graphicClassName="sm:h-96"
           title="Real-time analytics"
-          description="Track every scan in real time with detailed analytics on QR code performance, geographic data, and device types. Monitor trends and optimize campaigns instantly."
+          description="See scans as they happen. Geographic data. Device types. Time trends. Free includes 100 events per month. Pro includes 10,000."
         >
           <a
             href="https://app.chko.sh/share/dash_1KAYTMYPYVXD77ZPYQMPQ7VF6"
@@ -75,22 +74,22 @@ export function FeaturesSection({
         <div className="grid grid-cols-1 border-t border-neutral-200 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             className="border-r-0 border-neutral-200 sm:border-r lg:border-r"
-            title="Transparent Pricing"
-            description="No hidden fees or surprise charges. Clear, upfront pricing with no arbitrary limits. You know exactly what you're paying for."
+            title="Custom domains"
+            description="Use your own domain for branded short links. Your QR codes, your brand. No ForeverQRs branding required."
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Personalization />
           </FeatureCard>
           <FeatureCard
             className="border-r-0 border-neutral-200 lg:border-r"
-            title="Fully Customizable QR Codes"
-            description="Design QR codes that match your brand. Choose dot patterns, corner styles, colors, frames, and add your logo—all with pixel-perfect control at any scale."
+            title="Fully customizable design"
+            description="Match your brand. Dot patterns, corner styles, colors, frames, logos. Pixel-perfect at any scale."
           >
             <QRCustomization />
           </FeatureCard>
           <FeatureCard
-            title="Complete Data Ownership"
-            description="Your scan data belongs to you. Export anytime, full data portability, and complete control over your customer information."
+            title="Your data is yours"
+            description="Full CSV export of all your codes, destinations, and scan analytics. Export anytime. No lock-in."
           >
             {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
             <Domains />

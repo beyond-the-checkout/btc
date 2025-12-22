@@ -4,6 +4,7 @@ import { LinkLandingQRCreator } from "@/ui/modals/link-landing-qr-modal";
 import { CTA } from "@/ui/placeholders/cta";
 import { FeaturesSection } from "@/ui/placeholders/features-section";
 import { Hero } from "@/ui/placeholders/hero";
+import Logos from "@/ui/placeholders/logos";
 import { cn } from "@dub/utils";
 import { useParams } from "next/navigation";
 
@@ -25,7 +26,7 @@ export default function PlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            Dynamic QR codes that never expire
+            QR codes that work <span className="font-semibold">forever</span>.
           </h1>
           <p
             className={cn(
@@ -33,9 +34,8 @@ export default function PlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            Checkout delivers guaranteed longevity for your QR codes with
-            transparent pricing and no hidden fees. Your scan data belongs to
-            you—update anytime without reprinting.
+            Create QR codes you can update anytime. No surprise fees. No
+            &ldquo;upgrade or your codes stop working&rdquo; emails.
           </p>
           <div
             className={cn(
@@ -47,7 +47,8 @@ export default function PlaceholderContent() {
           </div>
         </div>
       </Hero>
-      <div className="mt-20">
+      <Logos domain={domain} utmParams={UTM_PARAMS} className="mt-8" />
+      <div className="mt-12">
         <FeaturesSection domain={domain} utmParams={UTM_PARAMS} />
       </div>
       <div className="mt-32">

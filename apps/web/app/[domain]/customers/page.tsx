@@ -92,9 +92,9 @@ export default function CustomersPage() {
           Meet our customers
         </h1>
         <p className="mt-6 text-lg text-neutral-600">
-          Checkout gives superpowers to businesses of all sizes – from startups
-          to established brands looking to connect physical products with
-          digital experiences.
+          ForeverQRs helps businesses of all sizes connect physical products
+          with digital experiences. QR codes that work forever, even if you
+          cancel.
         </p>
         <div className="mt-8 flex gap-4">
           <Link

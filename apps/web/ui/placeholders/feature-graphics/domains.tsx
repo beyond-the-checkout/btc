@@ -1,19 +1,19 @@
-import { QRCode, FlagWavy, LinkLogo } from "@dub/ui";
+import { FlagWavy, QRCode } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { CSSProperties } from "react";
 
 const DOMAINS = [
   {
-    domain: "chko.sh",
+    domain: "foreverqrs.com",
     scans: "15.6K",
     primary: true,
   },
   {
-    domain: "chko.sh",
+    domain: "foreverqrs.com",
     scans: "3.7K",
   },
   {
-    domain: "chko.sh",
+    domain: "foreverqrs.com",
     scans: "2.4K",
   },
 ];
@@ -35,11 +35,11 @@ export function Domains() {
               style={{ "--idx": idx } as CSSProperties}
             >
               <div className="flex-none rounded-full border border-neutral-200 bg-gradient-to-t from-neutral-100 p-2">
-                {/* NEW: Using Beyond The Checkout QR code logo */}
+                {/* ForeverQRs logo */}
                 <img
                   src="/logos/beyond-the-checkout-logo.png"
-                  alt="Beyond The Checkout"
-                  className="size-6 sm:size-6 object-contain"
+                  alt="ForeverQRs"
+                  className="size-6 object-contain sm:size-6"
                 />
                 {/* ORIGINAL LOGO (commented out) */}
                 {/* <LinkLogo apexDomain="dub.co" className="size-6 sm:size-6" /> */}

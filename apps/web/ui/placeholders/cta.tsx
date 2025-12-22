@@ -2,13 +2,12 @@ import { Grid } from "@dub/ui";
 import { APP_DOMAIN, cn, UTMTags } from "@dub/utils";
 import { ReactNode } from "react";
 import { ButtonLink } from "./button-link";
-import Logos from "./logos";
 
 export function CTA({
   domain,
   utmParams,
   title = "Print QR codes you can trust",
-  subtitle = "Guaranteed longevity with transparent pricing. Your QR codes never expire, and your scan data belongs to you—no hidden fees, no surprises.",
+  subtitle = "No ransom emails. No expiration surprises. Codes that work, forever.",
   className,
 }: {
   domain: string;
@@ -49,14 +48,6 @@ export function CTA({
         >
           Get Started
         </ButtonLink>
-      </div>
-
-      <div className="relative">
-        <Logos
-          domain={domain}
-          utmParams={utmParams}
-          className="mb-0 mt-8 max-w-screen-md"
-        />
       </div>
     </div>
   );

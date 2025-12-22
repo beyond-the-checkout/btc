@@ -11,7 +11,7 @@ export const revalidate = false; // cache indefinitely
 export const metadata = constructMetadata({
   title: "QR Code Not Found",
   description:
-    "This QR code does not exist on Checkout. Please check the URL and try again.",
+    "This QR code does not exist. Please check the URL and try again.",
   image: "https://assets.chko.sh/misc/notfoundlink.jpg",
   noIndex: true,
 });
@@ -46,8 +46,7 @@ export default async function NotFoundLinkPage(props: {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            This QR code does not exist on Checkout. Please check the URL and
-            try again.
+            This QR code does not exist. Please check the URL and try again.
           </p>
         </div>
 
@@ -61,7 +60,7 @@ export default async function NotFoundLinkPage(props: {
             variant="primary"
             href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
           >
-            Get started with CHKO.SH
+            Create your first QR code
           </ButtonLink>
           <ButtonLink
             variant="secondary"

@@ -8,14 +8,12 @@ export default function PricingPage() {
       {/* Header */}
       <div className="mx-auto max-w-3xl text-center">
         <h1 className="font-display text-4xl font-medium italic tracking-tight text-neutral-900 sm:text-5xl">
-          Flexible plans that
-          <br />
-          grow with you
+          Simple pricing
         </h1>
         <p className="mt-6 text-lg text-neutral-600">
-          Start for free, no credit card required.
+          Redirects are forever. Analytics are metered.
           <br />
-          Upgrade when you need a plan that fits your needs.
+          Start for free, no credit card required.
         </p>
       </div>
 

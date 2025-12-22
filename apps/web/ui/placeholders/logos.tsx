@@ -49,7 +49,7 @@ export default function Logos({
   domain,
   utmParams,
   variant = "default",
-  copy = "Trusted by our partners",
+  copy = "Trusted by",
   className,
 }: {
   domain: string;
@@ -74,7 +74,7 @@ export default function Logos({
       {copy !== null && (
         <p
           className={cn(
-            "mx-auto max-w-sm text-balance text-center text-sm text-content-subtle",
+            "text-content-subtle mx-auto max-w-sm text-balance text-center text-sm",
             variant === "default"
               ? "transition-[filter,opacity] duration-300 group-hover:opacity-30 group-hover:blur-sm sm:max-w-xl"
               : "sm:text-left",
@@ -109,9 +109,8 @@ export default function Logos({
         ))}
       </div>
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <span className="flex items-center text-sm font-medium text-content-emphasis">
-          See more of our partners{" "}
-          <ExpandingArrow className="size-4" />
+        <span className="text-content-emphasis flex items-center text-sm font-medium">
+          See more of our partners <ExpandingArrow className="size-4" />
         </span>
       </div>
     </Link>

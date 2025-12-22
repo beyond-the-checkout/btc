@@ -353,7 +353,7 @@ function LinkLandingQRModalInner({
               <input
                 id={`${id}-destination-url`}
                 type="url"
-                placeholder="https://chko.sh"
+                placeholder="https://foreverqrs.com"
                 className={cn(
                   "h-14 w-full rounded-xl border-2 border-neutral-200 px-5 text-center text-lg outline-none transition-all duration-200",
                   "placeholder:text-neutral-400",
@@ -439,7 +439,7 @@ function LinkLandingQRModalInner({
                           className="relative flex size-full flex-col items-center justify-center gap-4 p-4"
                         >
                           <QRCode
-                            url="https://chko.sh"
+                            url="https://foreverqrs.com"
                             fgColor="#a3a3a3"
                             logo={logo}
                             scale={2.2}

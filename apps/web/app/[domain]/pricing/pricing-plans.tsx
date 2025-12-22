@@ -16,10 +16,10 @@ import { APP_DOMAIN, cn, PLANS } from "@dub/utils";
 import { useState } from "react";
 
 const PLAN_DESCRIPTIONS: Record<string, string> = {
-  Free: "Get started with basic QR code creation and tracking",
-  Base: "For individuals and small teams getting started with QR codes",
-  Business: "For growing businesses needing advanced features and insights",
-  Advanced: "For power users needing higher limits and priority support",
+  Free: "Unlimited static codes. 2 dynamic codes per month. 100 analytics events.",
+  Base: "More dynamic codes and analytics events for growing needs.",
+  Business: "Unlimited dynamic codes and analytics events for teams.",
+  Advanced: "Higher limits, custom domains, and priority support.",
 };
 
 // Plans that are coming soon and cannot be upgraded to yet
@@ -216,6 +216,18 @@ export function PricingPlans() {
             Contact us
           </a>
         </div>
+      </div>
+
+      {/* Cancellation Explanation */}
+      <div className="mt-8 rounded-xl border border-neutral-200 bg-neutral-50 p-6 text-center">
+        <h3 className="text-lg font-semibold text-neutral-900">
+          What happens if I cancel or downgrade?
+        </h3>
+        <p className="mx-auto mt-2 max-w-2xl text-sm text-neutral-600">
+          Your codes keep redirecting. That never changes. Your analytics event
+          limit adjusts to your new plan. If your codes get more scans than your
+          plan includes, you&apos;ll see partial data until you upgrade.
+        </p>
       </div>
     </div>
   );
