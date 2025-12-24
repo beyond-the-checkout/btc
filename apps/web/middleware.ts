@@ -10,6 +10,8 @@ import {
   API_HOSTNAMES,
   APP_HOSTNAMES,
   DEFAULT_REDIRECTS,
+  isMarketingDomain,
+  isNicheSlug,
   isValidUrl,
 } from "@dub/utils";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
@@ -52,6 +54,13 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
   // for public marketing pages (pricing, customers, landing page)
   if (path === "/pricing" || path === "/customers" || path === "/") {
     return NextResponse.rewrite(new URL(`/${domain}${path}`, req.url));
+  }
+
+  const potentialNiche = path.slice(1).split("/")[0];
+  if (isMarketingDomain(domain) && isNicheSlug(potentialNiche)) {
+    return NextResponse.rewrite(
+      new URL(`/${domain}/${potentialNiche}`, req.url),
+    );
   }
 
   // for legal pages (TOS and Privacy Policy)

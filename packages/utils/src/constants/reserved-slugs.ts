@@ -3,8 +3,10 @@
  * - cannot be registered for a short link (only for dub.sh / dub.link domains)
  * - cannot be used as a workspace slug
  */
+import { NICHE_SLUGS } from "./niche-slugs";
 
 export const RESERVED_SLUGS = [
+  ...NICHE_SLUGS,
   "va",
   "static",
   "stats",

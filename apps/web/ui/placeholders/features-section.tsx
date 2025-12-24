@@ -1,3 +1,4 @@
+import { FeatureOverride } from "@/lib/niches";
 import { ExpandingArrow } from "@dub/ui";
 import { cn, UTMTags } from "@dub/utils";
 import Link from "next/link";
@@ -9,13 +10,86 @@ import { Personalization } from "./feature-graphics/personalization";
 import { QR } from "./feature-graphics/qr";
 import { QRCustomization } from "./feature-graphics/qr-customization";
 
+type BaseFeature = Pick<FeatureOverride, "id" | "graphic"> & {
+  title: string;
+  description: string;
+};
+
+const DEFAULT_FEATURES: BaseFeature[] = [
+  {
+    id: "domains",
+    title: "Never expires",
+    description:
+      "No arbitrary expiration dates. No surprise shutdowns. Once created, your QR code works indefinitely. Even if you cancel your account.",
+  },
+  {
+    id: "qr",
+    title: "Update anytime",
+    description:
+      "Change where your code points whenever you want. New menu? New landing page? Update the destination. The printed code stays the same.",
+  },
+  {
+    id: "analytics",
+    title: "Real-time analytics",
+    description:
+      "See scans as they happen. Geographic data. Device types. Time trends. Free includes 100 events per month. Pro includes 10,000.",
+  },
+  {
+    id: "personalization",
+    title: "Custom domains",
+    description:
+      "Use your own domain for branded short links. Your QR codes, your brand. No ForeverQRs branding required.",
+  },
+  {
+    id: "qr-customization",
+    title: "Fully customizable design",
+    description:
+      "Match your brand. Dot patterns, corner styles, colors, frames, logos. Pixel-perfect at any scale.",
+  },
+  {
+    id: "data-export",
+    title: "Your data is yours",
+    description:
+      "Full CSV export of all your codes, destinations, and scan analytics. Export anytime. No lock-in.",
+  },
+];
+
+const mergeFeatures = (overrides?: FeatureOverride[]): BaseFeature[] => {
+  const overrideMap = new Map(
+    (overrides ?? []).map((override) => [override.id, override]),
+  );
+
+  return DEFAULT_FEATURES.map((feature) => {
+    const override = overrideMap.get(feature.id);
+    return {
+      ...feature,
+      ...(override?.title ? { title: override.title } : {}),
+      ...(override?.description ? { description: override.description } : {}),
+      ...(override?.graphic ? { graphic: override.graphic } : {}),
+    };
+  });
+};
+
 export function FeaturesSection({
   domain,
   utmParams,
+  overrides,
 }: {
   domain: string;
   utmParams: Partial<Record<(typeof UTMTags)[number], string>>;
+  overrides?: FeatureOverride[];
 }) {
+  const features = mergeFeatures(overrides);
+  const getFeature = (id: FeatureOverride["id"]) =>
+    features.find((feature) => feature.id === id)!;
+
+  const domainsFeature = getFeature("domains");
+  const qrFeature = getFeature("qr");
+  const analyticsFeature = getFeature("analytics");
+  const personalizationFeature = getFeature("personalization");
+  const customizationFeature = getFeature("qr-customization");
+  const dataExportFeature = getFeature("data-export");
+
   return (
     <div className="mt-20">
       <div className="mx-auto w-full max-w-xl px-4 text-center">
@@ -33,35 +107,32 @@ export function FeaturesSection({
       <div className="mx-auto mt-14 grid w-full max-w-screen-lg grid-cols-1 px-4 sm:grid-cols-2">
         <div className="contents divide-neutral-200 max-sm:divide-y sm:divide-x">
           <FeatureCard
-            title="Never expires"
-            description="No arbitrary expiration dates. No surprise shutdowns. Once created, your QR code works indefinitely. Even if you cancel your account."
+            title={domainsFeature.title}
+            description={domainsFeature.description}
           >
-            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
-            <Domains />
+            {domainsFeature.graphic ?? <Domains />}
           </FeatureCard>
           <FeatureCard
-            title="Update anytime"
-            description="Change where your code points whenever you want. New menu? New landing page? Update the destination. The printed code stays the same."
+            title={qrFeature.title}
+            description={qrFeature.description}
           >
-            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
-            <QR />
+            {qrFeature.graphic ?? <QR />}
           </FeatureCard>
         </div>
 
         <FeatureCard
           className="border-y border-neutral-200 pt-12 sm:col-span-2"
           graphicClassName="sm:h-96"
-          title="Real-time analytics"
-          description="See scans as they happen. Geographic data. Device types. Time trends. Free includes 100 events per month. Pro includes 10,000."
+          title={analyticsFeature.title}
+          description={analyticsFeature.description}
         >
           <a
             href="https://app.chko.sh/share/dash_1KAYTMYPYVXD77ZPYQMPQ7VF6"
             target="_blank"
             className="group block size-full"
           >
-            {/* TODO: Update demo analytics link when available */}
             <div className="size-full transition-[filter,opacity] duration-300 group-hover:opacity-70 group-hover:blur-[3px]">
-              <Analytics />
+              {analyticsFeature.graphic ?? <Analytics />}
             </div>
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <span className="text-content-emphasis flex items-center text-sm font-medium">
@@ -74,25 +145,23 @@ export function FeaturesSection({
         <div className="grid grid-cols-1 border-t border-neutral-200 sm:col-span-2 sm:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             className="border-r-0 border-neutral-200 sm:border-r lg:border-r"
-            title="Custom domains"
-            description="Use your own domain for branded short links. Your QR codes, your brand. No ForeverQRs branding required."
+            title={personalizationFeature.title}
+            description={personalizationFeature.description}
           >
-            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
-            <Personalization />
+            {personalizationFeature.graphic ?? <Personalization />}
           </FeatureCard>
           <FeatureCard
             className="border-r-0 border-neutral-200 lg:border-r"
-            title="Fully customizable design"
-            description="Match your brand. Dot patterns, corner styles, colors, frames, logos. Pixel-perfect at any scale."
+            title={customizationFeature.title}
+            description={customizationFeature.description}
           >
-            <QRCustomization />
+            {customizationFeature.graphic ?? <QRCustomization />}
           </FeatureCard>
           <FeatureCard
-            title="Your data is yours"
-            description="Full CSV export of all your codes, destinations, and scan analytics. Export anytime. No lock-in."
+            title={dataExportFeature.title}
+            description={dataExportFeature.description}
           >
-            {/* TODO: Update graphic when btc.git-89 (brand assets) is complete */}
-            <Domains />
+            {dataExportFeature.graphic ?? <Domains />}
           </FeatureCard>
         </div>
       </div>

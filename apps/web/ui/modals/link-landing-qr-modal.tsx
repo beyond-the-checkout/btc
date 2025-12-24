@@ -127,9 +127,11 @@ export function LinkLandingQRModal({
 export function LinkLandingQRCreator({
   seedUrl,
   seedDraft,
+  ctaText,
 }: {
   seedUrl?: string;
   seedDraft?: Partial<QRCodeDesign>;
+  ctaText?: string;
 }) {
   const seeds = useMemo(
     () => computeInitialSeeds(seedUrl, seedDraft),
@@ -146,7 +148,7 @@ export function LinkLandingQRCreator({
       >
         <LinkLandingQRModalInner
           title="Create a QR code"
-          ctaText="Click to download"
+          ctaText={ctaText ?? "Click to download"}
           onClose={() => {}}
         />
       </LinkBuilderProvider>
