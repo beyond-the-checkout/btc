@@ -1,10 +1,12 @@
 import { isNicheSlug, NicheSlug } from "@dub/utils";
 
-import { NicheConfig } from "./types";
+import { ecommerceConfig } from "./configs/ecommerce";
 import { restaurantsConfig } from "./configs/restaurants";
+import { NicheConfig } from "./types";
 
 export const NICHE_CONFIGS = new Map<NicheSlug, NicheConfig>([
   ["restaurants", restaurantsConfig],
+  ["ecommerce", ecommerceConfig],
 ]);
 
 export const getNicheConfig = (slug: NicheSlug): NicheConfig | undefined =>

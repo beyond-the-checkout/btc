@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { getNicheConfig, hasNicheConfig } from "@/lib/niches";
 import {
   NICHE_SLUGS,
   NicheSlug,
@@ -7,11 +8,11 @@ import {
   isMarketingDomain,
   isNicheSlug,
 } from "@dub/utils";
-import { getNicheConfig, hasNicheConfig } from "@/lib/niches";
 
 describe("isNicheSlug", () => {
-  it('returns true for "restaurants"', () => {
+  it("returns true for valid niche slugs", () => {
     expect(isNicheSlug("restaurants")).toBe(true);
+    expect(isNicheSlug("ecommerce")).toBe(true);
   });
 
   it("returns false for unknown slugs", () => {
@@ -21,14 +22,15 @@ describe("isNicheSlug", () => {
   });
 
   it("narrows type for valid slugs", () => {
-    const slug: string = "restaurants";
+    const slugs: string[] = ["restaurants", "ecommerce"];
 
-    if (!isNicheSlug(slug)) {
-      throw new Error("Expected slug to be a valid niche slug");
-    }
-
-    const typedSlug: NicheSlug = slug;
-    expect(typedSlug).toBe("restaurants");
+    slugs.forEach((slug) => {
+      if (!isNicheSlug(slug)) {
+        throw new Error(`Expected ${slug} to be a valid niche slug`);
+      }
+      const typedSlug: NicheSlug = slug;
+      expect(typedSlug).toBe(slug);
+    });
   });
 });
 
@@ -45,10 +47,14 @@ describe("isMarketingDomain", () => {
 });
 
 describe("niche configs", () => {
-  it("returns config for valid niche slug", () => {
-    const config = getNicheConfig("restaurants");
-    expect(config).toBeDefined();
-    expect(config?.niche).toBe("restaurants");
+  it("returns config for valid niche slugs", () => {
+    const restaurantsConfig = getNicheConfig("restaurants");
+    expect(restaurantsConfig).toBeDefined();
+    expect(restaurantsConfig?.niche).toBe("restaurants");
+
+    const ecommerceConfig = getNicheConfig("ecommerce");
+    expect(ecommerceConfig).toBeDefined();
+    expect(ecommerceConfig?.niche).toBe("ecommerce");
   });
 
   it("returns undefined for unknown slugs", () => {
@@ -58,6 +64,7 @@ describe("niche configs", () => {
 
   it("hasNicheConfig only matches slugs with configs", () => {
     expect(hasNicheConfig("restaurants")).toBe(true);
+    expect(hasNicheConfig("ecommerce")).toBe(true);
     expect(hasNicheConfig("unknown")).toBe(false);
   });
 });
