@@ -11,29 +11,29 @@
 
 buildGoModule rec {
   pname = "bd";
-  version = "0.30.0";
+  version = "0.40.0";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
 # hash = lib.fakeHash; # use when upgrading
-    hash = "sha256-5n+6D/+iPjGoKZTxGMuNbW2La+Ut0gvytGj9bZNqVkM=";
+    hash = "sha256-SuL0VslJwCFFYACpQDlzYqgARb2FGKFIlx7N5lo9n9A=";
   };
 
   # Use proxyVendor because the vendor directory in the repo is out of sync
   proxyVendor = true;
 # vendorHash = lib.fakeHash; # use when upgrading
-  vendorHash = "sha256-vQ4CgbeGxmJXUr7abNEVDtrQtt7Jpe6kgg02pjv3eX8=";
+  vendorHash = "sha256-Sq3izOX7+CCAkEXdGKmQXMaS4hYFz5AO/8rWZ/klBZs=";
 
   # Add git to build environment for tests
   nativeBuildInputs = [ git ];
 
   # Some tests require the bd binary to be in PATH during test execution
   # Skip TestScripts (requires bd binary), TestGitPullSyncIntegration (network),
-  # and TestMigrateHashIDs (fails in sandbox)
+  # TestMigrateHashIDs (fails in sandbox), and git hooks tests (require git repo)
   checkFlags = [
-    "-skip=TestGitPullSyncIntegration|TestScripts|TestMigrateHashIDs"
+    "-skip=TestGitPullSyncIntegration|TestScripts|TestMigrateHashIDs|TestHooksCheckGitHooks|TestInstallHooksShared|TestDetectExistingHooks|TestInstallGitHooks_NoExistingHooks|TestInstallGitHooks_ExistingHookBackup|TestInstallHooks|TestInstallHooksBackup|TestInstallHooksForce|TestUninstallHooks|TestGetEventDisplay|TestCheckGitHooks"
   ];
 
   subPackages = [ "cmd/bd" ];
