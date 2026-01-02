@@ -74,10 +74,12 @@ export function FeaturesSection({
   domain,
   utmParams,
   overrides,
+  sectionTitle = "QR codes built for businesses that print on real things",
 }: {
   domain: string;
   utmParams: Partial<Record<(typeof UTMTags)[number], string>>;
   overrides?: FeatureOverride[];
+  sectionTitle?: string;
 }) {
   const features = mergeFeatures(overrides);
   const getFeature = (id: FeatureOverride["id"]) =>
@@ -97,7 +99,7 @@ export function FeaturesSection({
           Everything you need
         </div>
         <h2 className="font-display mt-2 text-balance text-3xl font-medium text-neutral-900">
-          QR codes built for businesses that print on real things
+          {sectionTitle}
         </h2>
         <p className="mt-3 text-pretty text-lg text-neutral-500">
           Menus. Packaging. Table tents. Signage. You print thousands of them,

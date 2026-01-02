@@ -1,5 +1,5 @@
 import { Grid } from "@dub/ui";
-import { APP_DOMAIN, cn, UTMTags } from "@dub/utils";
+import { APP_DOMAIN, cn, createHref, UTMTags } from "@dub/utils";
 import { ReactNode } from "react";
 import { ButtonLink } from "./button-link";
 
@@ -8,14 +8,29 @@ export function CTA({
   utmParams,
   title = "Print QR codes you can trust",
   subtitle = "No ransom emails. No expiration surprises. Codes that work, forever.",
+  ctaText = "Get Started",
+  belowCtaText,
   className,
 }: {
   domain: string;
   utmParams?: Partial<Record<(typeof UTMTags)[number], string>>;
   title?: ReactNode;
   subtitle?: ReactNode;
+  ctaText?: string;
+  belowCtaText?: string;
   className?: string;
 }) {
+  const registerHref = createHref(
+    `${APP_DOMAIN}/register?next=/onboarding/qr-landing`,
+    domain,
+    {
+      utm_source: "Custom Domain",
+      utm_medium: "Niche Landing",
+      utm_campaign: domain,
+      ...utmParams,
+    },
+  );
+
   return (
     <div
       className={cn(
@@ -41,13 +56,15 @@ export function CTA({
         </p>
       </div>
 
-      <div className="relative mx-auto mt-10 flex max-w-fit">
-        <ButtonLink
-          variant="primary"
-          href={`${APP_DOMAIN}/register?next=/onboarding/qr-landing`}
-        >
-          Get Started
+      <div className="relative mx-auto mt-10 flex max-w-fit flex-col items-center gap-2">
+        <ButtonLink variant="primary" href={registerHref}>
+          {ctaText}
         </ButtonLink>
+        {belowCtaText && (
+          <p className="text-sm text-neutral-500 sm:text-base">
+            {belowCtaText}
+          </p>
+        )}
       </div>
     </div>
   );
