@@ -11,19 +11,19 @@
 
 buildGoModule rec {
   pname = "bd";
-  version = "0.40.0";
+  version = "0.42.0";
 
   src = fetchFromGitHub {
     owner = "steveyegge";
     repo = "beads";
     rev = "v${version}";
-# hash = lib.fakeHash; # use when upgrading
-    hash = "sha256-SuL0VslJwCFFYACpQDlzYqgARb2FGKFIlx7N5lo9n9A=";
+    # hash = lib.fakeHash; # use when upgrading
+    hash = "sha256-3t+pm7vuFj3PH1oCJ/AnwbGupqleimNQnP2bRSBHrSg=";
   };
 
   # Use proxyVendor because the vendor directory in the repo is out of sync
   proxyVendor = true;
-# vendorHash = lib.fakeHash; # use when upgrading
+  # vendorHash = lib.fakeHash; # use when upgrading
   vendorHash = "sha256-Sq3izOX7+CCAkEXdGKmQXMaS4hYFz5AO/8rWZ/klBZs=";
 
   # Add git to build environment for tests
