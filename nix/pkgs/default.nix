@@ -30,4 +30,8 @@
   # OpenAI Codex CLI - AI-powered coding assistant
   # Normally installed via: npm install -g @openai/codex
   codex = pkgs.callPackage ./codex.nix { };
+
+  # Gas Town (gt) - Multi-agent coordination system for coding agents
+  # Normally installed via: go install github.com/steveyegge/gastown/cmd/gt@latest
+  gastown = pkgs.callPackage ./gastown.nix { };
 }

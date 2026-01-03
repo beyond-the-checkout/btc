@@ -23,6 +23,7 @@ in
 {
   # https://devenv.sh/basics/
   env.GREET = "devenv";
+  env.ENABLE_LSP_TOOL = "1";
 
 
   # https://devenv.sh/packages/
@@ -30,12 +31,14 @@ in
   pkgs.git
   pkgs.gh
   pkgs.curl
+  pkgs.tmux
   pkgs.caddy
   pkgs.jwt-cli
   pkgs.nodejs_20
   customPkgs.codex
   pkgs.mysql84
   pkgs.nodePackages.typescript
+  pkgs.nodePackages.typescript-language-server
   pkgs.nodePackages.yarn
   pkgs.opentofu
   pkgs-pnpm.pnpm_9
@@ -57,6 +60,8 @@ in
   customPkgs.beads  # Beads (bd) CLI - memory system for coding agents
   customPkgs.linearis  # Linearis CLI - Linear.app with JSON output for LLM agents
   customPkgs.claude-code
+  customPkgs.gastown  # Gas Town (gt) - multi-agent coordination system
+  pkgs-unstable.gemini-cli  # Gemini CLI - AI agent from Google
   ];
   # graphql-scalars
   # type-graphql
@@ -110,6 +115,8 @@ in
     echo "  linearis: $(linearis --version 2>/dev/null || echo 'not available')"
     echo "  claude: $(claude --version 2>/dev/null || echo 'not available')"
     echo "  codex: $(codex --version 2>/dev/null || echo 'not available')"
+    echo "  gt: $(gt --version 2>/dev/null || echo 'not available')"
+    echo "  gemini: $(gemini --version 2>/dev/null || echo 'not available')"
     # echo "  tb: $(tb --version 2>/dev/null || echo 'not available')"
 
     # Set DEVENV_PROFILE for Starship
