@@ -2,7 +2,22 @@
   "hooks": {
     "PostToolUse": [
       {
-        "matcher": "Edit|Write|mcp__repo_prompt__apply_edits|mcp__repo_prompt__file_actions|mcp__repo_prompt__chat_send",
+        "matcher": "Edit|Write|MultiEdit|mcp__repo_prompt__apply_edits",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-tool-use-tracker.sh",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-syntax-check.sh",
+            "timeout": 2
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__repo_prompt__file_actions|mcp__repo_prompt__chat_send",
         "hooks": [
           {
             "type": "command",
@@ -22,7 +37,6 @@
         ]
       }
     ],
-
     "UserPromptSubmit": [
       {
         "hooks": [
@@ -46,9 +60,18 @@
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-build-check-enhanced.sh",
             "timeout": 60
+          },
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/stop-run-affected-tests.sh",
+            "timeout": 120
           }
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "dev-browser@dev-browser-marketplace": true,
+    "typescript-lsp@claude-plugins-official": true
   }
 }
