@@ -1,10 +1,24 @@
-import { DubApiError } from "@/lib/api/errors";
 import { withWorkspace } from "@/lib/auth";
 import z from "@/lib/zod";
 import { getDefaultDomainsQuerySchema } from "@/lib/zod/schemas/domains";
 import { prisma } from "@dub/prisma";
-import { DUB_DOMAINS_ARRAY } from "@dub/utils";
+import { DUB_DOMAINS_ARRAY, LEGACY_SHORT_DOMAIN } from "@dub/utils";
 import { NextResponse } from "next/server";
+
+// Central mapping so we don't rely on fragile string replacement.
+// Keep dubsh mapped to legacy chko.sh forever.
+const DEFAULT_DOMAIN_COLUMN_TO_SLUG: Record<string, string> = {
+  dubsh: LEGACY_SHORT_DOMAIN, // legacy: chko.sh (stable mapping)
+  foreverqrs: "foreverqrs.com", // new primary short-link domain
+  dublink: "dub.link",
+  chatgpt: "chatg.pt",
+  sptifi: "spti.fi",
+  gitnew: "git.new",
+  callink: "cal.link",
+  amznid: "amzn.id",
+  ggllink: "ggl.link",
+  figpage: "fig.page",
+};
 
 // GET /api/domains/default - get default domains
 export const GET = withWorkspace(
@@ -17,6 +31,7 @@ export const GET = withWorkspace(
       },
       select: {
         dubsh: true,
+        foreverqrs: true,
         dublink: true,
         chatgpt: true,
         sptifi: true,
@@ -31,12 +46,11 @@ export const GET = withWorkspace(
     let defaultDomains: string[] = [];
 
     if (data) {
-      defaultDomains = Object.keys(data)
-        .filter((key) => data[key])
-        .map(
-          (domain) =>
-            DUB_DOMAINS_ARRAY.find((d) => d.replace(".", "") === domain)!,
-        )
+      defaultDomains = Object.entries(data)
+        .filter(([, enabled]) => enabled)
+        .map(([column]) => DEFAULT_DOMAIN_COLUMN_TO_SLUG[column])
+        .filter(Boolean) // defensive: prevent nulls
+        .filter((slug) => DUB_DOMAINS_ARRAY.includes(slug)) // only return domains that exist in DUB_DOMAINS
         .filter((domain) =>
           search ? domain?.toLowerCase().includes(search.toLowerCase()) : true,
         );
@@ -60,20 +74,13 @@ export const PATCH = withWorkspace(
       await req.json(),
     );
 
-    if (workspace.plan === "free" && defaultDomains.includes("dub.link")) {
-      throw new DubApiError({
-        code: "forbidden",
-        message:
-          "You can only use dub.link on a Base plan and above. Upgrade to Base to use this domain.",
-      });
-    }
-
     const response = await prisma.defaultDomains.update({
       where: {
         projectId: workspace.id,
       },
       data: {
-        dubsh: defaultDomains.includes("dub.sh"),
+        dubsh: defaultDomains.includes(LEGACY_SHORT_DOMAIN), // legacy chko.sh (stable mapping)
+        foreverqrs: defaultDomains.includes("foreverqrs.com"),
         dublink: defaultDomains.includes("dub.link"),
         chatgpt: defaultDomains.includes("chatg.pt"),
         sptifi: defaultDomains.includes("spti.fi"),

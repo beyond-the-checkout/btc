@@ -2,7 +2,9 @@ import { SHORT_DOMAIN } from "@dub/utils";
 import { NextRequest } from "next/server";
 
 export const parse = (req: NextRequest) => {
-  let domain = req.headers.get("host") as string;
+  // Prefer X-Forwarded-Host for reverse proxy setups (e.g., Caddy, Vercel)
+  let domain = (req.headers.get("x-forwarded-host") ||
+    req.headers.get("host")) as string;
   // path is the path of the URL (e.g. dub.sh/stats/github -> /stats/github)
   let path = req.nextUrl.pathname;
 

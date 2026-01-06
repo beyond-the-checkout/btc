@@ -73,7 +73,13 @@ module.exports = withAxiom({
         hostname: "assets.dub.co", // for Dub's static assets
       },
       {
-        hostname: "assets.chko.sh", // for Checkout's static assets
+        hostname: "assets.chko.sh", // for Checkout's static assets (legacy)
+      },
+      {
+        hostname: "assets.foreverqrs.com", // for ForeverQRs static assets
+      },
+      {
+        hostname: "foreverqrs.com", // for ForeverQRs domain
       },
       {
         hostname: "dubassets.com", // for Dub's user generated images

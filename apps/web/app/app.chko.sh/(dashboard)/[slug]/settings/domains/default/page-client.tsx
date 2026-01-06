@@ -5,44 +5,52 @@ import useDefaultDomains from "@/lib/swr/use-default-domains";
 import useWorkspace from "@/lib/swr/use-workspace";
 import { DomainCardTitleColumn } from "@/ui/domains/domain-card-title-column";
 import { UpgradeRequiredToast } from "@/ui/shared/upgrade-required-toast";
-import { Logo, Switch, TooltipContent } from "@dub/ui";
-import {
-  Amazon,
-  CalendarDays,
-  ChatGPT,
-  Figma,
-  GitHubEnhanced,
-  GoogleEnhanced,
-  Spotify,
-} from "@dub/ui/icons";
-import { DUB_DOMAINS } from "@dub/utils";
+import { Badge, InfoTooltip, Logo, Switch } from "@dub/ui";
+import { QRCode } from "@dub/ui/icons";
+import { CHECKOUT_HELP_BASE, DUB_DOMAINS } from "@dub/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function DubDomainsIcon(domain: string) {
   switch (domain) {
-    case "chatg.pt":
-      return ChatGPT;
-    case "git.new":
-      return GitHubEnhanced;
-    case "spti.fi":
-      return Spotify;
-    case "cal.link":
-      return CalendarDays;
-    case "amzn.id":
-      return Amazon;
-    case "ggl.link":
-      return GoogleEnhanced;
-    case "fig.page":
-      return Figma;
+    case "foreverqrs.com":
+      return QRCode; // Primary domain icon
+    case "chko.sh":
+      return Logo; // Legacy domain icon
+    // Dub domains removed - they're permanently disabled
     default:
       return Logo;
   }
 }
 
+// Returns additional label/badge info for domains
+function getDomainBadge(domain: string): {
+  label: string;
+  variant: "neutral" | "success" | "warning" | "new";
+  tooltip?: string;
+} | null {
+  switch (domain) {
+    case "foreverqrs.com":
+      return {
+        label: "Primary",
+        variant: "success",
+        tooltip: "The default domain for all new links",
+      };
+    case "chko.sh":
+      return {
+        label: "Legacy",
+        variant: "neutral",
+        tooltip:
+          "Existing links continue to work. New links should use foreverqrs.com.",
+      };
+    default:
+      return null;
+  }
+}
+
 export function DefaultDomains() {
-  const { id, plan, role, flags } = useWorkspace();
+  const { id, role } = useWorkspace();
   const [submitting, setSubmitting] = useState(false);
   const [defaultDomains, setDefaultDomains] = useState<string[]>([]);
   const { defaultDomains: initialDefaultDomains, mutate } = useDefaultDomains();
@@ -63,9 +71,9 @@ export function DefaultDomains() {
     <div className="grid gap-5">
       <div className="rounded-lg bg-neutral-100 p-4">
         <p className="text-sm text-neutral-500">
-          Leverage default branded domains from Dub for specific links.{" "}
+          Choose which default domains appear in your link creation dropdown.{" "}
           <Link
-            href="https://dub.co/help/article/default-dub-domains"
+            href={`${CHECKOUT_HELP_BASE}/article/default-domains`}
             target="_blank"
             className="underline transition-colors hover:text-neutral-800"
           >
@@ -75,32 +83,31 @@ export function DefaultDomains() {
       </div>
 
       <div className="mt-2 grid grid-cols-1 gap-3">
-        {DUB_DOMAINS.filter(
-          (domain) => domain.slug !== "dub.link" || !flags?.noDubLink,
-        ).map(({ slug, description }) => {
+        {DUB_DOMAINS.map(({ slug, description }) => {
+          const badge = getDomainBadge(slug);
+
           return (
             <div
               key={slug}
               className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white p-5"
             >
-              <DomainCardTitleColumn
-                domain={slug}
-                icon={DubDomainsIcon(slug)}
-                description={description}
-                defaultDomain
-              />
+              <div className="flex items-center gap-4">
+                <DomainCardTitleColumn
+                  domain={slug}
+                  icon={DubDomainsIcon(slug)}
+                  description={description}
+                  defaultDomain
+                />
+                {badge && (
+                  <div className="flex items-center gap-1">
+                    <Badge variant={badge.variant}>{badge.label}</Badge>
+                    {badge.tooltip && <InfoTooltip content={badge.tooltip} />}
+                  </div>
+                )}
+              </div>
               <Switch
                 disabled={submitting}
-                disabledTooltip={
-                  permissionsError ||
-                  (slug === "dub.link" && plan === "free" ? (
-                    <TooltipContent
-                      title="You can only use dub.link on a Base plan and above. Upgrade to Base to use this domain."
-                      cta="Upgrade to Base"
-                      href={`/${slug}/upgrade`}
-                    />
-                  ) : undefined)
-                }
+                disabledTooltip={permissionsError}
                 checked={defaultDomains?.includes(slug)}
                 fn={() => {
                   const oldDefaultDomains = defaultDomains.slice();

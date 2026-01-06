@@ -87,10 +87,13 @@ export default function useDomains({
         activeWorkspaceDomains.find(({ primary }) => primary)?.slug ||
         activeWorkspaceDomains[0].slug
       );
-    } else if (activeDefaultDomains.find(({ slug }) => slug === "dub.link")) {
-      return "dub.link";
     }
-    return SHORT_DOMAIN;
+    // When the workspace has no custom domains:
+    // - Prefer a primary built-in domain (foreverqrs.com)
+    // - Otherwise fall back to first enabled default domain
+    // - Last resort: SHORT_DOMAIN (may not be enabled)
+    const defaultBuiltIn = activeDefaultDomains.find((d) => d.primary)?.slug;
+    return defaultBuiltIn ?? activeDefaultDomains[0]?.slug ?? SHORT_DOMAIN;
   }, [activeDefaultDomains, activeWorkspaceDomains]);
 
   return {

@@ -3,8 +3,9 @@ import { DUB_DOMAINS, SHORT_DOMAIN } from "@dub/utils";
 import { useMemo } from "react";
 
 // Sort domains alphabetically, with a specific domain prioritized
+// Clone the array before sorting to avoid mutating the original
 const sortDomains = (domains: any[], prioritySlug?: string) => {
-  return domains.sort((a, b) => {
+  return [...domains].sort((a, b) => {
     if (prioritySlug) {
       if (a.slug === prioritySlug && b.slug !== prioritySlug) return -1;
       if (a.slug !== prioritySlug && b.slug === prioritySlug) return 1;
@@ -60,7 +61,7 @@ export function useAvailableDomains(
         // If domain not found at all, return all active domains
         return [
           ...sortDomains(activeWorkspaceDomains || []),
-          ...sortDomains(activeDefaultDomains, "dub.link"),
+          ...sortDomains(activeDefaultDomains, "foreverqrs.com"),
         ];
       }
 
@@ -71,7 +72,7 @@ export function useAvailableDomains(
       return [
         ...sortDomains(activeWorkspaceDomains || []),
         ...(isDefaultDomain ? [] : [domain]),
-        ...sortDomains(activeDefaultDomains, "dub.link"),
+        ...sortDomains(activeDefaultDomains, "foreverqrs.com"),
         ...(isDefaultDomain ? [domain] : []),
       ];
     }
@@ -83,8 +84,8 @@ export function useAvailableDomains(
         ...domain,
         isWorkspaceDomain: true,
       })),
-      // Default domains next, with dub.link first, then alphabetically
-      ...sortDomains(activeDefaultDomains, "dub.link").map((domain) => ({
+      // Default domains next, with foreverqrs.com first, then alphabetically
+      ...sortDomains(activeDefaultDomains, "foreverqrs.com").map((domain) => ({
         ...domain,
         isWorkspaceDomain: false,
       })),
@@ -102,6 +103,8 @@ export function useAvailableDomains(
     allWorkspaceDomains,
     activeWorkspaceDomains,
     loading: options.onboarding ? false : loading,
-    primaryDomain: options.onboarding ? SHORT_DOMAIN : primaryDomain,
+    primaryDomain: options.onboarding
+      ? DUB_DOMAINS.find((d) => d.primary)?.slug ?? SHORT_DOMAIN
+      : primaryDomain,
   };
 }
