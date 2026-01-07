@@ -37,7 +37,7 @@ export function Domains() {
               <div className="flex-none rounded-full border border-neutral-200 bg-gradient-to-t from-neutral-100 p-2">
                 {/* ForeverQRs logo */}
                 <img
-                  src="/logos/beyond-the-checkout-logo.png"
+                  src="https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg"
                   alt="ForeverQRs"
                   className="size-6 object-contain sm:size-6"
                 />
