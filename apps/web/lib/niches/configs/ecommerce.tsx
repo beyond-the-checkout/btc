@@ -35,6 +35,58 @@ export const ecommerceConfig: NicheConfig = {
         "Use your own domain for branded links. yourbrand.com/setup looks better on premium packaging than a random short link.",
     },
   ],
+  pricing: {
+    header: "Simple pricing",
+    intro:
+      "Redirects are forever. Analytics are metered. Here's exactly what you get:",
+    tiers: [
+      {
+        name: "Free",
+        price: "$0",
+        bullets: [
+          "2 dynamic codes/mo",
+          "100 tracked scans/mo",
+          "30-day analytics",
+          "Redirects work forever",
+        ],
+        ctaLabel: "Create free account",
+        ctaHref:
+          "https://app.foreverqrs.com/register?next=/onboarding/qr-landing",
+        note: "Perfect for a single location with a few QR codes.",
+      },
+      {
+        name: "Base",
+        price: "$9.99/month",
+        bullets: [
+          "10 dynamic codes/mo",
+          "10K tracked scans/mo",
+          "1-year analytics",
+          "Custom domains",
+          "QR code folders",
+        ],
+        ctaLabel: "Start Base",
+        ctaHref:
+          "https://app.foreverqrs.com/register?next=/onboarding/qr-landing",
+        note: "or $8.33/mo billed yearly",
+      },
+      {
+        name: "Business",
+        price: "$39.99/month",
+        bullets: [
+          "50 dynamic codes/mo",
+          "100K tracked scans/mo",
+          "3-year analytics",
+          "Team access (10 users)",
+          "Real-time events",
+        ],
+        ctaLabel: "Contact us",
+        ctaHref: "https://app.foreverqrs.com/contact",
+        note: "or $33.33/mo billed yearly",
+      },
+    ],
+    belowPricing:
+      "Your codes keep redirecting. That never changes. Your analytics event limit adjusts to your new plan. Customers scan the code, they get to your content. Always.",
+  },
   cta: {
     title: "Ship packaging you can trust",
     subtitle:

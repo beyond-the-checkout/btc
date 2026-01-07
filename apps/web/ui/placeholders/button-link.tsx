@@ -9,13 +9,15 @@ export function ButtonLink({
   variant,
   className,
   ...rest
-}: Pick<ButtonProps, "variant"> & ComponentProps<typeof Link>) {
+}: Partial<Pick<ButtonProps, "variant">> & ComponentProps<typeof Link>) {
+  const variantClassName = variant ? buttonVariants({ variant }) : undefined;
+
   return (
     <Link
       {...rest}
       className={cn(
         "flex h-10 w-fit items-center whitespace-nowrap rounded-lg border px-5 text-base",
-        buttonVariants({ variant }),
+        variantClassName,
         className,
       )}
     />
