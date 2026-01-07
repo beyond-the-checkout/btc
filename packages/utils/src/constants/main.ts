@@ -102,9 +102,9 @@ export const DUB_THUMBNAIL =
 
 // ForeverQRs brand assets
 export const CHECKOUT_WORDMARK =
-  "https://assets.foreverqrs.com/assets/foreverqrs_wordmark.jpeg";
+  "https://assets.foreverqrs.com/assets/foreverqrs_wordmark_transparent.png";
 export const CHECKOUT_LOGO =
-  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_transparent.png";
 export const CHECKOUT_LOGO_SQUARE =
   "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
 export const CHECKOUT_THUMBNAIL =
