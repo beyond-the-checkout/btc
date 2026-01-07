@@ -57,7 +57,7 @@ export function NavWordmark({
         <div className="max-w-fit">
           {/* REPOMARK:SCOPE: 1 - Update nav wordmark comment and alt text to ForeverQRs */}
           <img
-            src="https://assets.foreverqrs.com/assets/foreverqrs_wordmark.jpeg"
+            src="https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg"
             alt="ForeverQRs"
             width={40}
             height={40}
