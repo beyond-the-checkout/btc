@@ -8,7 +8,11 @@ export default function NotFound() {
     <>
       <div className="relative z-10 flex h-screen w-screen flex-col items-center justify-center gap-6">
         <Link href="/" className="absolute left-4 top-3">
-          <img src={CHECKOUT_WORDMARK} alt="Checkout" className="h-6 w-auto" />
+          <img
+            src={CHECKOUT_WORDMARK}
+            alt="ForeverQRs"
+            className="h-6 w-auto"
+          />
         </Link>
         <h1 className="font-display bg-gradient-to-r from-black to-neutral-600 bg-clip-text text-5xl font-semibold text-transparent">
           404

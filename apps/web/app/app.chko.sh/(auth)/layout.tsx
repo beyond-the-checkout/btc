@@ -53,8 +53,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         >
           <img
             src={CHECKOUT_WORDMARK}
-            alt="Beyond the Checkout"
-            className="w-32 h-auto"
+            alt="ForeverQRs"
+            className="h-auto w-32"
           />
         </a>
         {children}

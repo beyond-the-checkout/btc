@@ -33,7 +33,7 @@ export default function NewCommissionAlertPartner({
     amount: 25000,
     earnings: 6900,
   },
-  shortLink = "https://refer.chko.sh/oliver",
+  shortLink = "https://refer.foreverqrs.com/oliver",
 }: {
   email: string;
   program: {

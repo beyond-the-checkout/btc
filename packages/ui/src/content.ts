@@ -17,13 +17,10 @@ import {
   Php,
   Python,
   Ruby,
-  Toggle2Fill,
   Twitter,
   Typescript,
   UsersFill,
-  YouTube,
 } from "./icons";
-import { DubApiIcon } from "./icons/dub-api";
 import { Logo } from "./logo";
 
 export type NavItemChild = {
@@ -181,7 +178,7 @@ export const LEGAL_PAGES = [
 ];
 
 export const SOCIAL_LINKS = [
-  { name: "X (Twitter)", icon: Twitter, href: "https://x.com/BTCheckoutTech" },
+  { name: "X (Twitter)", icon: Twitter, href: "https://x.com/ForeverQRs" },
   {
     name: "LinkedIn",
     icon: LinkedIn,

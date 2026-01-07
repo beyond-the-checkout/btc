@@ -119,7 +119,7 @@ export default function ClicksSummary({
                         <Row>
                           <Column align="left">
                             <Link
-                              href={`https://app.chko.sh/${workspaceSlug}/analytics?domain=${domain}&key=${path}`}
+                              href={`https://app.foreverqrs.com/${workspaceSlug}/analytics?domain=${domain}&key=${path}`}
                               className="text-sm font-medium text-black underline"
                             >
                               {smartTruncate(link, 33)}↗
@@ -152,7 +152,7 @@ export default function ClicksSummary({
                 <Section className="my-8 text-center">
                   <Link
                     className="rounded-full bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                    href={`https://app.chko.sh/${workspaceSlug}`}
+                    href={`https://app.foreverqrs.com/${workspaceSlug}`}
                   >
                     Start creating links
                   </Link>
@@ -166,7 +166,7 @@ export default function ClicksSummary({
                 <Section className="my-8">
                   <Link
                     className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                    href={`https://app.chko.sh/${workspaceSlug}/analytics?interval=30d`}
+                    href={`https://app.foreverqrs.com/${workspaceSlug}/analytics?interval=30d`}
                   >
                     View my stats
                   </Link>
@@ -175,7 +175,7 @@ export default function ClicksSummary({
             )}
             <Footer
               email={email}
-              notificationSettingsUrl={`https://app.chko.sh/${workspaceSlug}/settings/notifications`}
+              notificationSettingsUrl={`https://app.foreverqrs.com/${workspaceSlug}/settings/notifications`}
             />
           </Container>
         </Body>

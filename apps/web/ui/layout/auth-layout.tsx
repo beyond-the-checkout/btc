@@ -20,7 +20,7 @@ export const AuthLayout = ({
       <div className="flex grow basis-0 flex-col justify-end">
         {showTerms && (
           <p className="px-20 py-8 text-center text-xs font-medium text-neutral-500 md:px-0">
-            By continuing, you agree to Checkout&rsquo;s{" "}
+            By continuing, you agree to ForeverQRs&rsquo;{" "}
             <a
               href={`${CHECKOUT_BASE_URL}/tos`}
               className="font-semibold text-neutral-600 hover:text-neutral-800"

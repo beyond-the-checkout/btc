@@ -2,17 +2,15 @@ import { deepViewDataSchema } from "@/lib/zod/schemas/deep-links";
 import { prisma } from "@dub/prisma";
 import { Grid } from "@dub/ui";
 import { ArrowRight, Copy, IOSAppStore, MobilePhone } from "@dub/ui/icons";
-import { cn, CHECKOUT_WORDMARK } from "@dub/utils";
+import { CHECKOUT_WORDMARK, cn } from "@dub/utils";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DeepLinkActionButtons } from "./action-buttons";
 import { BrandLogoBadge } from "./brand-logo-badge";
 
-export default async function DeepLinkPreviewPage(
-  props: {
-    params: Promise<{ domain: string; key: string }>;
-  }
-) {
+export default async function DeepLinkPreviewPage(props: {
+  params: Promise<{ domain: string; key: string }>;
+}) {
   const params = await props.params;
   const domain = params.domain;
   const key = decodeURIComponent(params.key);
@@ -94,7 +92,12 @@ export default async function DeepLinkPreviewPage(
             target="_blank"
             className="flex items-center gap-1 whitespace-nowrap text-sm font-medium text-neutral-900"
           >
-            Powered by <img src={CHECKOUT_WORDMARK} alt="Beyond the Checkout" className="text-content-emphasis w-14 h-auto" />
+            Powered by{" "}
+            <img
+              src={CHECKOUT_WORDMARK}
+              alt="ForeverQRs"
+              className="text-content-emphasis h-auto w-14"
+            />
           </Link>
         </div>
 

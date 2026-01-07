@@ -18,14 +18,12 @@ export function Footer({
           Don't want to get these emails?{" "}
           <Link
             className="text-neutral-700 underline"
-            href="https://app.chko.sh/account/settings"
+            href="https://app.foreverqrs.com/account/settings"
           >
             Unsubscribe here.
           </Link>
         </Text>
-        <Text className="text-[12px] text-neutral-500">
-          Beyond The Checkout
-        </Text>
+        <Text className="text-[12px] text-neutral-500">ForeverQRs</Text>
       </Tailwind>
     );
   }
@@ -51,7 +49,7 @@ export function Footer({
           </Link>
         </Text>
       )}
-      <Text className="text-[12px] text-neutral-500">Beyond The Checkout</Text>
+      <Text className="text-[12px] text-neutral-500">ForeverQRs</Text>
     </Tailwind>
   );
 }

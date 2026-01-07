@@ -3,26 +3,26 @@ import { Metadata } from "next";
 export function constructMetadata({
   title,
   fullTitle,
-  description = "Beyond The Checkout gives you QR codes you can trust. Create dynamic QR codes for your product packaging with transparent pricing, guaranteed longevity, and complete control over your data.",
-  image = "https://assets.chko.sh/thumbnail.jpg",
+  description = "ForeverQRs gives you QR codes you can trust. Create dynamic QR codes for your product packaging with transparent pricing, guaranteed longevity, and complete control over your data.",
+  image = "https://assets.foreverqrs.com/thumbnail.jpg",
   video,
   icons = [
     {
       rel: "apple-touch-icon",
       sizes: "32x32",
-      url: "https://assets.chko.sh/favicons/apple-touch-icon.png",
+      url: "https://assets.foreverqrs.com/favicons/apple-touch-icon.png",
     },
     {
       rel: "icon",
       type: "image/png",
       sizes: "32x32",
-      url: "https://assets.chko.sh/favicons/favicon-32x32.png",
+      url: "https://assets.foreverqrs.com/favicons/favicon-32x32.png",
     },
     {
       rel: "icon",
       type: "image/png",
       sizes: "16x16",
-      url: "https://assets.chko.sh/favicons/favicon-16x16.png",
+      url: "https://assets.foreverqrs.com/favicons/favicon-16x16.png",
     },
   ],
   url,
@@ -44,7 +44,9 @@ export function constructMetadata({
   return {
     title:
       fullTitle ||
-      (title ? `${title} | Beyond The Checkout` : "Beyond The Checkout - Dynamic QR Codes That Never Expire"),
+      (title
+        ? `${title} | ForeverQRs`
+        : "ForeverQRs - Dynamic QR Codes That Never Expire"),
     description,
     openGraph: {
       title,
@@ -67,10 +69,10 @@ export function constructMetadata({
       ...(video && {
         player: video,
       }),
-      creator: "@BTCheckoutTech",
+      creator: "@ForeverQRs",
     },
     icons,
-    metadataBase: new URL("https://chko.sh"),
+    metadataBase: new URL("https://foreverqrs.com"),
     ...((url || canonicalUrl) && {
       alternates: {
         canonical: url || canonicalUrl,

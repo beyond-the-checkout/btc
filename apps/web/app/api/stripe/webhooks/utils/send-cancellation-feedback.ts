@@ -31,8 +31,8 @@ export async function sendCancellationFeedback({
           to: owner.email,
           from: "ForeverQRs <team@foreverqrs.com>",
           replyTo: "team@foreverqrs.com",
-          subject: "Feedback for Checkout?",
-          text: `Hey ${owner.name ? owner.name.split(" ")[0] : "there"}!\n\nSaw you canceled your Checkout subscription${reasonText ? ` and mentioned that ${reasonText}` : ""} – do you mind sharing if there's anything we could've done better on our side?\n\nWe're always looking to improve our product offering so any feedback would be greatly appreciated!\n\nThank you so much in advance!\n\nBest,\nOliver & Dave\nCo-founders, Beyond the Checkout, Inc.`,
+          subject: "Feedback for ForeverQRs?",
+          text: `Hey ${owner.name ? owner.name.split(" ")[0] : "there"}!\n\nSaw you canceled your ForeverQRs subscription${reasonText ? ` and mentioned that ${reasonText}` : ""} – do you mind sharing if there's anything we could've done better on our side?\n\nWe're always looking to improve our product offering so any feedback would be greatly appreciated!\n\nThank you so much in advance!\n\nBest,\nOliver & Dave\nCo-founders, Beyond the Checkout, Inc.`,
         }),
     ),
   );

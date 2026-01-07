@@ -210,7 +210,7 @@ export function PricingPlans() {
             </div>
           </div>
           <a
-            href="mailto:support@chko.sh"
+            href="mailto:support@foreverqrs.com"
             className="flex items-center justify-center whitespace-nowrap rounded-lg border border-neutral-200 bg-white px-6 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-50"
           >
             Contact us

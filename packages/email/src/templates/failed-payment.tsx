@@ -52,14 +52,13 @@ export default function FailedPayment({
               <code className="text-purple-600">${amountDue / 100}</code> for
               your Checkout workspace{" "}
               <code className="text-purple-600">{workspace.name}</code> has
-              failed. Please{" "}
-              update your payment information in your account settings{" "}
-              using the link below:
+              failed. Please update your payment information in your account
+              settings using the link below:
             </Text>
             <Section className="my-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.chko.sh/${workspace.slug}/settings/billing`}
+                href={`https://app.foreverqrs.com/${workspace.slug}/settings/billing`}
               >
                 Update payment information
               </Link>

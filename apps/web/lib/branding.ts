@@ -1,13 +1,13 @@
 const BRAND_BASE = "https://foreverqrs.com";
 
 export const BRAND = {
-  name: "Beyond the Checkout",
-  short: "Checkout",
+  name: "ForeverQRs",
+  short: "ForeverQRs",
   home: `${BRAND_BASE}/home`,
   pricing: `${BRAND_BASE}/pricing`,
   enterprise: `${BRAND_BASE}/enterprise`,
   helpBase: `${BRAND_BASE}/help`,
-  assetsBase: "https://assets.chko.sh",
+  assetsBase: "https://assets.foreverqrs.com",
 } as const;
 
 export const brandName = (useShort = false) =>

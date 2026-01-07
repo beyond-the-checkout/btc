@@ -10,7 +10,7 @@ export default function Workspace() {
           Set up a shared space to manage your QR codes and packaging engagement
           campaigns with your team.{" "}
           <a
-            href="https://beyondthecheckout.com/help/workspaces"
+            href="https://foreverqrs.com/help/workspaces"
             target="_blank"
             rel="noopener noreferrer"
             className="cursor-help font-medium underline decoration-dotted underline-offset-2 transition-colors hover:text-neutral-700"

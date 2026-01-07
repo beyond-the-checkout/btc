@@ -60,7 +60,7 @@ export default async function BannedPage(props: {
           >
             <ButtonLink
               variant="primary"
-              href="https://app.chko.sh/register?next=/onboarding/qr-landing"
+              href="https://app.foreverqrs.com/register?next=/onboarding/qr-landing"
             >
               Get started with CHKO.SH
             </ButtonLink>

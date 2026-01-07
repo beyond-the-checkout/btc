@@ -120,7 +120,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
       users.map((user) => ({
         to: user.email as string,
         replyTo: "team@foreverqrs.com",
-        subject: `Thank you for upgrading to Checkout ${plan.name}!`,
+        subject: `Thank you for upgrading to ForeverQRs ${plan.name}!`,
         react: UpgradeEmail({
           name: user.name,
           email: user.email as string,

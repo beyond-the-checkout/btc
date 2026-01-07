@@ -128,8 +128,9 @@ export function FeaturesSection({
           title={analyticsFeature.title}
           description={analyticsFeature.description}
         >
+          {/* REPOMARK:SCOPE: 1 - Point live demo link to app.foreverqrs.com */}
           <a
-            href="https://app.chko.sh/share/dash_1KAYTMYPYVXD77ZPYQMPQ7VF6"
+            href="https://app.foreverqrs.com/share/dash_1KAYTMYPYVXD77ZPYQMPQ7VF6"
             target="_blank"
             className="group block size-full"
           >

@@ -30,7 +30,7 @@ export default function NewReferralSignup({
   };
 }) {
   // TODO: Determine referral domain (refer.chko.sh?)
-  const referralLink = `https://refer.chko.sh/${workspace.slug}`;
+  const referralLink = `https://refer.foreverqrs.com/${workspace.slug}`;
   return (
     <Html>
       <Head />
@@ -59,7 +59,7 @@ export default function NewReferralSignup({
               earned an additional {REFERRAL_SCANS_QUOTA_BONUS} scans quota
               for your{" "}
               <a
-                href={`https://app.chko.sh/${workspace.slug}`}
+                href={`https://app.foreverqrs.com/${workspace.slug}`}
                 className="text-semibold font-medium text-black underline"
               >
                 {workspace.name}
@@ -69,7 +69,7 @@ export default function NewReferralSignup({
             <Section className="my-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.chko.sh/${workspace.slug}`}
+                href={`https://app.foreverqrs.com/${workspace.slug}`}
               >
                 View your referral stats
               </Link>

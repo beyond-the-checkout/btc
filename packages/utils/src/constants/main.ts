@@ -89,19 +89,27 @@ export const PARTNERS_DOMAIN = requireEnv(
 export const PARTNERS_DOMAIN_WITH_NGROK =
   process.env.NEXT_PUBLIC_NGROK_URL ?? PARTNERS_DOMAIN;
 
-export const DUB_LOGO = "https://assets.dub.co/logo.png";
-export const DUB_LOGO_SQUARE = "https://assets.dub.co/logo-square.png";
-export const DUB_QR_LOGO = "https://assets.chko.sh/assets/checkmark_black.png";
-export const DUB_WORDMARK = "https://assets.dub.co/wordmark.png";
-export const DUB_THUMBNAIL = "https://assets.dub.co/thumbnail.jpg";
+export const DUB_LOGO =
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
+export const DUB_LOGO_SQUARE =
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
+export const DUB_QR_LOGO =
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
+export const DUB_WORDMARK =
+  "https://assets.foreverqrs.com/assets/foreverqrs_wordmark.jpeg";
+export const DUB_THUMBNAIL =
+  "https://assets.foreverqrs.com/assets/foreverqrs_wordmark.jpeg";
 
-// Checkout brand assets
-export const CHECKOUT_WORDMARK = "https://assets.chko.sh/assets/wordmark.png";
-export const CHECKOUT_LOGO = "https://assets.chko.sh/assets/logo.png";
+// ForeverQRs brand assets
+export const CHECKOUT_WORDMARK =
+  "https://assets.foreverqrs.com/assets/foreverqrs_wordmark.jpeg";
+export const CHECKOUT_LOGO =
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
 export const CHECKOUT_LOGO_SQUARE =
-  "https://assets.chko.sh/assets/logo-square.png";
-export const CHECKOUT_THUMBNAIL = "https://assets.chko.sh/assets/thumbnail.jpg";
-export const CHECKOUT_ASSETS_BASE = "https://assets.chko.sh";
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
+export const CHECKOUT_THUMBNAIL =
+  "https://assets.foreverqrs.com/assets/thumbnail.jpg";
+export const CHECKOUT_ASSETS_BASE = "https://assets.foreverqrs.com";
 
 // Brand domain - derived from SHORT_DOMAIN or explicit override
 // Allows dev environment to use foreverqrs.dev while prod uses foreverqrs.com

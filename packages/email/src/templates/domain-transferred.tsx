@@ -46,7 +46,7 @@ export default function DomainTransferred({
               )}
               has been transferred to the workspace{" "}
               <Link
-                href={`https://app.chko.sh/${newWorkspace.slug}/settings/domains`}
+                href={`https://app.foreverqrs.com/${newWorkspace.slug}/settings/domains`}
                 className="font-medium text-blue-600 no-underline"
               >
                 {newWorkspace.name}↗

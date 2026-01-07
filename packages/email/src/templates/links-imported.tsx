@@ -1,4 +1,9 @@
-import { CHECKOUT_WORDMARK, linkConstructor, pluralize, timeAgo } from "@dub/utils";
+import {
+  CHECKOUT_WORDMARK,
+  linkConstructor,
+  pluralize,
+  timeAgo,
+} from "@dub/utils";
 import {
   Body,
   Column,
@@ -84,7 +89,7 @@ export default function LinksImported({
               </strong>{" "}
               from {provider} into your Checkout workspace,{" "}
               <Link
-                href={`https://app.chko.sh/${workspaceSlug}`}
+                href={`https://app.foreverqrs.com/${workspaceSlug}`}
                 className="font-medium text-blue-600 no-underline"
               >
                 {workspaceName}↗
@@ -127,16 +132,16 @@ export default function LinksImported({
               <Section className="my-8">
                 <Link
                   className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                  href={`https://app.chko.sh/${workspaceSlug}`}
+                  href={`https://app.foreverqrs.com/${workspaceSlug}`}
                 >
                   View {Intl.NumberFormat("en-us").format(count - 5)} more links
                 </Link>
               </Section>
             )}
             <Text className="text-sm leading-6 text-black">
-              If you haven't already{" "}
-              configured your {pluralize("domain", domains.length)}
-              , you will need to do this before you can start using your links.
+              If you haven't already configured your{" "}
+              {pluralize("domain", domains.length)}, you will need to do this
+              before you can start using your links.
             </Text>
             <Footer email={email} />
           </Container>

@@ -131,8 +131,8 @@ export const POST = async (req: Request) => {
       await sendEmail({
         to: user.email,
         subject: isPartner
-          ? "Welcome to Checkout Partners!"
-          : "Welcome to Checkout!",
+          ? "Welcome to ForeverQRs Partners!"
+          : "Welcome to ForeverQRs!",
         react: isPartner
           ? WelcomeEmailPartner({ name: user.name, email: user.email })
           : WelcomeEmail({ name: user.name, email: user.email }),

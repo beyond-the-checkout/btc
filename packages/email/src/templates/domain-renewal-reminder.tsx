@@ -1,4 +1,4 @@
-import { currencyFormatter, CHECKOUT_WORDMARK, formatDate } from "@dub/utils";
+import { CHECKOUT_WORDMARK, currencyFormatter, formatDate } from "@dub/utils";
 import {
   Body,
   Container,
@@ -77,7 +77,7 @@ export default function DomainRenewalReminder({
               If you don't want to renew your domain, you can turn off
               auto-renewal in your{" "}
               <Link
-                href={`https://app.chko.sh/${workspace.slug}/links/domains`}
+                href={`https://app.foreverqrs.com/${workspace.slug}/links/domains`}
                 className="font-semibold text-black underline"
               >
                 domain settings page

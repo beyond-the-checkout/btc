@@ -3,7 +3,7 @@ import { RESEND_AUDIENCES } from "./constants";
 
 export async function unsubscribe({
   email,
-  audience = "app.chko.sh",
+  audience = "app.foreverqrs.com",
 }: {
   email: string;
   audience?: keyof typeof RESEND_AUDIENCES;

@@ -346,7 +346,7 @@ export function WorkspaceBillingUpgradePageClientLF() {
               </div>
             </div>
             <Link
-              href="mailto:support@chko.sh"
+              href="mailto:support@foreverqrs.com"
               className="flex items-center justify-center whitespace-nowrap rounded-md border border-neutral-200 bg-white px-6 py-2 text-sm font-medium text-neutral-900 shadow-sm transition-colors hover:bg-neutral-50"
             >
               Contact us

@@ -173,11 +173,11 @@ export const POST = withSession(async ({ req, session }) => {
               defaultWorkspace: workspace.slug,
             },
           }),
-        // Subscribe the user to the app.chko.sh Resend audience
+        // Subscribe the user to the app.foreverqrs.com Resend audience
         subscribe({
           email: session.user.email,
           name: session.user.name || undefined,
-          audience: "app.chko.sh",
+          audience: "app.foreverqrs.com",
         }),
         // Upload logo to R2 if base64-encoded (remote URLs are stored directly)
         isBase64Logo &&

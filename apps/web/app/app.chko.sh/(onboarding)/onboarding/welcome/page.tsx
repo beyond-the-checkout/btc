@@ -12,13 +12,13 @@ export default function Welcome() {
             <Gradient className="opacity-10 mix-blend-overlay" />
             <img
               src={CHECKOUT_WORDMARK}
-              alt="Beyond the Checkout"
+              alt="ForeverQRs"
               className="relative h-auto w-48 sm:w-64"
             />
             <Gradient className="opacity-50 mix-blend-hard-light" />
           </div>
           <h1 className="animate-slide-up-fade mt-14 text-xl font-semibold text-neutral-900 [--offset:10px] [animation-delay:250ms] [animation-duration:1s] [animation-fill-mode:both]">
-            Welcome to Beyond The Checkout
+            Welcome to ForeverQRs
           </h1>
           <p className="animate-slide-up-fade mt-2 text-balance text-base text-neutral-500 [--offset:10px] [animation-delay:500ms] [animation-duration:1s] [animation-fill-mode:both]">
             Your QR codes. Your data. Your control. Create dynamic QR codes that

@@ -23,18 +23,19 @@ export default function VerifyEmail({
   return (
     <Html>
       <Head />
-      <Preview>Your Checkout Verification Code</Preview>
+      <Preview>Your ForeverQRs Verification Code</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
               Please confirm your email address
             </Heading>
             <Text className="mx-auto text-sm leading-6">
-              Enter this code on the Checkout verify page to complete your sign up:
+              Enter this code on the ForeverQRs verify page to complete your
+              sign up:
             </Text>
             <Section className="my-8 rounded-lg border border-solid border-neutral-200">
               <div className="mx-auto w-fit px-6 py-3 text-center font-mono text-2xl font-semibold tracking-[0.25em]">

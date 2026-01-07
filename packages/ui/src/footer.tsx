@@ -12,7 +12,7 @@ const socials = [
   {
     name: "Twitter",
     icon: Twitter,
-    href: "https://x.com/BTCheckoutTech",
+    href: "https://x.com/ForeverQRs",
   },
   {
     name: "LinkedIn",
@@ -30,7 +30,7 @@ const navigation = {
   company: [
     { name: "About", href: "/" },
     { name: "Customers", href: "/customers" },
-    { name: "Contact", href: "mailto:team@chko.sh" },
+    { name: "Contact", href: "mailto:support@foreverqrs.com" },
   ],
   legal: LEGAL_PAGES.map(({ name, slug }) => ({
     name,
@@ -50,7 +50,7 @@ export function Footer({
   staticDomain?: string;
   className?: string;
 }) {
-  let { domain = "dub.co" } = useParams() as { domain: string };
+  let { domain = "foreverqrs.com" } = useParams() as { domain: string };
   if (staticDomain) {
     domain = staticDomain;
   }
@@ -126,7 +126,8 @@ export function Footer({
         {/* Bottom row (copyright) */}
         <div className="mt-12">
           <p className="text-center text-xs text-neutral-500">
-            © {new Date().getFullYear()} Beyond The Checkout, Inc.
+            © {new Date().getFullYear()} ForeverQRs a Beyond The Checkout
+            Product
           </p>
         </div>
       </footer>

@@ -40,7 +40,7 @@ export default function DomainDeleted({
               Your domain <code className="text-purple-600">{domain}</code> for
               your Checkout workspace{" "}
               <Link
-                href={`https://app.chko.sh/${workspaceSlug}`}
+                href={`https://app.foreverqrs.com/${workspaceSlug}`}
                 className="font-medium text-blue-600 no-underline"
               >
                 {workspaceSlug}↗
@@ -55,7 +55,7 @@ export default function DomainDeleted({
             <Section className="my-8">
               <Link
                 className="rounded-lg bg-black px-6 py-3 text-center text-[12px] font-semibold text-white no-underline"
-                href={`https://app.chko.sh/${workspaceSlug}/settings/domains`}
+                href={`https://app.foreverqrs.com/${workspaceSlug}/settings/domains`}
               >
                 Add a domain
               </Link>
@@ -66,7 +66,7 @@ export default function DomainDeleted({
             </Text>
             <Footer
               email={email}
-              notificationSettingsUrl={`https://app.chko.sh/${workspaceSlug}/settings/notifications`}
+              notificationSettingsUrl={`https://app.foreverqrs.com/${workspaceSlug}/settings/notifications`}
             />
           </Container>
         </Body>

@@ -133,12 +133,12 @@ export async function createWorkspaceForUser(
           where: { id: userId },
           data: { defaultWorkspace: workspace.slug },
         }),
-      // Subscribe the user to the app.chko.sh Resend audience
+      // Subscribe the user to the app.foreverqrs.com Resend audience
       user?.email &&
         subscribe({
           email: user.email,
           name: user.name || undefined,
-          audience: "app.chko.sh",
+          audience: "app.foreverqrs.com",
         }),
       // Upload logo to R2 if base64-encoded
       isBase64Logo &&

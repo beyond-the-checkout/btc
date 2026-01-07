@@ -65,7 +65,7 @@ export default function LinksImportErrors({
               {Intl.NumberFormat("en-us").format(errorLinks.length)} links from{" "}
               {provider} failed to import into your Checkout workspace,{" "}
               <Link
-                href={`https://app.chko.sh/${workspaceSlug}`}
+                href={`https://app.foreverqrs.com/${workspaceSlug}`}
                 className="font-medium text-blue-600 no-underline"
               >
                 {workspaceName}↗

@@ -67,7 +67,7 @@ export function Form() {
           <Input
             type="email"
             {...register("supportEmail", { required: true })}
-            placeholder="support@checkout.tech"
+            placeholder="support@foreverqrs.com"
             autoFocus={!isMobile}
             className="mt-2 w-full max-w-none"
           />
@@ -80,7 +80,7 @@ export function Form() {
           <Input
             type="url"
             {...register("helpUrl")}
-            placeholder="https://checkout.tech/help"
+            placeholder="https://foreverqrs.com/help"
             className="mt-2 w-full max-w-none"
           />
         </div>
@@ -92,7 +92,7 @@ export function Form() {
           <Input
             type="url"
             {...register("termsUrl")}
-            placeholder="https://checkout.tech/tos"
+            placeholder="https://foreverqrs.com/tos"
             className="mt-2 w-full max-w-none"
           />
         </div>

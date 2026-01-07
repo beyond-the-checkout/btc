@@ -25,8 +25,8 @@ export const sendLimitEmail = async ({
     sendBatchEmail(
       emails.map((email) => ({
         subject: type.endsWith("UsageLimitEmail")
-          ? "Checkout: Scans Limit Exceeded"
-          : `Checkout: ${workspace.name} has used ${percentage.toString()}% of its QR codes limit for the month`,
+          ? "ForeverQRs: Scans Limit Exceeded"
+          : `ForeverQRs: ${workspace.name} has used ${percentage.toString()}% of its QR codes limit for the month`,
         to: email,
         react: type.endsWith("UsageLimitEmail")
           ? ClicksExceeded({

@@ -81,7 +81,7 @@ function UpgradedModal({
         <div className="px-6 py-8 sm:px-8">
           <div className="text-left">
             <h1 className="text-lg font-semibold text-neutral-900">
-              Checkout {plan?.name} looks good on you!
+              ForeverQRs {plan?.name} looks good on you!
             </h1>
             <p className="mt-2 text-sm text-neutral-600">
               Thank you for upgrading to the {plan?.name} plan. You now have

@@ -23,14 +23,14 @@ import { workspacesPaths } from "./workspaces";
 export const document = createDocument({
   openapi: "3.0.3",
   info: {
-    title: "Dub API",
+    title: "ForeverQRs API",
     description:
-      "Dub is the modern link attribution platform for short links, conversion tracking, and affiliate programs.",
+      "ForeverQRs is the dynamic QR code platform for product packaging with transparent pricing and guaranteed longevity.",
     version: "0.0.1",
     contact: {
-      name: "Dub Support",
-      email: "support@dub.co",
-      url: "https://dub.co/api",
+      name: "ForeverQRs Support",
+      email: "support@foreverqrs.com",
+      url: "https://foreverqrs.com/api",
     },
     license: {
       name: "AGPL-3.0 license",
