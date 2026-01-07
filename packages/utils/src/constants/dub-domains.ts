@@ -1,28 +1,32 @@
-import { DUB_WORKSPACE_ID, LEGACY_SHORT_DOMAIN } from "./main";
+import { DUB_WORKSPACE_ID, LEGACY_SHORT_DOMAIN, SHORT_DOMAIN } from "./main";
+
+// Primary built-in domain - environment-driven for dev/prod flexibility
+// In dev: foreverqrs.dev, in prod: foreverqrs.com
+const PRIMARY_BUILTIN_DOMAIN = SHORT_DOMAIN;
 
 export const DUB_DOMAINS = [
-  // PRIMARY: foreverqrs.com (new default)
+  // PRIMARY: foreverqrs.com (prod) or foreverqrs.dev (dev)
   {
     // Use a stable synthetic ID for built-in domains.
     // Do NOT couple this to the DB primary key; the DB record is keyed by slug.
-    id: "builtin:foreverqrs.com",
-    slug: "foreverqrs.com",
+    id: `builtin:${PRIMARY_BUILTIN_DOMAIN}`,
+    slug: PRIMARY_BUILTIN_DOMAIN,
     verified: true,
     primary: true,
     archived: false,
-    placeholder: "https://foreverqrs.com/help",
+    placeholder: `https://${PRIMARY_BUILTIN_DOMAIN}/help`,
     allowedHostnames: [] as string[], // Explicit type to avoid TypeScript never[] inference
     description: "The default domain for all accounts.",
     projectId: DUB_WORKSPACE_ID,
   },
   // SECONDARY: chko.sh (kept for backwards compatibility)
   {
-    id: "builtin:chko.sh",
+    id: `builtin:${LEGACY_SHORT_DOMAIN}`,
     slug: LEGACY_SHORT_DOMAIN, // "chko.sh" - stable regardless of SHORT_DOMAIN env
     verified: true,
     primary: false, // Demoted to secondary
     archived: false,
-    placeholder: "https://chko.sh/help",
+    placeholder: `https://${LEGACY_SHORT_DOMAIN}/help`,
     allowedHostnames: [] as string[], // Explicit type to avoid TypeScript never[] inference
     description: "Legacy short domain (existing links continue to work).",
     projectId: DUB_WORKSPACE_ID,

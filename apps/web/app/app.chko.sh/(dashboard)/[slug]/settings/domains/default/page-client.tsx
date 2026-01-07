@@ -7,21 +7,25 @@ import { DomainCardTitleColumn } from "@/ui/domains/domain-card-title-column";
 import { UpgradeRequiredToast } from "@/ui/shared/upgrade-required-toast";
 import { Badge, InfoTooltip, Logo, Switch } from "@dub/ui";
 import { QRCode } from "@dub/ui/icons";
-import { CHECKOUT_HELP_BASE, DUB_DOMAINS } from "@dub/utils";
+import {
+  CHECKOUT_HELP_BASE,
+  DUB_DOMAINS,
+  LEGACY_SHORT_DOMAIN,
+  SHORT_DOMAIN,
+} from "@dub/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function DubDomainsIcon(domain: string) {
-  switch (domain) {
-    case "foreverqrs.com":
-      return QRCode; // Primary domain icon
-    case "chko.sh":
-      return Logo; // Legacy domain icon
-    // Dub domains removed - they're permanently disabled
-    default:
-      return Logo;
+  // Use constants for environment-driven domain matching
+  if (domain === SHORT_DOMAIN) {
+    return QRCode; // Primary domain icon
   }
+  if (domain === LEGACY_SHORT_DOMAIN) {
+    return Logo; // Legacy domain icon
+  }
+  return Logo;
 }
 
 // Returns additional label/badge info for domains
@@ -30,23 +34,22 @@ function getDomainBadge(domain: string): {
   variant: "neutral" | "success" | "warning" | "new";
   tooltip?: string;
 } | null {
-  switch (domain) {
-    case "foreverqrs.com":
-      return {
-        label: "Primary",
-        variant: "success",
-        tooltip: "The default domain for all new links",
-      };
-    case "chko.sh":
-      return {
-        label: "Legacy",
-        variant: "neutral",
-        tooltip:
-          "Existing links continue to work. New links should use foreverqrs.com.",
-      };
-    default:
-      return null;
+  // Use constants for environment-driven domain matching
+  if (domain === SHORT_DOMAIN) {
+    return {
+      label: "Primary",
+      variant: "success",
+      tooltip: "The default domain for all new links",
+    };
   }
+  if (domain === LEGACY_SHORT_DOMAIN) {
+    return {
+      label: "Legacy",
+      variant: "neutral",
+      tooltip: `Existing links continue to work. New links should use ${SHORT_DOMAIN}.`,
+    };
+  }
+  return null;
 }
 
 export function DefaultDomains() {

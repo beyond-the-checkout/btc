@@ -2,14 +2,19 @@ import { withWorkspace } from "@/lib/auth";
 import z from "@/lib/zod";
 import { getDefaultDomainsQuerySchema } from "@/lib/zod/schemas/domains";
 import { prisma } from "@dub/prisma";
-import { DUB_DOMAINS_ARRAY, LEGACY_SHORT_DOMAIN } from "@dub/utils";
+import {
+  DUB_DOMAINS_ARRAY,
+  LEGACY_SHORT_DOMAIN,
+  SHORT_DOMAIN,
+} from "@dub/utils";
 import { NextResponse } from "next/server";
 
 // Central mapping so we don't rely on fragile string replacement.
 // Keep dubsh mapped to legacy chko.sh forever.
+// foreverqrs maps to SHORT_DOMAIN (foreverqrs.dev in dev, foreverqrs.com in prod)
 const DEFAULT_DOMAIN_COLUMN_TO_SLUG: Record<string, string> = {
   dubsh: LEGACY_SHORT_DOMAIN, // legacy: chko.sh (stable mapping)
-  foreverqrs: "foreverqrs.com", // new primary short-link domain
+  foreverqrs: SHORT_DOMAIN, // primary: foreverqrs.dev (dev) or foreverqrs.com (prod)
   dublink: "dub.link",
   chatgpt: "chatg.pt",
   sptifi: "spti.fi",
@@ -80,7 +85,7 @@ export const PATCH = withWorkspace(
       },
       data: {
         dubsh: defaultDomains.includes(LEGACY_SHORT_DOMAIN), // legacy chko.sh (stable mapping)
-        foreverqrs: defaultDomains.includes("foreverqrs.com"),
+        foreverqrs: defaultDomains.includes(SHORT_DOMAIN), // primary: foreverqrs.dev or .com
         dublink: defaultDomains.includes("dub.link"),
         chatgpt: defaultDomains.includes("chatg.pt"),
         sptifi: defaultDomains.includes("spti.fi"),

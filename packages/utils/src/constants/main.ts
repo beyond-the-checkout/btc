@@ -103,15 +103,22 @@ export const CHECKOUT_LOGO_SQUARE =
 export const CHECKOUT_THUMBNAIL = "https://assets.chko.sh/assets/thumbnail.jpg";
 export const CHECKOUT_ASSETS_BASE = "https://assets.chko.sh";
 
-// Checkout domain constants - URLs updated for foreverqrs.com
+// Brand domain - derived from SHORT_DOMAIN or explicit override
+// Allows dev environment to use foreverqrs.dev while prod uses foreverqrs.com
+export const BRAND_DOMAIN =
+  process.env.NEXT_PUBLIC_BRAND_DOMAIN ?? SHORT_DOMAIN;
+
+// Checkout domain constants - environment-driven for dev/prod flexibility
 // Note: Asset URLs (images) remain on assets.chko.sh until CDN migration
-export const CHECKOUT_DOMAIN = "foreverqrs.com";
-export const CHECKOUT_BASE_URL = "https://foreverqrs.com";
+export const CHECKOUT_DOMAIN = BRAND_DOMAIN;
+export const CHECKOUT_BASE_URL = `https://${BRAND_DOMAIN}`;
 export const CHECKOUT_APP_URL = `https://app.${APP_DOMAIN_ENV}`;
 export const CHECKOUT_PARTNERS_URL = `https://partners.${APP_DOMAIN_ENV}`;
-export const CHECKOUT_HELP_BASE = "https://foreverqrs.com/help";
-export const CHECKOUT_DOCS_BASE = "https://foreverqrs.com/docs";
-export const CHECKOUT_SUPPORT_EMAIL = "support@foreverqrs.com";
+export const CHECKOUT_HELP_BASE = `${CHECKOUT_BASE_URL}/help`;
+export const CHECKOUT_DOCS_BASE = `${CHECKOUT_BASE_URL}/docs`;
+// Email can stay on .com even in dev (if email sending not set up for .dev)
+export const CHECKOUT_SUPPORT_EMAIL =
+  process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "support@foreverqrs.com";
 
 // The platform workspace ID. Override per environment using BEYONDTC_WORKSPACE_ID.
 // We keep DUB_WORKSPACE_ID for backward compatibility across imports.

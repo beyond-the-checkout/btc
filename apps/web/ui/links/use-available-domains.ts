@@ -61,7 +61,7 @@ export function useAvailableDomains(
         // If domain not found at all, return all active domains
         return [
           ...sortDomains(activeWorkspaceDomains || []),
-          ...sortDomains(activeDefaultDomains, "foreverqrs.com"),
+          ...sortDomains(activeDefaultDomains, SHORT_DOMAIN),
         ];
       }
 
@@ -72,7 +72,7 @@ export function useAvailableDomains(
       return [
         ...sortDomains(activeWorkspaceDomains || []),
         ...(isDefaultDomain ? [] : [domain]),
-        ...sortDomains(activeDefaultDomains, "foreverqrs.com"),
+        ...sortDomains(activeDefaultDomains, SHORT_DOMAIN),
         ...(isDefaultDomain ? [domain] : []),
       ];
     }
@@ -84,8 +84,8 @@ export function useAvailableDomains(
         ...domain,
         isWorkspaceDomain: true,
       })),
-      // Default domains next, with foreverqrs.com first, then alphabetically
-      ...sortDomains(activeDefaultDomains, "foreverqrs.com").map((domain) => ({
+      // Default domains next, with primary domain first, then alphabetically
+      ...sortDomains(activeDefaultDomains, SHORT_DOMAIN).map((domain) => ({
         ...domain,
         isWorkspaceDomain: false,
       })),
