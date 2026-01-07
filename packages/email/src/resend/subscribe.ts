@@ -4,7 +4,7 @@ import { RESEND_AUDIENCES } from "./constants";
 export async function subscribe({
   email,
   name,
-  audience = "app.chko.sh",
+  audience = "app.foreverqrs.com",
 }: {
   email: string;
   name?: string | null;
