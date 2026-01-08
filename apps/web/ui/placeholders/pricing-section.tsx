@@ -32,7 +32,9 @@ export function PricingSection({ config }: { config?: PricingSectionConfig }) {
       {tiers?.length ? (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {tiers.map((tier, idx) => {
-            const isFeatured = tier.name.toLowerCase() === "base";
+            const isFeatured = ["base", "pro"].includes(
+              tier.name.toLowerCase(),
+            );
             const buttonClassName = isFeatured
               ? "justify-center bg-neutral-900 text-white hover:bg-neutral-800 border-transparent"
               : "justify-center border border-neutral-200 bg-white text-neutral-900 hover:bg-neutral-50";
