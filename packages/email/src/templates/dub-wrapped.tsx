@@ -29,7 +29,7 @@ import { Footer } from "../components/footer";
 export default function DubWrapped({
   email = "panic@thedis.co",
   workspace = {
-    name: "Checkout",
+    name: "ForeverQRs",
     slug: "checkout",
     logo: CHECKOUT_LOGO,
   },
@@ -124,7 +124,7 @@ export default function DubWrapped({
     {
       title: "Free .LINK domains on all paid plans",
       description:
-        "We partnered with Nova Registry to offer a <b>1-year free .link custom domain</b> to all paying Checkout customers. By using a custom domain, you get <b>30% higher click-through rates</b> and better brand recognition.",
+        "We partnered with Nova Registry to offer a <b>1-year free .link custom domain</b> to all paying ForeverQRs customers. By using a custom domain, you get <b>30% higher click-through rates</b> and better brand recognition.",
       image: `${CHECKOUT_ASSETS_BASE}/blog/free-dot-link.jpg`,
       cta: {
         text: "Read the announcement",
@@ -142,9 +142,9 @@ export default function DubWrapped({
       },
     },
     {
-      title: "Checkout API General Availability",
+      title: "ForeverQRs API General Availability",
       description:
-        "Our Checkout API went GA, allowing you to build your powerful integrations with Checkout. We also launched <b>native SDKs in 5 different languages</b>: TypeScript, Python, Ruby, PHP, and Go.",
+        "Our ForeverQRs API went GA, allowing you to build your powerful integrations with ForeverQRs. We also launched <b>native SDKs in 5 different languages</b>: TypeScript, Python, Ruby, PHP, and Go.",
       image: `${CHECKOUT_ASSETS_BASE}/blog/dub-api.jpg`,
       cta: {
         text: "Read the announcement",
@@ -158,7 +158,7 @@ export default function DubWrapped({
       <Head />
       <Preview>
         In 2024, you created {nFormatter(stats["Total Links"], { full: true })}{" "}
-        links on Checkout and got{" "}
+        links on ForeverQRs and got{" "}
         {nFormatter(stats["Total Clicks"], { full: true })} clicks.
       </Preview>
       <Tailwind>
@@ -168,12 +168,12 @@ export default function DubWrapped({
               <Img
                 src={CHECKOUT_WORDMARK}
                 height="32"
-                alt="Checkout"
+                alt="ForeverQRs"
                 className="my-0"
               />
             </Section>
             <Heading className="mx-0 mb-4 mt-8 p-0 text-xl font-semibold text-black">
-              Checkout Year in Review 🎊
+              ForeverQRs Year in Review 🎊
             </Heading>
             <Text className="text-sm leading-6 text-black">
               As we put a wrap on 2024, we wanted to say thank you for your
@@ -304,7 +304,7 @@ export default function DubWrapped({
               className="max-w-[200px]"
             />
             <Text className="text-sm leading-6 text-black">
-              and the Checkout team 🎄
+              and the ForeverQRs team 🎄
             </Text>
 
             <Footer email={email} marketing />

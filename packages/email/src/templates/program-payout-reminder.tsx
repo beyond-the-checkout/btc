@@ -63,7 +63,7 @@ export default function ProgramPayoutReminder({
                 src={CHECKOUT_WORDMARK}
                 width="61"
                 height="32"
-                alt="Checkout"
+                alt="ForeverQRs"
               />
             </Section>
 

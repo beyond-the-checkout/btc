@@ -26,7 +26,7 @@ export default function PartnerAccountMerged({
   return (
     <Html>
       <Head />
-      <Preview>Your Checkout partner accounts are now merged</Preview>
+      <Preview>Your ForeverQRs partner accounts are now merged</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-10 py-5">
@@ -34,13 +34,13 @@ export default function PartnerAccountMerged({
               <Img
                 src={CHECKOUT_WORDMARK}
                 height="32"
-                alt="Checkout"
+                alt="ForeverQRs"
                 className="mr-auto"
               />
             </Section>
 
             <Heading className="p-0 text-xl font-semibold text-black">
-              Your Checkout partner accounts are now merged
+              Your ForeverQRs partner accounts are now merged
             </Heading>
 
             <Text className="text-base text-neutral-600">
@@ -50,7 +50,7 @@ export default function PartnerAccountMerged({
 
             <Text className="text-base text-neutral-600">
               The merged account ({sourceEmail}) has been deleted. To use
-              Checkout with that email, a new account will need to be created.
+              ForeverQRs with that email, a new account will need to be created.
             </Text>
 
             <Text className="text-base text-neutral-600">

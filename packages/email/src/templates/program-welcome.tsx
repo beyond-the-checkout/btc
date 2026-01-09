@@ -55,7 +55,7 @@ export default function ProgramWelcome({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading
               className="mt-8 text-lg font-semibold leading-7 text-neutral-900"

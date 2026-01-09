@@ -77,7 +77,7 @@ export default function LinksImported({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               Your {provider} links have been imported
@@ -87,7 +87,7 @@ export default function LinksImported({
               <strong>
                 imported {Intl.NumberFormat("en-us").format(count)} links
               </strong>{" "}
-              from {provider} into your Checkout workspace,{" "}
+              from {provider} into your ForeverQRs workspace,{" "}
               <Link
                 href={`https://app.foreverqrs.com/${workspaceSlug}`}
                 className="font-medium text-blue-600 no-underline"

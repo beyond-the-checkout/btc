@@ -78,7 +78,7 @@ export default function PartnerApplicationReceived({
                 src={CHECKOUT_WORDMARK}
                 width="61"
                 height="32"
-                alt="Checkout"
+                alt="ForeverQRs"
               />
             </Section>
 
@@ -94,7 +94,7 @@ export default function PartnerApplicationReceived({
                 href={applicationUrl}
                 className="text-neutral-600 underline underline-offset-4"
               >
-                review on Checkout
+                review on ForeverQRs
               </Link>
               .
             </Text>
@@ -160,7 +160,7 @@ export default function PartnerApplicationReceived({
                       href={applicationUrl}
                       className="box-border block w-full rounded-lg bg-black px-0 py-4 text-center text-sm font-semibold leading-none text-white no-underline"
                     >
-                      Review application on Checkout
+                      Review application on ForeverQRs
                     </Link>
                   </Section>
                 </Section>

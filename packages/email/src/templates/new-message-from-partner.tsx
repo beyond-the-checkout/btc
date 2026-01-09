@@ -53,7 +53,7 @@ export default function NewMessageFromPartner({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
 
             <Section className="my-8">
@@ -67,7 +67,7 @@ export default function NewMessageFromPartner({
                 className="text-[13px] font-medium text-neutral-500 underline"
                 href={`${CHECKOUT_APP_URL}/${workspaceSlug}/program/partners/${partner.id}`}
               >
-                View profile in Checkout
+                View profile in ForeverQRs
               </Link>
             </Section>
 
@@ -103,7 +103,7 @@ export default function NewMessageFromPartner({
                 className="mt-4 block rounded-lg bg-neutral-900 px-6 py-3 text-center text-[13px] font-medium text-white no-underline"
                 href={`${CHECKOUT_APP_URL}/${workspaceSlug}/program/messages/${partner.id}`}
               >
-                View in Checkout
+                View in ForeverQRs
               </Link>
             </Section>
 

@@ -27,27 +27,27 @@ export default function UpgradeEmail({
   return (
     <Html>
       <Head />
-      <Preview>Thank you for upgrading to Checkout {plan}!</Preview>
+      <Preview>Thank you for upgrading to ForeverQRs {plan}!</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
-              Thank you for upgrading to Checkout {plan}!
+              Thank you for upgrading to ForeverQRs {plan}!
             </Heading>
 
             <Text className="text-sm leading-6 text-black">
               Hey{name && ` ${name}`}!
             </Text>
             <Text className="text-sm leading-6 text-black">
-              My name is Oliver, and I'm one of the co-founders of Checkout.
+              My name is Oliver, and I'm one of the co-founders of ForeverQRs.
             </Text>
             <Text className="text-sm leading-6 text-black">
               I wanted to personally reach out to thank you for upgrading to{" "}
-              <strong>Checkout {plan}</strong>! Your support means the world to
-              us and helps us continue to build and improve Checkout.
+              <strong>ForeverQRs {plan}</strong>! Your support means the world to
+              us and helps us continue to build and improve ForeverQRs.
             </Text>
             <Text className="text-sm leading-6 text-black">
               On the {plan} plan, you now have access to:
@@ -63,11 +63,11 @@ export default function UpgradeEmail({
               </Text>
             ))}
             <Text className="text-sm leading-6 text-black">
-              If you have any questions or feedback about Checkout, please don't
+              If you have any questions or feedback about ForeverQRs, please don't
               hesitate to reach out – I'm always happy to help!
             </Text>
             <Text className="text-sm font-light leading-6 text-neutral-400">
-              Oliver from Checkout
+              Oliver from ForeverQRs
             </Text>
             <Footer email={email} marketing />
           </Container>

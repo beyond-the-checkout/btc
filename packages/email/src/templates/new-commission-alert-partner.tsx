@@ -59,7 +59,7 @@ export default function NewCommissionAlertPartner({
         You just earned {earningsInDollars} in commissions via{" "}
         {shortLink
           ? `your referral link ${getPrettyUrl(shortLink)}`
-          : "Checkout Partners"}
+          : "ForeverQRs Partners"}
       </Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">

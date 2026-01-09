@@ -62,7 +62,7 @@ export default function ConnectPayoutReminder({
                 src={CHECKOUT_WORDMARK}
                 width="65"
                 height="32"
-                alt="Checkout"
+                alt="ForeverQRs"
               />
             </Section>
 
@@ -71,7 +71,7 @@ export default function ConnectPayoutReminder({
             </Heading>
 
             <Text className="text-sm leading-6 text-neutral-600">
-              You have pending rewards on Checkout Partners, but you need to{" "}
+              You have pending rewards on ForeverQRs Partners, but you need to{" "}
               <Link
                 href={`${CHECKOUT_HELP_BASE}/article/receiving-payouts`}
                 className="font-semibold text-black underline"
@@ -115,7 +115,7 @@ export default function ConnectPayoutReminder({
 
             <Text className="text-sm leading-6 text-neutral-600">
               If you haven't already, please create a partner account on
-              Checkout with your <strong className="underline">{email}</strong>{" "}
+              ForeverQRs with your <strong className="underline">{email}</strong>{" "}
               email and set up your payout details.
             </Text>
 

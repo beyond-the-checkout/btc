@@ -39,13 +39,13 @@ export default function NewReferralSignup({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               New referral signup
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              Congratulations – someone just signed up for Checkout using your
+              Congratulations – someone just signed up for ForeverQRs using your
               referral link:{" "}
               <a
                 href={referralLink}
@@ -55,7 +55,7 @@ export default function NewReferralSignup({
               </a>
             </Text>
             <Text className="text-sm leading-6 text-black">
-              As a thank you from us for spreading the word about Checkout, you've
+              As a thank you from us for spreading the word about ForeverQRs, you've
               earned an additional {REFERRAL_SCANS_QUOTA_BONUS} scans quota
               for your{" "}
               <a
@@ -64,7 +64,7 @@ export default function NewReferralSignup({
               >
                 {workspace.name}
               </a>{" "}
-              workspace on Checkout.
+              workspace on ForeverQRs.
             </Text>
             <Section className="my-8">
               <Link

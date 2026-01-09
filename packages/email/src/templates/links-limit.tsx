@@ -49,20 +49,20 @@ export default function LinksLimitAlert({
     <Html>
       <Head />
       <Preview>
-        Your Checkout workspace, {name} has used {percentage.toString()}% of its
+        Your ForeverQRs workspace, {name} has used {percentage.toString()}% of its
         QR codes limit for the month.
       </Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               QR Codes Limit Alert
             </Heading>
             <Text className="text-sm leading-6 text-black">
-              Your Checkout workspace,{" "}
+              Your ForeverQRs workspace,{" "}
               <Link
                 href={`${CHECKOUT_APP_URL}/${slug}`}
                 className="text-black underline"

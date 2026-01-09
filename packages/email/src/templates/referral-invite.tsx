@@ -28,15 +28,15 @@ export default function ReferralInvite({
   return (
     <Html>
       <Head />
-      <Preview>Sign up for Checkout</Preview>
+      <Preview>Sign up for ForeverQRs</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
-              Join Checkout
+              Join ForeverQRs
             </Heading>
             {workspaceUser && workspaceUserEmail ? (
               <Text className="text-sm leading-6 text-black">
@@ -47,11 +47,11 @@ export default function ReferralInvite({
                 >
                   {workspaceUserEmail}
                 </Link>
-                ) has invited you to start using Checkout – the transparent QR platform with guaranteed longevity!
+                ) has invited you to start using ForeverQRs – the transparent QR platform with guaranteed longevity!
               </Text>
             ) : (
               <Text className="text-sm leading-6 text-black">
-                You have been invited to start using Checkout – the transparent QR platform with guaranteed longevity!
+                You have been invited to start using ForeverQRs – the transparent QR platform with guaranteed longevity!
               </Text>
             )}
             <Section className="mb-8 mt-8">

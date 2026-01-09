@@ -55,7 +55,7 @@ export default function LinksImportErrors({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               Some {provider} links have failed to import
@@ -63,7 +63,7 @@ export default function LinksImportErrors({
             <Text className="text-sm leading-6 text-black">
               The following{" "}
               {Intl.NumberFormat("en-us").format(errorLinks.length)} links from{" "}
-              {provider} failed to import into your Checkout workspace,{" "}
+              {provider} failed to import into your ForeverQRs workspace,{" "}
               <Link
                 href={`https://app.foreverqrs.com/${workspaceSlug}`}
                 className="font-medium text-blue-600 no-underline"

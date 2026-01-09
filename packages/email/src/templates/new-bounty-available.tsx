@@ -53,7 +53,7 @@ export default function NewBountyAvailable({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-8 max-w-[600px] px-8 py-8">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
 
             <Heading className="bt-5 mx-0 mt-10 p-0 text-lg font-medium text-black">

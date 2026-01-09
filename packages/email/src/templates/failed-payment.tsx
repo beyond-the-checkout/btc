@@ -38,7 +38,7 @@ export default function FailedPayment({
         <Body className="mx-auto my-auto bg-white font-sans">
           <Container className="mx-auto my-10 max-w-[600px] rounded border border-solid border-neutral-200 px-10 py-5">
             <Section className="mt-8">
-              <Img src={CHECKOUT_WORDMARK} height="32" alt="Checkout" />
+              <Img src={CHECKOUT_WORDMARK} height="32" alt="ForeverQRs" />
             </Section>
             <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
               {attemptCount == 2 ? "2nd " : attemptCount == 3 ? "3rd  " : ""}
@@ -50,7 +50,7 @@ export default function FailedPayment({
             <Text className="text-sm leading-6 text-black">
               Your payment of{" "}
               <code className="text-purple-600">${amountDue / 100}</code> for
-              your Checkout workspace{" "}
+              your ForeverQRs workspace{" "}
               <code className="text-purple-600">{workspace.name}</code> has
               failed. Please update your payment information in your account
               settings using the link below:

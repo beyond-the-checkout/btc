@@ -33,7 +33,7 @@ export default function VerifyEmailForAccountMerge({
               <Img
                 src={CHECKOUT_WORDMARK}
                 height="32"
-                alt="Checkout"
+                alt="ForeverQRs"
                 className="mr-auto"
               />
             </Section>
