@@ -106,7 +106,7 @@ export const CHECKOUT_WORDMARK =
 export const CHECKOUT_LOGO =
   "https://assets.foreverqrs.com/assets/foreverqrs_logo_transparent.png";
 export const CHECKOUT_LOGO_SQUARE =
-  "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg";
+  "https://assets.foreverqrs.com/assets/foreverqrs_logo_transparent.png";
 export const CHECKOUT_THUMBNAIL =
   "https://assets.foreverqrs.com/assets/thumbnail.jpg";
 export const CHECKOUT_ASSETS_BASE = "https://assets.foreverqrs.com";
