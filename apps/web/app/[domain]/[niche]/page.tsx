@@ -1,10 +1,17 @@
 import { constructMetadata, isMarketingDomain, NicheSlug } from "@dub/utils";
 import { redirect } from "next/navigation";
 
-import { getNicheConfig, hasNicheConfig } from "@/lib/niches";
+import { getNicheConfig, hasNicheConfig, NICHE_CONFIGS } from "@/lib/niches";
 import NichePlaceholderContent from "./placeholder";
 
 export const revalidate = false;
+
+export async function generateStaticParams() {
+  return Array.from(NICHE_CONFIGS.keys()).map((niche) => ({
+    domain: "foreverqrs.com",
+    niche,
+  }));
+}
 
 export async function generateMetadata(props: {
   params: Promise<{ domain: string; niche: string }>;
@@ -32,5 +39,5 @@ export default async function NicheLandingPage(props: {
     return redirect("/");
   }
 
-  return <NichePlaceholderContent />;
+  return <NichePlaceholderContent domain={domain} niche={niche} />;
 }

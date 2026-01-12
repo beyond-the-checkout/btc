@@ -1,13 +1,12 @@
 "use client";
 
 import { PosthogPageview } from "@/ui/layout/posthog-pageview";
-import { Analytics as DubAnalytics } from "@dub/analytics/react";
 import {
   KeyboardShortcutProvider,
   TooltipProvider,
   useRemoveGAParams,
 } from "@dub/ui";
-import PlausibleProvider from "next-plausible";
+
 import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { ReactNode } from "react";
@@ -27,29 +26,11 @@ export default function RootProviders({ children }: { children: ReactNode }) {
 
   return (
     <PostHogProvider client={posthog}>
-      <PlausibleProvider
-        domain="dub.co"
-        revenue
-        scriptProps={{
-          src: "/_proxy/plausible/script.js",
-          // @ts-ignore
-          "data-api": "/_proxy/plausible/event",
-        }}
-      />
       <TooltipProvider>
         <KeyboardShortcutProvider>
           <Toaster className="pointer-events-auto" closeButton />
           <PosthogPageview />
           {children}
-          <DubAnalytics
-            apiHost="/_proxy/dub"
-            cookieOptions={{
-              domain: process.env.VERCEL === "1" ? ".dub.co" : "localhost",
-            }}
-            domainsConfig={{
-              refer: "refer.dub.co",
-            }}
-          />
         </KeyboardShortcutProvider>
       </TooltipProvider>
     </PostHogProvider>

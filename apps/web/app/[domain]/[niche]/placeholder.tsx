@@ -1,7 +1,4 @@
-"use client";
-
 import { getNicheConfig } from "@/lib/niches";
-import { LinkLandingQRCreator } from "@/ui/modals/link-landing-qr-modal";
 import { CTA } from "@/ui/placeholders/cta";
 import { FaqSection } from "@/ui/placeholders/faq-section";
 import { FeaturesSection } from "@/ui/placeholders/features-section";
@@ -11,12 +8,20 @@ import Logos from "@/ui/placeholders/logos";
 import { PainSection } from "@/ui/placeholders/pain-section";
 import { PricingSection } from "@/ui/placeholders/pricing-section";
 import { SolutionSection } from "@/ui/placeholders/solution-section";
+import { QRCreatorClient } from "./qr-creator-client";
+
 import { cn, NicheSlug } from "@dub/utils";
-import { useParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function NichePlaceholderContent() {
-  const { domain, niche } = useParams() as { domain: string; niche: string };
+type NichePlaceholderContentProps = {
+  domain: string;
+  niche: string;
+};
 
+export default function NichePlaceholderContent({
+  domain,
+  niche,
+}: NichePlaceholderContentProps) {
   const config = getNicheConfig(niche as NicheSlug);
 
   if (!config) {
@@ -28,6 +33,18 @@ export default function NichePlaceholderContent() {
     utm_medium: "Niche Landing",
     utm_campaign: niche,
   };
+
+  const qrPlaceholder = (
+    <div className="flex flex-col items-center gap-4">
+      <div
+        className="h-[220px] w-[220px] animate-pulse rounded-lg bg-neutral-200"
+        aria-label="Loading QR code editor"
+      />
+      <p className="text-center text-sm text-neutral-500">
+        Loading QR editor...
+      </p>
+    </div>
+  );
 
   return (
     <div>
@@ -55,7 +72,9 @@ export default function NichePlaceholderContent() {
               "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:400ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
-            <LinkLandingQRCreator ctaText={config.hero.ctaText} />
+            <Suspense fallback={qrPlaceholder}>
+              <QRCreatorClient ctaText={config.hero.ctaText} />
+            </Suspense>
             {config.hero.belowCtaText && (
               <p className="mt-3 text-sm text-neutral-500 sm:text-base">
                 {config.hero.belowCtaText}

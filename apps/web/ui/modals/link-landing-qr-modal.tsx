@@ -33,7 +33,7 @@ import { QRCode } from "@/ui/shared/qr-code";
 import { Button, IconMenu, Modal, ShimmerDots, useMediaQuery } from "@dub/ui";
 import { Photo, Sliders, Sparkle3 } from "@dub/ui/icons";
 import { APP_DOMAIN, cn, nanoid } from "@dub/utils";
-import { AnimatePresence, motion } from "motion/react";
+
 import {
   Dispatch,
   SetStateAction,
@@ -385,88 +385,79 @@ function LinkLandingQRModalInner({
                     {!isMobile && (
                       <ShimmerDots className="opacity-10 [mask-image:radial-gradient(50%_50%,transparent_40%,black)]" />
                     )}
-                    <AnimatePresence mode="wait">
-                      {url ? (
-                        <motion.div
-                          key={
-                            draft.fgColor +
-                            draft.qrHideLogo +
-                            draft.qrDotType +
-                            draft.qrCornerSquareType +
-                            draft.qrCornerDotType +
-                            draft.qrShape +
-                            draft.hasFrame +
-                            (draft.qrFrameStyle || "") +
-                            (draft.qrFrameColor || "") +
-                            (draft.qrDotsColor || "") +
-                            (draft.qrCornerSquareColor || "") +
-                            (draft.qrCornerDotColor || "")
-                          }
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.95 }}
-                          transition={{ duration: 0.25, ease: "easeOut" }}
-                          className="relative flex size-full items-center justify-center p-4"
-                        >
-                          <QRCode
-                            url={url}
-                            fgColor={draft.qrDotsColor || draft.fgColor}
-                            hideLogo={draft.qrHideLogo}
-                            logo={logo}
-                            scale={2.2}
-                            qrShape={draft.qrShape}
-                            dotsOptions={{
-                              type: draft.qrDotType,
-                              color: draft.qrDotsColor || draft.fgColor,
-                            }}
-                            eyeOptions={{
-                              cornerSquare: {
-                                type: draft.qrCornerSquareType,
-                                color:
-                                  draft.qrCornerSquareColor || draft.fgColor,
-                              },
-                              cornerDot: {
-                                type: draft.qrCornerDotType,
-                                color: draft.qrCornerDotColor || draft.fgColor,
-                              },
-                            }}
-                            frameOptions={frameOptions}
-                          />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="sample-qr"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="relative flex size-full flex-col items-center justify-center gap-4 p-4"
-                        >
-                          <QRCode
-                            url="https://foreverqrs.com"
-                            fgColor="#a3a3a3"
-                            logo={logo}
-                            scale={2.2}
-                            qrShape="square"
-                            dotsOptions={{
+                    {url ? (
+                      <div
+                        key={
+                          draft.fgColor +
+                          draft.qrHideLogo +
+                          draft.qrDotType +
+                          draft.qrCornerSquareType +
+                          draft.qrCornerDotType +
+                          draft.qrShape +
+                          draft.hasFrame +
+                          (draft.qrFrameStyle || "") +
+                          (draft.qrFrameColor || "") +
+                          (draft.qrDotsColor || "") +
+                          (draft.qrCornerSquareColor || "") +
+                          (draft.qrCornerDotColor || "")
+                        }
+                        className="animate-fade-in relative flex size-full items-center justify-center p-4 motion-reduce:animate-none"
+                      >
+                        <QRCode
+                          url={url}
+                          fgColor={draft.qrDotsColor || draft.fgColor}
+                          hideLogo={draft.qrHideLogo}
+                          logo={logo}
+                          scale={2.2}
+                          qrShape={draft.qrShape}
+                          dotsOptions={{
+                            type: draft.qrDotType,
+                            color: draft.qrDotsColor || draft.fgColor,
+                          }}
+                          eyeOptions={{
+                            cornerSquare: {
+                              type: draft.qrCornerSquareType,
+                              color: draft.qrCornerSquareColor || draft.fgColor,
+                            },
+                            cornerDot: {
+                              type: draft.qrCornerDotType,
+                              color: draft.qrCornerDotColor || draft.fgColor,
+                            },
+                          }}
+                          frameOptions={frameOptions}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        key="sample-qr"
+                        className="animate-fade-in relative flex size-full flex-col items-center justify-center gap-4 p-4 motion-reduce:animate-none"
+                      >
+                        <QRCode
+                          url="https://foreverqrs.com"
+                          fgColor="#a3a3a3"
+                          logo={logo}
+                          scale={2.2}
+                          qrShape="square"
+                          dotsOptions={{
+                            type: "square",
+                            color: "#a3a3a3",
+                          }}
+                          eyeOptions={{
+                            cornerSquare: {
                               type: "square",
                               color: "#a3a3a3",
-                            }}
-                            eyeOptions={{
-                              cornerSquare: {
-                                type: "square",
-                                color: "#a3a3a3",
-                              },
-                              cornerDot: {
-                                type: "square",
-                                color: "#a3a3a3",
-                              },
-                            }}
-                          />
-                          <p className="text-center text-sm text-neutral-400">
-                            Enter a URL to generate your QR code
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                            },
+                            cornerDot: {
+                              type: "square",
+                              color: "#a3a3a3",
+                            },
+                          }}
+                        />
+                        <p className="text-center text-sm text-neutral-400">
+                          Enter a URL to generate your QR code
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Customize toggle button - sits at bottom of preview card */}
@@ -487,26 +478,17 @@ function LinkLandingQRModalInner({
               </div>
 
               {/* Customization Panel - slides in from right */}
-              {/* popLayout removes exiting element from flow so it animates from its last position */}
-              <AnimatePresence mode="popLayout">
-                {isCustomizing && (
-                  <motion.div
-                    initial={{ opacity: 0, x: isMobile ? 0 : 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: isMobile ? 0 : 24 }}
-                    transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-                    className="flex h-[620px] max-h-[calc(100vh-12rem)] w-full flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-neutral-200/80 bg-neutral-50/80 p-5 shadow-sm backdrop-blur-sm max-lg:max-w-md lg:w-[448px]"
-                  >
-                    <h3 className="mb-3 flex-shrink-0 text-sm font-semibold text-neutral-900">
-                      Customize
-                    </h3>
-                    <div className="scrollbar-thin scrollbar-thumb-neutral-300/50 scrollbar-track-transparent hover:scrollbar-thumb-neutral-400/70 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
-                      <QRCustomizationSection />
-                      <QRColorSection />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {isCustomizing && (
+                <div className="animate-fade-in flex h-[620px] max-h-[calc(100vh-12rem)] w-full flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-neutral-200/80 bg-neutral-50/80 p-5 shadow-sm backdrop-blur-sm motion-reduce:animate-none max-lg:max-w-md lg:w-[448px]">
+                  <h3 className="mb-3 flex-shrink-0 text-sm font-semibold text-neutral-900">
+                    Customize
+                  </h3>
+                  <div className="scrollbar-thin scrollbar-thumb-neutral-300/50 scrollbar-track-transparent hover:scrollbar-thumb-neutral-400/70 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+                    <QRCustomizationSection />
+                    <QRColorSection />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
