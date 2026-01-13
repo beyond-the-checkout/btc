@@ -244,6 +244,7 @@ function LinkLandingQRModalInner({
 
   // Use centralized logo resolution for landing surface (always DUB_QR_LOGO)
   const logo = resolveLogo("landing");
+  const hideLogo = false;
 
   // Local QR state seeded from provider's initial design
   const [draft, setDraft] = useState<QRCodeDesign>(
@@ -266,9 +267,9 @@ function LinkLandingQRModalInner({
     return buildQrRenderData(draft, {
       url,
       logo,
-      hideLogo: draft.qrHideLogo,
+      hideLogo,
     });
-  }, [url, draft, logo]);
+  }, [url, draft, logo, hideLogo]);
 
   // Frame options derived from render data for context compatibility
   const frameOptions = renderData?.frameOptions;
@@ -310,7 +311,7 @@ function LinkLandingQRModalInner({
       setDraft,
       url,
       logo, // Use resolved logo from centralized utility
-      hideLogo: draft.qrHideLogo,
+      hideLogo,
       frameOptions,
       qrData,
       qrDataForActions: qrData,
@@ -327,6 +328,7 @@ function LinkLandingQRModalInner({
       setDraft,
       url,
       logo,
+      hideLogo,
       frameOptions,
       qrData,
       linkProps,
@@ -389,7 +391,6 @@ function LinkLandingQRModalInner({
                       <div
                         key={
                           draft.fgColor +
-                          draft.qrHideLogo +
                           draft.qrDotType +
                           draft.qrCornerSquareType +
                           draft.qrCornerDotType +
@@ -406,7 +407,7 @@ function LinkLandingQRModalInner({
                         <QRCode
                           url={url}
                           fgColor={draft.qrDotsColor || draft.fgColor}
-                          hideLogo={draft.qrHideLogo}
+                          hideLogo={hideLogo}
                           logo={logo}
                           scale={2.2}
                           qrShape={draft.qrShape}
@@ -435,6 +436,7 @@ function LinkLandingQRModalInner({
                         <QRCode
                           url="https://foreverqrs.com"
                           fgColor="#a3a3a3"
+                          hideLogo={hideLogo}
                           logo={logo}
                           scale={2.2}
                           qrShape="square"

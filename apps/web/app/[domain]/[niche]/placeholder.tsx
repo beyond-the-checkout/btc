@@ -11,7 +11,6 @@ import { SolutionSection } from "@/ui/placeholders/solution-section";
 import { QRCreatorClient } from "./qr-creator-client";
 
 import { cn, NicheSlug } from "@dub/utils";
-import { Suspense } from "react";
 
 type NichePlaceholderContentProps = {
   domain: string;
@@ -34,18 +33,6 @@ export default function NichePlaceholderContent({
     utm_campaign: niche,
   };
 
-  const qrPlaceholder = (
-    <div className="flex flex-col items-center gap-4">
-      <div
-        className="h-[220px] w-[220px] animate-pulse rounded-lg bg-neutral-200"
-        aria-label="Loading QR code editor"
-      />
-      <p className="text-center text-sm text-neutral-500">
-        Loading QR editor...
-      </p>
-    </div>
-  );
-
   return (
     <div>
       <Hero>
@@ -53,7 +40,6 @@ export default function NichePlaceholderContent({
           <h1
             className={cn(
               "font-display mt-4 text-center text-3xl font-medium text-neutral-900 sm:text-4xl sm:leading-tight",
-              "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:20px] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
             {config.hero.headline}
@@ -61,20 +47,12 @@ export default function NichePlaceholderContent({
           <p
             className={cn(
               "mt-3 max-w-3xl text-balance text-center text-sm text-neutral-700 sm:text-base",
-              "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:10px] [animation-delay:200ms] [animation-duration:1s] [animation-fill-mode:both]",
             )}
           >
             {config.hero.subheadline}
           </p>
-          <div
-            className={cn(
-              "mt-8 flex flex-col items-center",
-              "animate-slide-up-fade motion-reduce:animate-fade-in [--offset:5px] [animation-delay:400ms] [animation-duration:1s] [animation-fill-mode:both]",
-            )}
-          >
-            <Suspense fallback={qrPlaceholder}>
-              <QRCreatorClient ctaText={config.hero.ctaText} />
-            </Suspense>
+          <div className={cn("mt-8 flex flex-col items-center")}>
+            <QRCreatorClient ctaText={config.hero.ctaText} />
             {config.hero.belowCtaText && (
               <p className="mt-3 text-sm text-neutral-500 sm:text-base">
                 {config.hero.belowCtaText}
