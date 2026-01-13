@@ -22,7 +22,6 @@ console.warn = (...args) => {
 module.exports = withAxiom({
   reactStrictMode: false,
   transpilePackages: [
-    "shiki",
     "@dub/prisma",
     "@dub/email",
     "@dub/utils",

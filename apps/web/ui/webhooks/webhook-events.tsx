@@ -11,7 +11,7 @@ import {
 } from "@dub/ui";
 import { CircleCheck, CircleHalfDottedClock, Copy } from "@dub/ui/icons";
 import { PropsWithChildren, useEffect, useState } from "react";
-import { Highlighter } from "shiki";
+import type { Highlighter } from "shiki";
 import { toast } from "sonner";
 import { X } from "../shared/icons";
 

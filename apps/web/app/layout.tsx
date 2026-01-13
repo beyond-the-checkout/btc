@@ -1,6 +1,7 @@
 import { GoogleTag } from "@/lib/tracking-pixels";
 import { geistMono, inter, satoshi } from "@/styles/fonts";
 import "@/styles/globals.css";
+import "@dub/ui/styles";
 import { cn, constructMetadata } from "@dub/utils";
 import Script from "next/script";
 import RootProviders from "./providers";

@@ -1,3 +1,4 @@
+import { ForeverQRsLogo } from "@/ui/branding/foreverqrs-logo";
 import { FlagWavy, QRCode } from "@dub/ui";
 import { cn } from "@dub/utils";
 import { CSSProperties } from "react";
@@ -35,10 +36,9 @@ export function Domains() {
               style={{ "--idx": idx } as CSSProperties}
             >
               <div className="flex-none rounded-full border border-neutral-200 bg-gradient-to-t from-neutral-100 p-2">
-                {/* ForeverQRs logo */}
-                <img
-                  src="https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg"
-                  alt="ForeverQRs"
+                <ForeverQRsLogo
+                  variant="white"
+                  size="sm"
                   className="size-6 object-contain sm:size-6"
                 />
                 {/* ORIGINAL LOGO (commented out) */}

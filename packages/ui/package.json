@@ -2,7 +2,11 @@
   "name": "@dub/ui",
   "description": "UI components for Dub",
   "version": "0.2.66",
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css",
+    "./dist/styles.mjs",
+    "./dist/styles.js"
+  ],
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -24,6 +28,11 @@
       "types": "./dist/charts/index.d.ts",
       "import": "./dist/charts/index.mjs",
       "require": "./dist/charts/index.js"
+    },
+    "./styles": {
+      "types": "./dist/styles.d.ts",
+      "import": "./dist/styles.mjs",
+      "require": "./dist/styles.js"
     }
   },
   "scripts": {

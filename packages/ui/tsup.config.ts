@@ -5,6 +5,7 @@ export default defineConfig((options: Options) => ({
     index: "src/index.tsx",
     "icons/index": "src/icons/index.tsx",
     "charts/index": "src/charts/index.ts",
+    styles: "src/styles.ts",
   },
 
   format: ["esm"],

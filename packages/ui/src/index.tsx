@@ -1,6 +1,3 @@
-// styles
-import "./styles.css";
-
 // components
 export * from "./accordion";
 export * from "./alert";
@@ -41,6 +38,7 @@ export * from "./switch";
 export * from "./table";
 export * from "./toggle-group";
 export * from "./tooltip";
+export * from "./tooltip-advanced-link-features";
 export * from "./utm-builder";
 
 // hooks
@@ -72,7 +70,6 @@ export * from "./motion-constants";
 export * from "./popup";
 export * from "./progress-bar";
 export * from "./tab-select";
-export * from "./tooltip-advanced-link-features";
 
 // logos
 export * from "./composite-logo";
