@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { cn } from "@dub/utils";
+import Image from "next/image";
 
 type LogoVariant = "white" | "transparent";
 type LogoSize = "sm" | "md" | "lg";
@@ -7,7 +7,7 @@ type LogoSize = "sm" | "md" | "lg";
 const LOGO_SOURCES: Record<LogoVariant, string> = {
   white: "https://assets.foreverqrs.com/assets/foreverqrs_logo_white.jpeg",
   transparent:
-    "https://assets.foreverqrs.com/assets/foreverqrs_logo_transparent.png",
+    "https://assets.foreverqrs.com/assets/foreverqrs_logo_transparent.webp",
 };
 
 const LOGO_SIZES: Record<LogoSize, number> = {
