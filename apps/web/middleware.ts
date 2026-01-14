@@ -1,4 +1,5 @@
 import {
+  AdminMiddleware,
   ApiMiddleware,
   AppMiddleware,
   AxiomMiddleware,
@@ -7,6 +8,7 @@ import {
 } from "@/lib/middleware";
 import { parse } from "@/lib/middleware/utils";
 import {
+  ADMIN_HOSTNAMES,
   API_HOSTNAMES,
   APP_HOSTNAMES,
   DEFAULT_REDIRECTS,
@@ -44,6 +46,11 @@ export default async function middleware(req: NextRequest, ev: NextFetchEvent) {
   // for API
   if (API_HOSTNAMES.has(domain)) {
     return ApiMiddleware(req);
+  }
+
+  // for Admin
+  if (ADMIN_HOSTNAMES.has(domain)) {
+    return AdminMiddleware(req);
   }
 
   // for public stats pages (e.g. d.to/stats/try)
