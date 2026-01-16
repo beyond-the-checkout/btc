@@ -98,6 +98,7 @@ export function CreateWorkspaceForm({
               workspace_id: workspaceId,
               workspace_name: data.name,
               workspace_slug: data.slug,
+              source: "manual_form",
             });
             await Promise.all([mutate("/api/workspaces"), update()]);
             onSuccess?.(data);

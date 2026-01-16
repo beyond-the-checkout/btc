@@ -43,6 +43,7 @@ import {
   parseQROnboardingSeed,
   QR_ONBOARDING_SEED_COOKIE,
 } from "@/lib/onboarding/qr/seed";
+import { captureServerEvent, flushPostHog } from "@/lib/posthog/server";
 import {
   qrDesignToLinkQRFields,
   sanitizeQrFieldsForPlan,
@@ -51,6 +52,7 @@ import { PlanProps } from "@/lib/types";
 import { redis } from "@/lib/upstash";
 import { prisma } from "@dub/prisma";
 import { getUrlFromString } from "@dub/utils";
+import { waitUntil } from "@vercel/functions";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -180,6 +182,12 @@ export async function GET(req: Request) {
             },
           });
           workspaceSlug = newWorkspace.slug;
+          void captureServerEvent(userId, "workspace_created", {
+            source: "qr_onboarding",
+            workspace_id: newWorkspace.id,
+            workspace_name: newWorkspace.slug,
+            workspace_slug: newWorkspace.slug,
+          });
         } catch (error) {
           console.error("Failed to create workspace for sign-up path:", error);
           // Clear stale cookie and redirect to / - middleware will route appropriately
@@ -207,6 +215,7 @@ export async function GET(req: Request) {
         name: QR_ONBOARDING_SEED_COOKIE,
         ...cookieOpts,
       });
+      waitUntil(flushPostHog());
       return response;
     }
 
@@ -226,7 +235,12 @@ export async function GET(req: Request) {
     }
 
     // 5. Determine target workspace
-    let workspace: { id: string; slug: string; plan: PlanProps } | null = null;
+    let workspace: {
+      id: string;
+      slug: string;
+      plan: PlanProps;
+      name?: string;
+    } | null = null;
 
     // Check if user has a default workspace
     const user = await prisma.user.findUnique({
@@ -248,7 +262,7 @@ export async function GET(req: Request) {
             some: { userId },
           },
         },
-        select: { id: true, slug: true, plan: true },
+        select: { id: true, slug: true, plan: true, name: true },
       });
 
       if (existingWorkspace) {
@@ -270,6 +284,12 @@ export async function GET(req: Request) {
             image: user?.image,
             defaultWorkspace: user?.defaultWorkspace,
           },
+        });
+        void captureServerEvent(userId, "workspace_created", {
+          source: "qr_onboarding",
+          workspace_id: workspace.id,
+          workspace_name: workspace.name ?? workspace.slug,
+          workspace_slug: workspace.slug,
         });
       } catch (error) {
         console.error("Failed to create workspace:", error);
@@ -322,6 +342,14 @@ export async function GET(req: Request) {
       }
 
       const link = await createLink(fallbackResult.link);
+      void captureServerEvent(userId, "link_created", {
+        source: "qr_onboarding",
+        link_id: link.id,
+        domain: link.domain,
+        key: link.key,
+        url: link.url,
+        workspace_id: workspace.id,
+      });
 
       // 7. Verify link is fully committed before redirect
       await prisma.$queryRaw`SELECT 1 FROM Link WHERE id = ${link.id}`;
@@ -336,15 +364,25 @@ export async function GET(req: Request) {
 
       // 10. Redirect to dashboard - DO NOT delete cookie here!
       // The cookie is kept alive so WelcomeModal can read the QR design for download.
-      return NextResponse.redirect(
+      const response = NextResponse.redirect(
         new URL(
           `/${workspace.slug}/links?onboarded=true&source=qr-landing&qrLinkId=${link.id}`,
           origin,
         ),
       );
+      waitUntil(flushPostHog());
+      return response;
     }
 
     const link = await createLink(processedResult.link);
+    void captureServerEvent(userId, "link_created", {
+      source: "qr_onboarding",
+      link_id: link.id,
+      domain: link.domain,
+      key: link.key,
+      url: link.url,
+      workspace_id: workspace.id,
+    });
 
     // 7. Verify link is fully committed before redirect
     // This guards against potential read-replica lag in PlanetScale/Vitess
@@ -365,12 +403,14 @@ export async function GET(req: Request) {
     // The cookie is kept alive so WelcomeModal can read the QR design for download.
     // WelcomeModal will clear the cookie after the user downloads the QR.
     // Duplicate link creation is prevented by the Redis consumption check above.
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       new URL(
         `/${workspace.slug}/links?onboarded=true&source=qr-landing&qrLinkId=${link.id}`,
         origin,
       ),
     );
+    waitUntil(flushPostHog());
+    return response;
   } catch (error) {
     console.error("QR bootstrap route error:", error);
     // On any unexpected error, clear cookie and redirect to / - middleware will route appropriately
