@@ -2,11 +2,16 @@ import { DubApiError, handleAndReturnErrorResponse } from "@/lib/api/errors";
 import { verifyQstashSignature } from "@/lib/cron/verify-qstash";
 import { sendEmail } from "@dub/email";
 import { subscribe } from "@dub/email/resend";
-import WelcomeEmail from "@dub/email/templates/welcome-email";
 import WelcomeEmailPartner from "@dub/email/templates/welcome-email-partner";
 import { prisma } from "@dub/prisma";
 import { Redis } from "@upstash/redis";
 import { z } from "zod";
+
+// Brevo list ID for welcome sequence - must be explicitly configured
+// Production: 3, Staging: 6
+const BREVO_WELCOME_LIST_ID = process.env.BREVO_WELCOME_LIST_ID
+  ? parseInt(process.env.BREVO_WELCOME_LIST_ID, 10)
+  : null;
 
 const redis = (() => {
   try {
@@ -104,43 +109,94 @@ export const POST = async (req: Request) => {
         user.defaultPartnerId || (user.partners && user.partners.length > 0),
       );
 
-      // Choose audience based on partner status
-      const audience = isPartner
-        ? "partners.foreverqrs.com"
-        : "app.foreverqrs.com";
+      if (isPartner) {
+        // Partners: Use existing Resend flow
+        const audience = "partners.foreverqrs.com";
 
-      // Subscribe to Resend audience (non-fatal - don't block welcome email if this fails)
-      if (user.subscribed) {
-        try {
-          await subscribe({
-            email: user.email,
-            name: user.name,
-            audience,
+        if (user.subscribed) {
+          try {
+            await subscribe({
+              email: user.email,
+              name: user.name,
+              audience,
+            });
+          } catch (error) {
+            console.error(
+              `Failed to subscribe ${user.email} to ${audience}:`,
+              error,
+            );
+          }
+        }
+
+        await sendEmail({
+          to: user.email,
+          subject: "Welcome to ForeverQRs Partners!",
+          react: WelcomeEmailPartner({ name: user.name, email: user.email }),
+          variant: "marketing",
+        });
+
+        return new Response(
+          `Welcome email sent to partner ${user.email}`,
+        );
+      }
+
+      // Non-partners: Add to Brevo welcome sequence list
+      // The Brevo automation will handle the 5-email nurture series
+      const brevoApiKey = process.env.BREVO_API_KEY;
+      if (!brevoApiKey) {
+        // No API key - log and skip (useful for local development)
+        // Clear dedupe key so user can be processed when API key is configured
+        if (redis && dedupeLocked && dedupeKey) {
+          await redis.del(dedupeKey);
+        }
+        console.log(
+          `[Brevo] Skipping - no API key configured. Would add ${user.email} to welcome sequence`,
+        );
+        return new Response(
+          `Brevo API key not configured - skipped adding ${user.email} to welcome sequence`,
+          { status: 200 },
+        );
+      }
+
+      if (!BREVO_WELCOME_LIST_ID) {
+        throw new DubApiError({
+          code: "internal_server_error",
+          message: "BREVO_WELCOME_LIST_ID not configured",
+        });
+      }
+
+      const firstName = user.name?.split(" ")[0] || "";
+
+      const brevoResponse = await fetch("https://api.brevo.com/v3/contacts", {
+        method: "POST",
+        headers: {
+          "api-key": brevoApiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: user.email,
+          attributes: { FIRSTNAME: firstName },
+          listIds: [BREVO_WELCOME_LIST_ID],
+          updateEnabled: true,
+        }),
+      });
+
+      if (!brevoResponse.ok) {
+        const errorText = await brevoResponse.text();
+        console.error(
+          `Brevo API error for ${user.email}: ${brevoResponse.status} ${errorText}`,
+        );
+        // Don't throw - contact may already exist, which is fine
+        if (brevoResponse.status !== 400) {
+          throw new DubApiError({
+            code: "internal_server_error",
+            message: `Brevo API error: ${brevoResponse.status}`,
           });
-        } catch (error) {
-          console.error(
-            `Failed to subscribe ${user.email} to ${audience}:`,
-            error,
-          );
-          // Continue to send welcome email even if subscription fails
         }
       }
 
-      // Send welcome email (transactional - always send regardless of subscribed status)
-      // Welcome emails are considered transactional as they confirm account creation
-      await sendEmail({
-        to: user.email,
-        subject: isPartner
-          ? "Welcome to ForeverQRs Partners!"
-          : "Welcome to ForeverQRs!",
-        react: isPartner
-          ? WelcomeEmailPartner({ name: user.name, email: user.email })
-          : WelcomeEmail({ name: user.name, email: user.email }),
-        variant: "marketing",
-      });
-
       return new Response(
-        `Welcome email sent to ${user.email} (partner: ${isPartner})`,
+        `Added ${user.email} to Brevo welcome sequence (list ${BREVO_WELCOME_LIST_ID})`,
       );
     } catch (error) {
       if (redis && dedupeLocked && dedupeKey) {
