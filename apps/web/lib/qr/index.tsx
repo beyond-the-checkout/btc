@@ -800,16 +800,6 @@ function generateCornerDotsString(
             }
           } else if (neighborCount === 2 && !hasOpposites) {
             // Two perpendicular neighbors: corner-rounded (round the corner WITHOUT neighbors)
-            console.log("[SVG Export] Perpendicular corner detected:", {
-              x,
-              y,
-              left,
-              right,
-              top,
-              bottom,
-              localSize,
-              useExtraRounded,
-            });
             // Cap radius to avoid gaps between adjacent dots
             const r = useExtraRounded
               ? localSize

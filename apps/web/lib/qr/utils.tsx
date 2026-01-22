@@ -759,7 +759,6 @@ function generateCornerDots(numCells: number, margin: number, dotType: DotType):
             }
           } else if (neighborCount === 2 && !hasOpposites) {
             // Two perpendicular neighbors: corner-rounded (round the corner WITHOUT neighbors)
-            console.log('[Border Dot] Perpendicular corner detected:', { x, y, left, right, top, bottom, localSize, useExtraRounded });
             // Cap radius to avoid gaps between adjacent dots
             const r = useExtraRounded ? localSize : Math.min(localSize / 2, 0.45);
             if (left && top) {
